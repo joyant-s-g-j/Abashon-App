@@ -8,7 +8,7 @@ const SignIn = () => {
   const handleLogin = () => {}
 
   return (
-    <SafeAreaView className='bg-white flex-1 h-full'>
+    <SafeAreaView className='bg-white h-full'>
       <ScrollView contentContainerClassName='h-full'>
         <Image
           source={images.onboarding}
