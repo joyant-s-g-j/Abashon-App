@@ -1,3 +1,4 @@
+import Search from "@/components/Search";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import { Link } from "expo-router";
@@ -18,6 +19,7 @@ export default function Index() {
           </View>
           <Image source={icons.bell} className="size-6" />
         </View>
+        <Search />
       </View>
     </SafeAreaView>
   );
