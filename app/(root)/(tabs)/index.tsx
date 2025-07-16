@@ -1,4 +1,5 @@
 import { Card, FeaturedCard } from "@/components/Cards";
+import Filters from "@/components/Filters";
 import Search from "@/components/Search";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
@@ -35,21 +36,22 @@ export default function Index() {
           <FeaturedCard />
           <FeaturedCard />
           <FeaturedCard />
-        </View>  
-      </View>
+        </View>
 
-      <View className="flex px-5 pt-5 flex-row items-center justify-between">
-        <Text className="text-xl font-rubik-bold text-black-300">Our Recommendation</Text>
-        <TouchableOpacity>
-          <Text className="text-base font-rubik-bold text-primary-300">See All</Text>
-        </TouchableOpacity>
-      </View>
+        <View className="flex mt-5 flex-row items-center justify-between">
+          <Text className="text-xl font-rubik-bold text-black-300">Our Recommendation</Text>
+          <TouchableOpacity>
+            <Text className="text-base font-rubik-bold text-primary-300">See All</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View className="flex px-4 flex-row gap-4">
-        <Card />
-        <Card />
-      </View> 
-      
+        <Filters />
+
+        <View className="flex flex-row gap-4 mt-2">
+          <Card />
+          <Card />
+        </View>   
+      </View>   
     </SafeAreaView>
   );
 }
