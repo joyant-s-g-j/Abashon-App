@@ -1,13 +1,39 @@
-import express from "express"
-import dotenv from "dotenv"
+import express from "express";
+import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import authRoutes from "./routes/auth.route.js"; // Assuming this is your route file
+import { connectDB } from "./lib/db.js";
 
-dotenv.config()
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5000;
 
-app.use(express.json({ limit: "10mb" }))
-app.use(cookieParser())
+// Connect to MongoDB
+connectDB();
 
-app.use("/api/auth",)
+// Middleware
+app.use(express.json({ limit: "10mb" }));
+app.use(cookieParser());
+
+// CORS setup for React Native (Expo)
+app.use(
+  cors({
+    origin: "http://localhost:8081", // Replace with your Expo dev server IP if needed
+    credentials: true,
+  })
+);
+
+// Routes
+app.use("/api/auth", authRoutes);
+
+// Health check
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
