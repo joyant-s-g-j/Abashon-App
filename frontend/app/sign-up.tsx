@@ -3,14 +3,16 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import images from '@/constants/images'
-import { Link } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native'
 
 const SignUp = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const router = useRouter()
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -47,6 +49,7 @@ const SignUp = () => {
         }
       );
       console.log('Signup Success:', response.data);
+      router.push("/login")
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error('Login Failed:', error.response?.data || error.message);
