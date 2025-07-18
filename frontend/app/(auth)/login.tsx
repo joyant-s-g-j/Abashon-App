@@ -5,6 +5,7 @@ import images from '@/constants/images'
 import { Link, useRouter } from 'expo-router'
 import axios from 'axios';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const login = () => {
   const [email, setEmail] = useState('');
@@ -44,7 +45,9 @@ const login = () => {
       );
 
       console.log('Login Success:', response.data);
-      router.push("/(root)/(tabs)")
+      await AsyncStorage.setItem('user', JSON.stringify(response.data.user || response.data));
+      // Redirect to home (tabs/index)
+      router.replace("/");
     } catch (error) {
       if (axios.isAxiosError(error)) {
       console.error('Login Failed:', error.response?.data || error.message);
