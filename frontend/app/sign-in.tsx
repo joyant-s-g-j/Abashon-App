@@ -3,9 +3,14 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import images from '@/constants/images'
 import icons from '@/constants/icons'
+import { router } from 'expo-router'
 
 const SignIn = () => {
-  const handleLogin = () => {}
+  const handleGoogleLogin = () => {}
+
+   const handleNavigateToLogin = () => {
+    router.push('/login')
+  }
 
   return (
     <SafeAreaView className='bg-white h-full'>
@@ -25,12 +30,21 @@ const SignIn = () => {
               Start your search today
             </Text>
           </Text>
-          <Text className='text-lg font-rubik text-black-200 text-center mt-12'>
+          <Text className='text-lg font-rubik text-black-200 text-center mt-4'>
             Login to Abashon with Google
           </Text>
 
           <TouchableOpacity 
-            onPress={handleLogin}
+            onPress={handleNavigateToLogin}
+            className='bg-primary-300 shadow-md shadow-zinc-400 rounded-full w-full py-4 mt-5'
+          >
+            <Text className='text-lg font-rubik-medium text-white text-center'>
+              Login
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={handleGoogleLogin}
             className='bg-white shadow-md shadow-zinc-400 rounded-full w-full py-4 mt-5'
           >
             <View className='flex flex-row items-center justify-center gap-2'>
