@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import icons from '@/constants/icons'
 import images from '@/constants/images'
 import { settings } from '@/constants/data'
+import { useRouter } from 'expo-router'
 
 interface SettingsItemProps {
   icon: ImageSourcePropType;
@@ -27,7 +28,14 @@ const SettingsItem = ({icon, title, onPress, textStyle, showArrow = true }: Sett
 }
 
 const profile = () => {
-  const handleLogout = async () => {}
+  const router = useRouter()
+  const handleLogout = async () => {
+    try {
+      router.replace('/login');
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
   return (
     <SafeAreaView>
       <ScrollView
@@ -67,7 +75,7 @@ const profile = () => {
         </View>
 
         <View className='flex flex-col mt-5 border-t pt-5 border-primary-200'>
-          <SettingsItem 
+          <SettingsItem
             icon={icons.logout} 
             title='Logout' 
             textStyle='text-danger' 
