@@ -1,6 +1,5 @@
 import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
-import bcrypt from "bcryptjs"
 
 export const signup = async (req, res) => {
     const {name, email, password} = req.body
@@ -15,18 +14,15 @@ export const signup = async (req, res) => {
 
         if (user) return res.status(400).json({message: "Email already exists"});
 
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password,salt)
-
         const newUser = new User({
             name,
             email,
-            password: hashedPassword
+            password
         })
 
         if(newUser) {
-            generateToken(newUser._id,res);
             await newUser.save();
+            generateToken(newUser._id,res);
             
             res.status(201).json({
                 _id:newUser._id,
@@ -44,31 +40,33 @@ export const signup = async (req, res) => {
 }
 
 export const login = async (req, res) => {
-    const {email, password} = req.body
+    const { email, password } = req.body;
     try {
-        const user = await User.findOne({email})
+        const user = await User.findOne({ email });
 
-        if(!user) {
-            return res.status(400).json({message: "Invalid credentials"})
+        if (!user) {
+            return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password, user.password)
-        if(!isPasswordCorrect) {
-            return res.status(400).json({message: "Invalid credentials"})
+        const isPasswordCorrect = await user.comparePassword(password);
+        if (!isPasswordCorrect) {
+            return res.status(400).json({ message: "Password incorrect" });
         }
-        generateToken(user._id, res)
+
+        generateToken(user._id, res);
 
         res.status(200).json({
-            _id:user._id,
+            _id: user._id,
             name: user.name,
-            email:user.email,
-            profilePic: user.profilePic, 
-        })
+            email: user.email,
+            profilePic: user.profilePic,
+        });
     } catch (error) {
         console.log("Error in login controller", error.message);
-        res.status(500).json({message: "Internal Server Error"});
+        res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
+
 
 export const logout = (req, res) => {
     try {

@@ -3,13 +3,33 @@ import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import images from '@/constants/images'
 import { Link } from 'expo-router'
+import axios from 'axios';
 
 const login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    console.log('Logging in with:', email, password);
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(
+        'http://192.168.0.101:5000/api/auth/login',
+        {
+          email: email,
+          password: password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log('Login Success:', response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+      console.error('Login Failed:', error.response?.data || error.message);
+    } else {
+      console.error('An unexpected error occurred:', error);
+    }
+    }
   };
   return (
     <SafeAreaView className="bg-white h-full">

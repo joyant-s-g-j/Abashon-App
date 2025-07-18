@@ -20,7 +20,7 @@ app.use(cookieParser());
 // CORS setup for React Native (Expo)
 app.use(
   cors({
-    origin: "http://localhost:8081", // Replace with your Expo dev server IP if needed
+    origin: "*", // Replace with your Expo dev server IP if needed
     credentials: true,
   })
 );
