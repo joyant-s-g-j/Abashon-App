@@ -9,14 +9,42 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.joyant.abashon",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "abashon",
+            "CFBundleURLSchemes": ["abashon"]
+          }
+        ]
+      }
     },
     "android": {
+      "package": "com.joyant.abashon",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "auth.expo.dev",
+              "pathPrefix": "/@joyant_s_g_j/abashon"
+            },
+            {
+              "scheme": "abashon"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -24,6 +52,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "expo-dev-client",
       "expo-router",
       [
         "expo-splash-screen",
@@ -50,6 +79,17 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "762cae6e-27e8-4400-80c4-56e5c9c064fe"
+      },
+      "expoClientId": "190106511692-iikvq7bnhndvscmej10lcc1uqolre172.apps.googleusercontent.com"
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/762cae6e-27e8-4400-80c4-56e5c9c064fe"
     }
   }
 }

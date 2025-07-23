@@ -8,7 +8,7 @@ const explore = () => {
     <SafeAreaView className="bg-white h-full">
         <Text>explore</Text>
       <Link href="/sign-in">Sign In</Link>
-      <Link href="/login">Sign In</Link>
+      {/* <Link href="/login">Sign In</Link> */}
     </SafeAreaView>
   )
 }

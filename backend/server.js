@@ -20,7 +20,7 @@ app.use(cookieParser());
 // CORS setup for React Native (Expo)
 app.use(
   cors({
-    origin: "*", // Replace with your Expo dev server IP if needed
+    origin: ['http://localhost:19006', 'http://192.168.0.105:19006'], // Replace with your Expo dev server IP if needed
     credentials: true,
   })
 );
@@ -31,6 +31,12 @@ app.use("/api/auth", authRoutes);
 // Health check
 app.get("/", (req, res) => {
   res.send("API is running...");
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err.message);
+  res.status(500).json({ message: 'Something went wrong!' });
 });
 
 // Start the server

@@ -38,7 +38,7 @@ const SignUp = () => {
   const handleSignup = async () => {
     try {
       const response = await axios.post(
-        'http://192.168.0.101:5000/api/auth/signup',
+        'http://192.168.0.105:5000/api/auth/signup',
         {
           name: name,
           email: email,
@@ -52,7 +52,7 @@ const SignUp = () => {
       router.push("/login")
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error('Login Failed:', error.response?.data || error.message);
+        console.error('Login Failed:', error?.response?.data || error?.message);
       } else {
         console.error('An unexpected error occurred:', error);
       }

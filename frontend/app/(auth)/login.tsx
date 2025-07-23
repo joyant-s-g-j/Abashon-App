@@ -6,6 +6,7 @@ import { Link, useRouter } from 'expo-router'
 import axios from 'axios';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { API_BASE_URL } from '@env'
 
 const login = () => {
   const [email, setEmail] = useState('');
@@ -34,7 +35,7 @@ const login = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        'http://192.168.0.101:5000/api/auth/login',
+        `${API_BASE_URL}/api/auth/login`,
         {
           email: email,
           password: password,
@@ -50,7 +51,7 @@ const login = () => {
       router.replace("/");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-      console.error('Login Failed:', error.response?.data || error.message);
+      console.error('Login Failed:', error?.response?.data || error?.message);
     } else {
       console.error('An unexpected error occurred:', error);
     }
