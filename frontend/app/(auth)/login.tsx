@@ -6,14 +6,13 @@ import { Link, useRouter } from 'expo-router'
 import axios from 'axios';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { API_BASE_URL } from '@env'
 
 const login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const router = useRouter()
-
+  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow', () => {

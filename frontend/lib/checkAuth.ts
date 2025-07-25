@@ -5,9 +5,10 @@ import axios from "axios";
 export const isLoggedIn = async (): Promise<boolean> => {
   try {
     const token = await AsyncStorage.getItem("token");
+    const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
     if (!token) return false;
 
-    const res = await axios.get("http://192.168.0.101:5000/api/auth/check", {
+    const res = await axios.get(`${API_BASE_URL}/api/auth/check`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

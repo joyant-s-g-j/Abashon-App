@@ -5,7 +5,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import images from '@/constants/images'
 import { Link, useRouter } from 'expo-router'
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native'
 
 const SignUp = () => {
   const [name, setName] = useState('')
@@ -13,6 +12,7 @@ const SignUp = () => {
   const [password, setPassword] = useState('')
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const router = useRouter()
+  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -38,7 +38,7 @@ const SignUp = () => {
   const handleSignup = async () => {
     try {
       const response = await axios.post(
-        'http://192.168.0.105:5000/api/auth/signup',
+        `${API_BASE_URL}/api/auth/signup`,
         {
           name: name,
           email: email,

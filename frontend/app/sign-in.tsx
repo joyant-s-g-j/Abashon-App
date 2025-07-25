@@ -6,11 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import images from '@/constants/images';
 import icons from '@/constants/icons';
-import { API_BASE_URL, GOOGLE_CLIENT_ID, REDIRECT_URI } from '@env';
 
 const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showWebView, setShowWebView] = useState(false);
+  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
+  const GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID
+  const REDIRECT_URI = process.env.REDIRECT_URI || 'http://localhost:19006'
   
   const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${GOOGLE_CLIENT_ID}&` +

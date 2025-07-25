@@ -39,3 +39,8 @@ yarn-error.*
 app-example
 
 .env
+
+eas.json.backup
+debug.keystore.backup
+/android
+/ios

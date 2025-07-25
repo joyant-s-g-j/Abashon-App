@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "abashon",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.joyant.abashon",
@@ -52,7 +51,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-dev-client",
       "expo-router",
       [
         "expo-splash-screen",
@@ -86,10 +84,6 @@
         "projectId": "762cae6e-27e8-4400-80c4-56e5c9c064fe"
       },
       "expoClientId": "190106511692-iikvq7bnhndvscmej10lcc1uqolre172.apps.googleusercontent.com"
-    },
-    "runtimeVersion": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/762cae6e-27e8-4400-80c4-56e5c9c064fe"
     }
   }
 }
