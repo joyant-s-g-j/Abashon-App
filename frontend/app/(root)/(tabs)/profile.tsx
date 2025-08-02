@@ -1,10 +1,11 @@
 import { View, Text, ScrollView, Image, TouchableOpacity, ImageSourcePropType } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import icons from '@/constants/icons'
 import images from '@/constants/images'
 import { settings } from '@/constants/data'
 import { useRouter } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 interface SettingsItemProps {
   icon: ImageSourcePropType;
@@ -29,6 +30,27 @@ const SettingsItem = ({icon, title, onPress, textStyle, showArrow = true }: Sett
 
 const profile = () => {
   const router = useRouter()
+  const [user, setUser] = useState<null | {
+    name: string;
+    email: string;
+    profilePic: string;
+  }>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem('user')
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser)
+          setUser(parsedUser)
+        }
+      } catch (error) {
+        console.error('Failed to load user:', error)
+      }
+    };
+    fetchUser();
+  }, [])
+
   const handleLogout = async () => {
     try {
       router.replace('/sign-in');
@@ -50,15 +72,22 @@ const profile = () => {
         <View className='flex-row justify-center flex mt-5'>
           <View className='flex flex-col items-center relative mt-5'>
             <Image
-              source={images.avatar}
+              source={
+                user?.profilePic === "local" || !user?.profilePic
+                  ? images.avatar
+                  : { uri: user.profilePic }
+              }
               className='size-44 relative rounded-full'
             />
-            <TouchableOpacity className='absolute bottom-11 right-10'>
+            {/* <TouchableOpacity className='absolute bottom-11 right-4'>
               <Image source={icons.edit} className='size-9' />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <Text className='text-2xl font-rubik-bold mt-2'>
-              Joyant Sheikhar Gupta Joy
+              {user?.name}
+            </Text>
+            <Text className='text-base font-rubik text-black-200'>
+              {user?.email}
             </Text>
           </View>
         </View>

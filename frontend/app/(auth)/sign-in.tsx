@@ -70,7 +70,7 @@ const SignIn = () => {
 
       if (response.ok && data.success) {
         // Store user data
-        await AsyncStorage.setItem('userData', JSON.stringify(data));
+        await AsyncStorage.setItem('user', JSON.stringify(data.user || data));
 
         Alert.alert(
           'Success!',

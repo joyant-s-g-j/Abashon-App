@@ -1,4 +1,3 @@
-// app/(root)/_layout.tsx
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Slot } from "expo-router";
 
