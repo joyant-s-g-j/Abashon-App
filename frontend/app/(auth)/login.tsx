@@ -47,7 +47,7 @@ const login = () => {
       console.log('Login Success:', response.data);
       await AsyncStorage.setItem('user', JSON.stringify(response.data.user || response.data));
       // Redirect to home (tabs/index)
-      router.replace("/");
+      router.replace("/(root)/(tabs)");
     } catch (error) {
       if (axios.isAxiosError(error)) {
       console.error('Login Failed:', error?.response?.data || error?.message);

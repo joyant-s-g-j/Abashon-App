@@ -31,7 +31,7 @@ const profile = () => {
   const router = useRouter()
   const handleLogout = async () => {
     try {
-      router.replace('/login');
+      router.replace('/sign-in');
     } catch (error) {
       console.error("Logout failed:", error);
     }

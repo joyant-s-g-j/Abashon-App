@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, ScrollView, Alert, Modal } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import images from '@/constants/images';
 import icons from '@/constants/icons';
 
@@ -45,56 +45,56 @@ const SignIn = () => {
   };
 
   const exchangeCodeForToken = async (code: string) => {
-  setIsLoading(true);
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/google/code`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        code: code,
-        redirectUri: REDIRECT_URI,
-      }),
-    });
-
-    const text = await response.text();
-
-    let data;
+    setIsLoading(true);
     try {
-      data = JSON.parse(text);
-    } catch (parseError) {
-      Alert.alert('Error', 'Invalid response from server. Please try again.');
-      return;
-    }
+      const response = await fetch(`${API_BASE_URL}/api/auth/google/code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: code,
+          redirectUri: REDIRECT_URI,
+        }),
+      });
 
-    if (response.ok && data.success) {
-      // Store user data
-      await AsyncStorage.setItem('userData', JSON.stringify(data));
+      const text = await response.text();
 
-      Alert.alert(
-        'Success!',
-        `Welcome ${data.name}! You have successfully signed in.`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              router.replace('/(root)/(tabs)');
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        Alert.alert('Error', 'Invalid response from server. Please try again.');
+        return;
+      }
+
+      if (response.ok && data.success) {
+        // Store user data
+        await AsyncStorage.setItem('userData', JSON.stringify(data));
+
+        Alert.alert(
+          'Success!',
+          `Welcome ${data.name}! You have successfully signed in.`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                router.replace('/(root)/(tabs)');
+              },
             },
-          },
-        ]
-      );
-    } else {
-      Alert.alert('Error', data.message || 'Authentication failed');
-    }
+          ]
+        );
+      } else {
+        Alert.alert('Error', data.message || 'Authentication failed');
+      }
 
-  } catch (error) {
-    console.error('❌ Code exchange error:', error);
-    Alert.alert('Error', 'Authentication failed. Please try again.');
-  } finally {
-    setIsLoading(false);
-  }
-};
+    } catch (error) {
+      console.error('❌ Code exchange error:', error);
+      Alert.alert('Error', 'Authentication failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
@@ -117,10 +117,15 @@ const SignIn = () => {
             Find your dream home easily{"\n"}
             <Text className="text-primary-300">Start your search today</Text>
           </Text>
-          <Text className="text-lg font-rubik text-black-200 text-center mt-4">
-            Login to Abashon with Google
-          </Text>
 
+          <TouchableOpacity
+            className='bg-blue-500 rounded-full w-full py-4 mt-4 items-center'
+          >
+            <Link href="/login" className='text-lg font-rubik-medium text-white'>
+              Continue with Email
+            </Link>
+          </TouchableOpacity>
+          
           <TouchableOpacity
             onPress={handleGoogleLogin}
             disabled={isLoading}
@@ -139,6 +144,7 @@ const SignIn = () => {
               </Text>
             </View>
           </TouchableOpacity>
+          
         </View>
       </ScrollView>
 

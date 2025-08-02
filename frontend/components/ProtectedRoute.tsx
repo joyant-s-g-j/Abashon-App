@@ -15,11 +15,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         if (user) {
           setIsLoggedIn(true);
         } else {
-          router.replace('/login'); // redirect to login if not logged in
+          router.replace('/sign-in');
         }
       } catch (error) {
         console.error('Error checking login:', error);
-        router.replace('/login');
+        router.replace('/sign-in');
       } finally {
         setLoading(false);
       }
