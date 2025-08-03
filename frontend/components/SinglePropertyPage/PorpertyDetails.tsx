@@ -53,7 +53,7 @@ const PorpertyDetails = () => {
       <View className='flex-row justify-between mt-3'>
         <TouchableOpacity className='flex-row gap-2'>
           <Image source={icons.star} className='size-5' />
-          <Text className='text-black-300 font-rubik-semibold text-lg'>4.8 (1,275 reviews)</Text>
+          <Text className='text-black-300 font-rubik-semibold text-lg'>4.8 (12 reviews)</Text>
         </TouchableOpacity>
         <TouchableOpacity>
           <Text className='text-primary-300 font-rubik-semibold text-lg'>See All</Text>

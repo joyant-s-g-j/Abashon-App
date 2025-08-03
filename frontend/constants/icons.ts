@@ -20,6 +20,7 @@ import bed from "@/assets/icons/bed.png";
 import bath from "@/assets/icons/bath.png";
 import area from "@/assets/icons/area.png";
 import chat from "@/assets/icons/chat.png";
+import email from "@/assets/icons/email.png"
 import phone from "@/assets/icons/phone.png";
 import carPark from "@/assets/icons/car-park.png";
 import cutlery from "@/assets/icons/cutlery.png";
@@ -55,6 +56,7 @@ export default {
   bath,
   area,
   chat,
+  email,
   phone,
   carPark,
   cutlery,

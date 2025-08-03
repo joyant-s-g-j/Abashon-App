@@ -1,4 +1,4 @@
-import { View, Text, Image } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Linking } from 'react-native'
 import React from 'react'
 import icons from '@/constants/icons'
 import IconText from './IconText'
@@ -33,13 +33,17 @@ const PropertInfo = () => {
             <View className='flex-row gap-3 items-center'>
                 <Image source={images.avatar} className='size-14 rounded-full' />
                 <View className='flex-col'>
-                    <Text className='text-lg font-rubik-semibold text-black-300'>Joyant Sheikhar</Text>
-                    <Text className='text-base font-rubik text-black-200'>Owner</Text>
+                  <Text className='text-lg font-rubik-semibold text-black-300'>Joyant Sheikhar</Text>
+                  <Text className='text-base font-rubik text-black-200'>Owner</Text>
                 </View>
             </View>
             <View className='flex-row gap-3 items-center'>
-                <Image source={icons.chat} className='size-8' />
+              <TouchableOpacity onPress={() => Linking.openURL('mailto:agent@example.com')}>
+                <Image source={icons.email} className='size-8' />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Linking.openURL('tel:+123456789')}>
                 <Image source={icons.phone} className='size-8' />
+              </TouchableOpacity>
             </View>
         </View>
       </View>
