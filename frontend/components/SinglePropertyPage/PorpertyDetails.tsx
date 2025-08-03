@@ -1,11 +1,11 @@
-import { View, Text, Image } from 'react-native'
+import { View, Text, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Heading from './Heading'
 import IconText from './IconText'
 import Gallery from './Gallery'
 import { facilities, gallery } from '@/constants/data'
-import icons from '@/constants/icons'
 import Location from './Location'
+import icons from '@/constants/icons'
 
 const PorpertyDetails = () => {
   const galleryImages = gallery.map(item => item.image)
@@ -49,6 +49,16 @@ const PorpertyDetails = () => {
       </View>
       {/* location */}
       <Location />
+      {/* Ratings */}
+      <View className='flex-row justify-between mt-3'>
+        <TouchableOpacity className='flex-row gap-2'>
+          <Image source={icons.star} className='size-5' />
+          <Text className='text-black-300 font-rubik-semibold text-lg'>4.8 (1,275 reviews)</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text className='text-primary-300 font-rubik-semibold text-lg'>See All</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
