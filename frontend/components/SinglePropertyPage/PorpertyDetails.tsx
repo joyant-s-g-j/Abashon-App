@@ -1,11 +1,13 @@
-import { View, Text } from 'react-native'
+import { View, Text, Image } from 'react-native'
 import React from 'react'
 import Heading from './Heading'
 import IconText from './IconText'
 import Gallery from './Gallery'
 import { facilities, gallery } from '@/constants/data'
+import icons from '@/constants/icons'
+import Location from './Location'
 
-const PorpertyInfoTwo = () => {
+const PorpertyDetails = () => {
   const galleryImages = gallery.map(item => item.image)
   const handleImagePress = (index: number) => {
     // Handle individual image press
@@ -45,8 +47,10 @@ const PorpertyInfoTwo = () => {
             onViewAllPress={handleViewAllPress}
         />
       </View>
+      {/* location */}
+      <Location />
     </View>
   )
 }
 
-export default PorpertyInfoTwo
+export default PorpertyDetails

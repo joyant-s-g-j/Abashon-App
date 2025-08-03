@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import images from '@/constants/images'
 import ImageSlider from '@/components/SinglePropertyPage/ImageSlider'
 import PropertInfo from '@/components/SinglePropertyPage/PropertInfo'
-import PorpertyInfoTwo from '@/components/SinglePropertyPage/PorpertyInfoTwo'
 import { gallery } from '@/constants/data'
+import PorpertyDetails from '@/components/SinglePropertyPage/PorpertyDetails'
 
 const Property = () => {
   // const {id} = useLocalSearchParams()
@@ -17,7 +17,7 @@ const Property = () => {
         <ImageSlider images={galleryImages} />
         <View className='p-4'>
           <PropertInfo />
-          <PorpertyInfoTwo />
+          <PorpertyDetails />
         </View>
       </ScrollView>
     </SafeAreaView>
