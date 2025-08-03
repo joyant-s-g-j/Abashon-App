@@ -77,7 +77,7 @@ export const ExploreCard = ({ onPress }: Props) => {
             onPress={onPress}
             className='flex-row items-center w-full mt-4 px-4 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70'
         >
-            {/* Image with rating */}
+            
             <View className='relative'>
                 <Image source={images.newYork} className='w-28 h-28 rounded-lg' />
                 
