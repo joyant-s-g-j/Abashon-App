@@ -16,7 +16,7 @@ export function useNavigateToProperty() {
         if(onPress) {
             onPress();
         }
-        router.push(`/properties/${id}`);
+        router.replace(`/properties/${id}`);
     }
     return { navigateToProperty }
 }
