@@ -50,10 +50,10 @@ const login = () => {
       router.replace("/(root)/(tabs)");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-      console.error('Login Failed:', error?.response?.data || error?.message);
-    } else {
-      console.error('An unexpected error occurred:', error);
-    }
+        console.error('Login Failed:', error?.response?.data || error?.message);
+      } else {
+        console.error('An unexpected error occurred:', error);
+      }
     }
   };
 
