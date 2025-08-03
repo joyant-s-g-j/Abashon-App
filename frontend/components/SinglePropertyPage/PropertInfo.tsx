@@ -8,7 +8,7 @@ import Heading from './Heading'
 
 const PropertInfo = () => {
   return (
-    <View className='p-4'>
+    <View>
       <View className='flex-col gap-3'>
         <Heading title='Modern Appartment' size='text-3xl' />
         {/* category and rating */}
