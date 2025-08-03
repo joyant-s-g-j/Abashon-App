@@ -31,7 +31,7 @@ useEffect(() => {
     <SafeAreaView className="bg-white h-full">
       <FlatList
         data={[1, 2, 3, 4]}
-        renderItem={({item}) => <Card />}
+        renderItem={({item}) => <Card id={item.toString()} />}
         keyExtractor={(item) => item.toString()}
         numColumns={2}
         contentContainerClassName="pb-32"
@@ -69,7 +69,7 @@ useEffect(() => {
 
               <FlatList
                 data={[1, 2, 3]}
-                renderItem={({item}) => <FeaturedCard />}
+                renderItem={({item}) => <FeaturedCard id={item.toString()} />}
                 keyExtractor={(item) => item.toString()}
                 horizontal
                 bounces={false}

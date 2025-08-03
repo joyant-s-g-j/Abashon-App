@@ -12,7 +12,7 @@ const explore = () => {
     <SafeAreaView className="bg-white h-full">
       <FlatList
         data={[1, 2, 3, 4]}
-        renderItem={({item}) => <ExploreCard />}
+        renderItem={({item}) => <ExploreCard id={item.toString()} />}
         keyExtractor={(item) => item.toString()}
         contentContainerClassName="pb-32 px-4"
         showsVerticalScrollIndicator={false}
