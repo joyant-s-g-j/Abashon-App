@@ -2,14 +2,29 @@ import { View, Text, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import images from '@/constants/images'
 import icons from '@/constants/icons'
+import { useRouter } from 'expo-router'
 
 interface Props {
+    id: string
     onPress?: () => void
 }
 
-export const FeaturedCard = ({ onPress }: Props) => {
+export function useNavigateToProperty() {
+    const router = useRouter()
+
+    function navigateToProperty(id: string, onPress?: () => void) {
+        if(onPress) {
+            onPress();
+        }
+        router.push(`/properties/${id}`);
+    }
+    return { navigateToProperty }
+}
+
+export const FeaturedCard = ({id, onPress }: Props) => {
+  const { navigateToProperty } = useNavigateToProperty();
   return (
-    <TouchableOpacity onPress={onPress} className='flex flex-col items-start w-60 h-80 relative'>
+    <TouchableOpacity onPress={() => navigateToProperty(id, onPress)} className='flex flex-col items-start w-60 h-80 relative'>
         
         <Image source={images.japan} className='size-full rounded-2xl' />
         <Image source={images.cardGradient} className='size-full rounded-2xl absolute bottom-0' />
@@ -39,10 +54,11 @@ export const FeaturedCard = ({ onPress }: Props) => {
   )
 }
 
-export const Card = ({onPress}: Props) => {
+export const Card = ({id, onPress}: Props) => {
+  const { navigateToProperty } = useNavigateToProperty();
   return (
     <TouchableOpacity 
-        onPress={onPress} 
+        onPress={() => navigateToProperty(id, onPress)}
         className='flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative'
     >
       <View className='flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50'>
@@ -71,13 +87,14 @@ export const Card = ({onPress}: Props) => {
   )
 }
 
-export const ExploreCard = ({ onPress }: Props) => {
+export const ExploreCard = ({ id, onPress }: Props) => {
+    const { navigateToProperty } = useNavigateToProperty();
     return (
         <TouchableOpacity
-            onPress={onPress}
+            onPress={() => navigateToProperty(id, onPress)}
             className='flex-row items-center w-full mt-4 px-4 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70'
         >
-            
+            {/* Image with rating */}
             <View className='relative'>
                 <Image source={images.newYork} className='w-28 h-28 rounded-lg' />
                 
