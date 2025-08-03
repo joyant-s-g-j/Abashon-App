@@ -104,28 +104,20 @@ export const settings = [
 
 export const facilities = [
   {
-    title: "Laundry",
-    icon: icons.laundry,
-  },
-  {
     title: "Car Parking",
     icon: icons.carPark,
   },
   {
-    title: "Sports Center",
-    icon: icons.run,
-  },
-  {
-    title: "Cutlery",
-    icon: icons.cutlery,
+    title: "Swimming",
+    icon: icons.swim,
   },
   {
     title: "Gym",
     icon: icons.dumbell,
   },
   {
-    title: "Swimming pool",
-    icon: icons.swim,
+    title: "Dining Area",
+    icon: icons.cutlery,
   },
   {
     title: "Wifi",
@@ -134,6 +126,14 @@ export const facilities = [
   {
     title: "Pet Center",
     icon: icons.dog,
+  },
+  {
+    title: "Sports Center",
+    icon: icons.run,
+  },
+  {
+    title: "Laundry",
+    icon: icons.laundry,
   },
 ];
 

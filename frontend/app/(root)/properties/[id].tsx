@@ -6,17 +6,15 @@ import images from '@/constants/images'
 import ImageSlider from '@/components/SinglePropertyPage/ImageSlider'
 import PropertInfo from '@/components/SinglePropertyPage/PropertInfo'
 import PorpertyInfoTwo from '@/components/SinglePropertyPage/PorpertyInfoTwo'
+import { gallery } from '@/constants/data'
 
 const Property = () => {
   // const {id} = useLocalSearchParams()
-  const imageBox = [
-    images.japan,
-    images.newYork,
-  ]
+  const galleryImages = gallery.map(item => item.image)
   return (
     <SafeAreaView>
       <ScrollView>
-        <ImageSlider images={imageBox} />
+        <ImageSlider images={galleryImages} />
         <View className='p-4'>
           <PropertInfo />
           <PorpertyInfoTwo />
