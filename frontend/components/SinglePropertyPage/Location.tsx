@@ -17,20 +17,20 @@ const Location = () => {
         </View>
         {/* Google map */}
         <View 
-            className='mt-3 overflow-hidden rounded-xl'
-            style={{ width: width - 32, height: 200 }}
+          className='mt-3 overflow-hidden rounded-xl'
+          style={{ width: width - 32, height: 200 }}
         >
-            <MapView
-                style={{ flex: 1 }}
-                initialRegion={{
-                    latitude: LATITUDE,
-                    longitude: LONGITUDE,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01
-                }}
-            >
-                <Marker coordinate={{ latitude: LATITUDE, longitude: LONGITUDE }} />
-            </MapView>
+          <MapView
+            style={{ flex: 1 }}
+            initialRegion={{
+                latitude: LATITUDE,
+                longitude: LONGITUDE,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01
+            }}
+          >
+            <Marker coordinate={{ latitude: LATITUDE, longitude: LONGITUDE }} />
+          </MapView>
         </View>
       </View>
   )
