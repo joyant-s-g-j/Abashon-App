@@ -1,6 +1,7 @@
 // components/ImageSlider.tsx
 import icons from '@/constants/icons';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
+
 import React, { useState } from 'react';
 import { View, Image, Dimensions, Text, TouchableOpacity } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
@@ -13,7 +14,7 @@ interface Props {
 
 const ImageSlider: React.FC<Props> = ({ images }) => {
   const [active, setActive] = useState(0);
-
+  const router = useRouter()
   return (
     <View className="relative h-[250px]">
       <Carousel
@@ -35,7 +36,10 @@ const ImageSlider: React.FC<Props> = ({ images }) => {
       />
       {/* upper content */}
       <View className="absolute top-3 left-3 right-3 flex-row items-center justify-between z-10">
-        <TouchableOpacity onPress={() => router.back()} className='bg-primary-200 rounded-full size-11 items-center justify-center'>
+        <TouchableOpacity 
+          onPress={() => router.replace('/(root)/(tabs)')}
+          className='bg-primary-200 rounded-full size-11 items-center justify-center'
+        >
           <Image source={icons.backArrow} className='size-6' />
         </TouchableOpacity>
 

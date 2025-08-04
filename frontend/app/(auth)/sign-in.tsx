@@ -119,11 +119,12 @@ const SignIn = () => {
           </Text>
 
           <TouchableOpacity
+            onPress={() => router.replace('/login')}
             className='bg-blue-500 rounded-full w-full py-4 mt-4 items-center'
           >
-            <Link href="/login" className='text-lg font-rubik-medium text-white'>
+            <Text className='text-lg font-rubik-medium text-white'>
               Continue with Email
-            </Link>
+            </Text>
           </TouchableOpacity>
           
           <TouchableOpacity
