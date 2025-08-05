@@ -1,6 +1,7 @@
 import express from "express"
-import { checkAuth, googleAuth, googleAuthWithAccessToken, googleAuthWithCode, googleAuthWithUserData, login, logout, signup } from "../controllers/auth.controller.js"
+import { checkAuth, login, logout, signup } from "../controllers/auth.controller.js"
 import { protectRoute } from "../middleware/auth.middleware.js"
+import { googleAuth, googleAuthWithAccessToken, googleAuthWithCode, googleAuthWithUserData } from "../controllers/googleAuth.controller.js"
 
 const router = express.Router()
 

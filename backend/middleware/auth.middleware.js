@@ -28,3 +28,11 @@ export const protectRoute = async (req, res, next) => {
         res.status(500).json({message: "Internal Server Error"});
     }
 }
+
+export const adminRoute = async (req, res, next) => {
+    if(req.user && req.user.role === "admin") {
+        next()
+    } else {
+        return res.status(403).json({ message: "Access denied - Admin Only" })
+    }
+}
