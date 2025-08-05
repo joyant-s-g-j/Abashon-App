@@ -104,3 +104,68 @@ export const getPropertyById = async (req, res) => {
         res.status(500).json({ success: false, message: "Server Error", error: error.message })
     }
 }
+
+export const createProperty = async (req, res) => {
+    try {
+        const {
+            name,
+            thumnailImage,
+            type,
+            specifications,
+            owner,
+            description,
+            facilities,
+            galleryImages,
+            location,
+            price,
+            isFeatured
+        } = req.body;
+
+        if( !name || !thumnailImage || !specifications || !description || !location || !price) {
+            return res.status(400).json({ success: false, message: "Please provide all required fields" });
+        }
+
+        if(!location.latitude || !location.longtitude || !location.addess) {
+            return res.status(400).json({ success: false, message: "Please provide complete location information"})
+        }
+
+        if(!specifications.bed || !specifications.bath || !specifications.area) {
+            return res.status(400).json({ success: false, message: "Please provide all specifications (bed, bath, area)"})
+        }
+
+        if(type && !mongoose.Types.ObjectId.isValid(type)) {
+            return res.status(400).json({ success: false, message: "Invalid category Id"})
+        }
+
+        if(owner && !mongoose.Types.ObjectId.isValid(owner)) {
+            return res.status(400).json({ success: false, message: "Invalid owner Id"})
+        }
+
+        if(facilities && !mongoose.Types.ObjectId.isValid(facilities)) {
+            return res.status(400).json({ success: false, message: "Invalid facility Id"})
+        }
+
+        const property = await Property.create({
+            name,
+            thumnailImage,
+            type,
+            specifications,
+            owner,
+            description,
+            facilities,
+            galleryImages: galleryImages || [],
+            location,
+            price,
+            isFeatured: isFeatured || false
+        })
+
+        const populatedProperty = await Property.findById(property._id)
+            .populate('type', 'name')
+            .populate('owner', 'name email')
+            .populate('facilities', 'name');
+        
+        res.status(201).json({ success: true, data: populatedProperty, message: "Property created successfully"})
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error", error: error.message })        
+    }
+}
