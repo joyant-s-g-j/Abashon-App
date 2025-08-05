@@ -36,7 +36,7 @@ export const getAllFacilites = async (req, res) => {
     }
 }
 
-export const getAllFacilityById = async (req, res) => {
+export const getFacilityById = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -51,6 +51,36 @@ export const getAllFacilityById = async (req, res) => {
         }
 
         res.status(200).json({ success: true, data: facility })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    }
+}
+
+export const createFacility = async (req, res) => {
+    try {
+        const { name, icon } = req.body;
+
+        if(!name || !icon) {
+            return res.status(400).json({ success: false, message: "Name and icon are required" })
+        }
+
+        const existingFacility = await Facility.findOne({
+            name: { $regex: new RegExp(`^${name}$`, 'i') } 
+        })
+
+        if(existingFacility) {
+            return res.status(400).json({ success: true, message: "Facility already exists" })
+        }
+
+        let uploadIcon;
+        try {
+            uploadIcon = await uploadIconToCloudinary(icon);
+        } catch (error) {
+            return res.status(400).json({ success: false, message: error.message })
+        }
+
+        const facility = await Facility.create({ name, icon: uploadIcon });
+        res.status(201).json({success: true, data: facility, message: "Facility created successfully" })
     } catch (error) {
         res.status(500).json({ success: false, message: "Server Error", error: error.message })
     }
