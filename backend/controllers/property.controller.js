@@ -203,6 +203,37 @@ export const updateProperty = async (req, res) => {
             return res.status(400).json({ success: false, message: "Property not found" })
         }
 
+        const updateData = { ...req.body };
+
+        if(req.body.thumnailImage && req.body.thumnailImage !== property.thumnailImage) {
+            try {
+                const newThumnail = await uploadToCloudinary(req.body.thumnailImage, 'properties/thumbnails')
+
+                if(property.thumnailImage) {
+                    await deleteFromCloudinary(property.thumnailImage)
+                }
+                updateData.thumnailImage = newThumnail
+            } catch (error) {
+                return res.status(400).json({ success: false, message: `Thumbnail update failed: ${error.message}` });
+            }
+        }
+
+        if(req.body.galleryImages && Array.isArray(req.body.galleryImages)) {
+            try {
+                const uploadPromises = req.body.galleryImages.map(image => uploadToCloudinary(image, 'properties/gallery'))
+                const newGalleryImages = await Promise.all(uploadPromises)
+
+                if(property.galleryImages && property.galleryImages.length > 0) {
+                    const deletePromises = property.galleryImages.map(imageUrl => deleteFromCloudinary(imageUrl));
+                    await Promise.all(deletePromises)
+                }
+
+                updateData.galleryImages = newGalleryImages
+            } catch (error) {
+                return res.status(400).json({ success: false, message: `Gallery update failed: ${error.message}` });
+            }
+        }
+
         const updatedProperty = await Property.findByIdAndUpdate( id, req.body, { new: true, runValidators: true })
             .populate('type', 'name')
             .populate('owner', 'name email')
