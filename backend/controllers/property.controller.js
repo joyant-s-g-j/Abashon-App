@@ -258,6 +258,15 @@ export const deleteProperty = async (req, res) => {
         if(!property) {
             return res.status(404).json({ success: false, message: "Property not found" })
         }
+
+        if(property.thumnailImage) {
+            await deleteFromCloudinary(property.thumnailImage)
+        }
+
+        if(property.galleryImages && property.galleryImages.length > 0) {
+            const deletePromises = property.galleryImages.map(imageUrl => deleteFromCloudinary(imageUrl))
+            await Promise.all(deletePromises)
+        }
         
         await Property.findByIdAndDelete(id)
 
