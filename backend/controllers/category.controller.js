@@ -55,7 +55,32 @@ export const createCatgory = async (req, res) => {
 export const updateCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name } = req.body
+        const { name } = req.body;
+
+        if(!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid category Id" })
+        }
+
+        if(!name) {
+            return res.status(400).json({ success: false, message: "Category name is required" })
+        }
+
+        const category = await Category.findById(id)
+        if(!category) {
+            return res.status(404).json({ success: false, message: "Category not found" })
+        }
+
+        const existingCategory = await Category.findOne({
+            name: { $regex: new RegExp(`^${name}$`, 'i') },
+            _id: { $ne: id }
+        })
+
+        if(existingCategory) {
+            return res.status(400).json({ success: false, message: "Category name already exists" })
+        }
+
+        const updatedCategory = await Category.findByIdAndUpdate(id, { name }, { new: true, runValidators: true });
+        res.status(200).json({ success: true, data: updatedCategory, message: "Category updated successfully"})
     } catch (error) {
         res.status(500).json({success: false, message: "Server Error", error: error.message})        
     }
