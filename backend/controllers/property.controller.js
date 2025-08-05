@@ -1,5 +1,21 @@
 import mongoose from "mongoose"
 import Property from "../models/property.model.js"
+import cloudinary from "../lib/cloudinary.js"
+
+const uploadToCloudinary = async(imageData, folder = 'properties') => {
+    try {
+        const result = await cloudinary.uploader.upload(imageData, {
+            folder: folder,
+            resource_type: 'image',
+            transformation: [
+                { width: 800, height: 600, crop: 'fill', quality: 'auto' }
+            ]
+        });
+        return result.secure_url;
+    } catch (error) {
+        throw new Error(`Image upload failed: ${error.message}`);
+    }
+}
 
 export const getAllProperties = async (req, res) => {
     try {
