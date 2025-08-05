@@ -29,20 +29,7 @@ const deleteFromCloudinary = async (imageUrl) => {
 
 export const getAllProperties = async (req, res) => {
     try {
-        const {
-            page = 1,
-            limit = 10,
-            search,
-            type,
-            minPrice,
-            maxPrice,
-            bed,
-            bath,
-            isFeatured,
-            owner,
-            sortBy = 'createdAt',
-            sortOrder = 'desc'
-        } = req.query
+        const { page = 1, limit = 10, search, type, minPrice, maxPrice, bed, bath, isFeatured, owner, sortBy = 'createdAt', sortOrder = 'desc' } = req.query
         
         const query = {}
         
@@ -60,7 +47,7 @@ export const getAllProperties = async (req, res) => {
         if(minPrice || maxPrice) {
             query.price = {}
             if(minPrice) query.price.$gte = Number(minPrice)
-            if(maxPrice) query.price.$gte = Number(maxPrice)
+            if(maxPrice) query.price.$lte = Number(maxPrice)
         }
 
         if(bed) query['specifications.bed'] = bed;
@@ -133,25 +120,13 @@ export const getPropertyById = async (req, res) => {
 
 export const createProperty = async (req, res) => {
     try {
-        const {
-            name,
-            thumnailImage,
-            type,
-            specifications,
-            owner,
-            description,
-            facilities,
-            galleryImages,
-            location,
-            price,
-            isFeatured
-        } = req.body;
+        const { name, thumnailImage, type, specifications, owner, description, facilities, galleryImages, location, price, isFeatured } = req.body;
 
         if( !name || !thumnailImage || !specifications || !description || !location || !price) {
             return res.status(400).json({ success: false, message: "Please provide all required fields" });
         }
 
-        if(!location.latitude || !location.longtitude || !location.addess) {
+        if(!location.latitude || !location.longtitude || !location.address) {
             return res.status(400).json({ success: false, message: "Please provide complete location information"})
         }
 
@@ -171,15 +146,33 @@ export const createProperty = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid facility Id"})
         }
 
+        let uploadedThumbnail;
+        try {
+            uploadedThumbnail = await uploadToCloudinary(thumnailImage, 'properties/thumbnails')
+        } catch (error) {
+            return res.status(400).json({ success: false, message: error.message });
+        }
+
+        let uploadedGalleryImages = [];
+        if(galleryImages && galleryImages.length > 0) {
+            try {
+                const uploadPromises = galleryImages.map(image => uploadToCloudinary(image, 'properties/gallery'));
+                uploadedGalleryImages = await Promise.all(uploadPromises);
+            } catch (error) {
+                await deleteFromCloudinary(uploadedThumbnail)
+                return res.status(400).json({ success: false, message: `Gallery upload failed: ${error.message}` })
+            }
+        }
+
         const property = await Property.create({
             name,
-            thumnailImage,
+            thumnailImage: uploadedThumbnail,
             type,
             specifications,
             owner,
             description,
             facilities,
-            galleryImages: galleryImages || [],
+            galleryImages: uploadedGalleryImages,
             location,
             price,
             isFeatured: isFeatured || false
