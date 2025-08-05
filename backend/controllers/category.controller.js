@@ -28,3 +28,35 @@ export const getCategoryById = async (req, res) => {
         res.status(500).json({success: false, message: "Server Error", error: error.message})
     }
 }
+
+export const createCatgory = async (req, res) => {
+    try {
+        const { name } = req.body;
+
+        if(!name) {
+            return res.status(400).json({ success: false, message: "Category name is required" })
+        }
+
+        const existingCategory = await Category.findOne({
+            name: { $regex: new RegExp(`^${name}$`, 'i') }
+        });
+
+        if(existingCategory) {
+            return res.status(400).json({ success: false, message: "Category already exists" })
+        }
+
+        const category = await Category.create({ name })
+        res.status(201).json({ success: true, data: category, message: "Category created successfully" })
+    } catch (error) {
+        res.status(500).json({success: false, message: "Server Error", error: error.message})        
+    }
+}
+
+export const updateCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body
+    } catch (error) {
+        res.status(500).json({success: false, message: "Server Error", error: error.message})        
+    }
+}
