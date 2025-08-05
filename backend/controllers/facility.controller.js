@@ -1,4 +1,5 @@
 import cloudinary from "../lib/cloudinary.js"
+import Facility from "../models/facility.model.js";
 
 const uploadIconToCloudinary = async (iconData) => {
     try {
@@ -22,5 +23,14 @@ const deleteIconFromCloudinary = async (iconUrl) => {
         await cloudinary.uploader.destroy(folderPath)
     } catch (error) {
         console.error('Error deleting icon from Cloudinary:', error.message);
+    }
+}
+
+export const getAllFacilites = async (req, res) => {
+    try {
+        const facilities = await Facility.find().sort({ name: 1 });
+        res.status(200).json({ success: true, data: facilities })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error", error: error.message })
     }
 }
