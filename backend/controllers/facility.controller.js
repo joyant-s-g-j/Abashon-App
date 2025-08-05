@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import cloudinary from "../lib/cloudinary.js"
 import Facility from "../models/facility.model.js";
 
@@ -30,6 +31,26 @@ export const getAllFacilites = async (req, res) => {
     try {
         const facilities = await Facility.find().sort({ name: 1 });
         res.status(200).json({ success: true, data: facilities })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    }
+}
+
+export const getAllFacilityById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if(!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid facility Id" })
+        }
+
+        const facility = await Facility.findById(id);
+
+        if(!facility) {
+            return res.status(404).json({ success: false, message: "Facility not found" })
+        }
+
+        res.status(200).json({ success: true, data: facility })
     } catch (error) {
         res.status(500).json({ success: false, message: "Server Error", error: error.message })
     }
