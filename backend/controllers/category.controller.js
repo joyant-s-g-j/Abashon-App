@@ -85,3 +85,24 @@ export const updateCategory = async (req, res) => {
         res.status(500).json({success: false, message: "Server Error", error: error.message})        
     }
 }
+
+export const deleteCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if(!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid category Id" })
+        }
+
+        const category = await Category.findById(id)
+
+        if(!category) {
+            return res.status(404).json({ success: false, message: "Category not found" })
+        }
+
+        await Category.findByIdAndDelete(id)
+        res.status(200).json({ success: true, message: "Category deleted successfully" })
+    } catch (error) {
+        res.status(500).json({success: false, message: "Server Error", error: error.message})
+    }
+}
