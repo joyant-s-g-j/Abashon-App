@@ -135,3 +135,28 @@ export const updateFacility = async (req, res) => {
         res.status(500).json({ success: false, message: "Server Error", error: error.message })
     }
 }
+
+export const deleteFacility = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        if(!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid facility Id" })
+        }
+
+        const facility = await Facility.findById(id);
+
+        if(!facility) {
+            return res.status(404).json({ success: false, message: "Facility not found" })
+        }
+
+        if(facility.icon) {
+            await deleteIconFromCloudinary(facility.icon)
+        }
+
+        await Facility.findByIdAndDelete(id)
+        res.status(200).json({ success: true, message: "Facility deleted successfully" })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    }
+}
