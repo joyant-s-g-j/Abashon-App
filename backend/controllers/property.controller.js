@@ -1,0 +1,78 @@
+import Property from "../models/property.model.js"
+
+export const getAllProperties = async (req, res) => {
+    try {
+        const {
+            page = 1,
+            limit = 10,
+            search,
+            type,
+            minPrice,
+            maxPrice,
+            bed,
+            bath,
+            isFeatured,
+            owner,
+            sortBy = 'createdAt',
+            sortOrder = 'desc'
+        } = req.query
+        
+        const query = {}
+        
+        if(search) {
+            query.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ]
+        }
+
+        if(type) {
+            query.type = type
+        }
+
+        if(minPrice || maxPrice) {
+            query.price = {}
+            if(minPrice) query.price.$gte = Number(minPrice)
+            if(maxPrice) query.price.$gte = Number(maxPrice)
+        }
+
+        if(bed) query['specifications.bed'] = bed;
+        if(bath) query['specifications.bath'] = bath;
+
+        if(isFeatured !== undefined) {
+            query.isFeatured = isFeatured === 'true';
+        }
+
+        if(owner) {
+            query.owner = owner;
+        }
+
+        const skip = (page - 1) * limit;
+
+        const sort = {};
+        sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
+        const properties = await Property.find(query)
+            .populate('type', 'name')
+            .populate('owner', 'name email')
+            .populate('facilities', 'name')
+            .sort(sort)
+            .skip(skip)
+            .limit(Number(limit));
+
+        const total = await Property.countDocuments(query);
+
+        res.status(200).json({
+            success: true,
+            data: properties,
+            pagination: {
+                page: Number(page),
+                limit: Number(limit),
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    }
+}
