@@ -2,7 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import authRoutes from "./routes/auth.route.js"; // Assuming this is your route file
+import authRoutes from "./routes/auth.route.js";
+import propertyRoutes from "./routes/property.route.js"
 import { connectDB } from "./lib/db.js";
 
 dotenv.config();
@@ -27,6 +28,7 @@ app.use(
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/properties", propertyRoutes)
 
 // Health check
 app.get("/", (req, res) => {
