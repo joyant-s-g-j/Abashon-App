@@ -6,6 +6,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, "Name is required"]
     },
+    phone: {
+        type: Number,
+        required: [true, "Phone Number is required"]
+    },
     email: {
         type: String,
         required: [true, "Email is required"],
@@ -20,7 +24,6 @@ const userSchema = new mongoose.Schema({
         },
         minlength: [6, "Password must be at least 6 characters long"]
     },
-
     googleId: {
         type: String,
         unique: true,
@@ -34,6 +37,17 @@ const userSchema = new mongoose.Schema({
     isEmailVerified: {
         type: Boolean,
         default: false
+    },
+    favProperties: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Property"
+        }
+    ],
+    role: {
+        type: String,
+        enum: ["customer", "agent", "admin"],
+        default: "customer"
     }
 }, {timestamps: true})
 
