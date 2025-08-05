@@ -17,6 +17,16 @@ const uploadToCloudinary = async(imageData, folder = 'properties') => {
     }
 }
 
+const deleteFromCloudinary = async (imageUrl) => {
+    try {
+        const publicId = imageUrl.split('/').pop().split('.')[0];
+        const folderPath = imageUrl.includes('/properties') ? 'properties/' + publicId : publicId;
+        await cloudinary.uploader.destroy(folderPath);
+    } catch (error) {
+        console.error('Error deleting image from Cloudinary:', error.message);
+    }
+}
+
 export const getAllProperties = async (req, res) => {
     try {
         const {
