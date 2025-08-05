@@ -85,3 +85,53 @@ export const createFacility = async (req, res) => {
         res.status(500).json({ success: false, message: "Server Error", error: error.message })
     }
 }
+
+export const updateFacility = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { name, icon } = req.body
+
+        if(!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid facility Id" })
+        }
+
+        const facility = await Facility.findById(id)
+
+        if(!facility) {
+            return res.status(404).json({ success: false, message: "Facility not found" })
+        }
+
+        const updateData = {}
+
+        if(name) {
+            const existingFacility = await Facility.findOne({
+                name: { $regex: new RegExp(`^${name}$`, 'i') },
+                _id: { $ne: id }
+            });
+
+            if(existingFacility) {
+                return res.status(400).json({ success: false, message: "Facility name already exists" })
+            };
+            updateData.name = name;
+        }
+        
+        if(icon && icon !== facility.icon) {
+            try {
+                const newIcon = await uploadIconToCloudinary(icon);
+
+                if(facility.icon) {
+                    await deleteIconFromCloudinary(facility.icon);
+                }
+
+                updateData.icon = newIcon;
+            } catch (error) {
+                return res.status(400).json({ success: false, message: `Icon update failed: ${error.message}` })
+            }
+        }
+
+        const updatedFacility = await Facility.findByIdAndUpdate(id, updateData, { new: true, runValidators: true })
+        res.status(200).json({ success: true, data: updatedFacility, message: "Facility updated successfully" })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    }
+}
