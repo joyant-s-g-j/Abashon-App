@@ -74,23 +74,11 @@ const login = () => {
         scrollToOverflowEnabled={true}
         viewIsInsideTabBar={false}
       >
-        <View className="relative">
-          <Image
-            source={images.login}
-            className="w-full h-80"
-            resizeMode="cover"
-          />
-          {/* Simple white overlay at bottom */}
-          <View className="absolute bottom-0 left-0 right-0 h-24">
-            <View className="absolute bottom-0 left-0 right-0 h-6 bg-white" />
-            <View className="absolute bottom-4 left-0 right-0 h-6 bg-white/90" />
-            <View className="absolute bottom-6 left-0 right-0 h-6 bg-white/90" />
-            <View className="absolute bottom-8 left-0 right-0 h-6 bg-white/70" />
-            <View className="absolute bottom-10 left-0 right-0 h-6 bg-white/50" />
-            <View className="absolute bottom-12 left-0 right-0 h-6 bg-white/30" />
-            <View className="absolute bottom-14 left-0 right-0 h-6 bg-white/15" />
-          </View>
-        </View>
+        <Image
+          source={images.login}
+          className="w-full h-80"
+          resizeMode="cover"
+        />
         <View className=" flex-1 px-5 py-3">
           <Text className="text-4xl font-rubik-bold text-black-300">Login</Text>
           <Text className="text-base font-rubik text-black-200 mt-1 mb-4">
