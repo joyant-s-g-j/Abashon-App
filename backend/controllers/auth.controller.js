@@ -2,9 +2,9 @@ import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 
 export const signup = async (req, res) => {
-    const {name, email, password} = req.body
+    const {name, email, phone, password} = req.body
     try {
-        if(!name || !email || !password) {
+        if(!name || !email || !phone || !password) {
             return res.status(400).json({message: "All fields are required"});
         }
         if(password.length < 6) {
@@ -17,6 +17,7 @@ export const signup = async (req, res) => {
         const newUser = new User({
             name,
             email,
+            phone,
             password,
             authMethod: 'local'
         })
@@ -29,6 +30,7 @@ export const signup = async (req, res) => {
                 _id:newUser._id,
                 name: newUser.name,
                 email: newUser.email,
+                phone: newUser.phone,
                 profilePic: newUser.profilePic,
                 authMethod: newUser.authMethod
             })
@@ -92,6 +94,7 @@ export const checkAuth = (req, res) => {
             _id: req.user._id,
             name: req.user.name,
             email: req.user.email,
+            phone: req.user.phone,
             profilePic: req.user.profilePic,
             authMethod: req.user.authMethod,
             googleId: req.user.googleId,

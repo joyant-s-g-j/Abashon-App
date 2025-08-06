@@ -74,55 +74,64 @@ const login = () => {
         scrollToOverflowEnabled={true}
         viewIsInsideTabBar={false}
       >
-        <View className="flex-1 flex justify-center">
+        <View className="relative">
           <Image
-            source={images.loginHome}
-            className="w-full h-64"
-            resizeMode="contain"
+            source={images.login}
+            className="w-full h-80"
+            resizeMode="cover"
+          />
+          {/* Simple white overlay at bottom */}
+          <View className="absolute bottom-0 left-0 right-0 h-24">
+            <View className="absolute bottom-0 left-0 right-0 h-6 bg-white" />
+            <View className="absolute bottom-4 left-0 right-0 h-6 bg-white/90" />
+            <View className="absolute bottom-6 left-0 right-0 h-6 bg-white/90" />
+            <View className="absolute bottom-8 left-0 right-0 h-6 bg-white/70" />
+            <View className="absolute bottom-10 left-0 right-0 h-6 bg-white/50" />
+            <View className="absolute bottom-12 left-0 right-0 h-6 bg-white/30" />
+            <View className="absolute bottom-14 left-0 right-0 h-6 bg-white/15" />
+          </View>
+        </View>
+        <View className=" flex-1 px-5 py-3">
+          <Text className="text-4xl font-rubik-bold text-black-300">Login</Text>
+          <Text className="text-base font-rubik text-black-200 mt-1 mb-4">
+            Please login to continue
+          </Text>
+
+          {/* Email Input */}
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Email"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-black-300 font-rubik"
           />
 
-          <View className="px-5 py-3">
-            <Text className="text-4xl font-rubik-bold text-black-300">Login</Text>
-            <Text className="text-base font-rubik text-black-200 mt-1 mb-4">
-              Please login to continue
+          {/* Password Input */}
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+            secureTextEntry
+            className="border border-gray-300 rounded-xl px-4 py-3 mb-2 text-black-300 font-rubik"
+          />
+
+          {/* Login Button */}
+          <TouchableOpacity
+            onPress={handleLogin}
+            className="bg-primary-300 py-4 mt-6 rounded-xl"
+          >
+            <Text className="text-white text-center font-rubik-bold text-lg">
+              Login
             </Text>
+          </TouchableOpacity>
 
-            {/* Email Input */}
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-black-300 font-rubik"
-            />
-
-            {/* Password Input */}
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Password"
-              secureTextEntry
-              className="border border-gray-300 rounded-xl px-4 py-3 mb-2 text-black-300 font-rubik"
-            />
-
-            {/* Login Button */}
-            <TouchableOpacity
-              onPress={handleLogin}
-              className="bg-primary-300 py-4 mt-6 rounded-xl"
-            >
-              <Text className="text-white text-center font-rubik-bold text-lg">
-                Login
-              </Text>
+          {/* Register Redirect */}
+          <View className="flex-row justify-center mt-6">
+            <Text className="text-black-200 font-rubik">Don’t have an account? </Text>
+            <TouchableOpacity>
+              <Link href="/sign-up" className="text-primary-300 font-rubik-medium">Sign Up</Link>
             </TouchableOpacity>
-
-            {/* Register Redirect */}
-            <View className="flex-row justify-center mt-6">
-              <Text className="text-black-200 font-rubik">Don’t have an account? </Text>
-              <TouchableOpacity>
-                <Link href="/sign-up" className="text-primary-300 font-rubik-medium">Sign Up</Link>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </KeyboardAwareScrollView>

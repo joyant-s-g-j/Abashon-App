@@ -7,8 +7,11 @@ const userSchema = new mongoose.Schema({
         required: [true, "Name is required"]
     },
     phone: {
-        type: Number,
-        required: [true, "Phone Number is required"]
+        type: String,
+        required: function () {
+            return !this.googleId;
+        },
+        unique: true
     },
     email: {
         type: String,
