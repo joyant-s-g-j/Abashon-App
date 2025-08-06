@@ -132,3 +132,65 @@ const deleteImageFromCloudinary = async (imageUrl) => {
         console.error('Error deleting image from Cloudinary:', error.message);
     }
 }
+
+export const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { name, email, phone, role, profilePic } = req.body;
+
+        if(!name || !email || !phone) {
+            return res.status(400).json({ success: false, message: "Name, email and phone are required" })
+        }
+
+        if(role && req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Not authorized to update role' })
+        }
+
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.status(404).json({ success: false, message: "User not found" })
+        }
+        
+        user.name = name;
+        user.email = email;
+        user.phone = phone;
+
+        if(role) {
+            user.role = role
+        }
+
+        if(profilePic) {
+            if(profilePic.startsWith('data:')) {
+                const newImageUrl = await uploadImageToCloudinary(profilePic)
+
+                if(user.profilePic && !user.profilePic.includes('googleusercontent.com')) {
+                    await deleteImageFromCloudinary(user.profilePic)
+                }
+                user.profilePic = newImageUrl;
+            } else if (profilePic !== user.profilePic) {
+                if(user.profilePic && !user.profilePic.includes('googleusercontent.com')) {
+                    await deleteImageFromCloudinary(user.profilePic)
+                }
+                user.profilePic = profilePic;
+            }
+        }
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                profilePic: user.profilePic,
+                authMethod: user.authMethod,
+            }
+        })
+    } catch (error) {
+        console.error("Error updating profile:", error.message);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
