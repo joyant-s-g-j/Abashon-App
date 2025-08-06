@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, ImageSourcePropType, TextInput } from 'react-native'
+import { View, Text, ScrollView, Image, TouchableOpacity, ImageSourcePropType } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import icons from '@/constants/icons'
@@ -28,36 +28,24 @@ const SettingsItem = ({icon, title, onPress, textStyle, showArrow = true }: Sett
   )
 }
 
-const Profile = () => {
+const profile = () => {
   const router = useRouter()
   const [user, setUser] = useState<null | {
     name: string;
     email: string;
     phone: string;
-    role?: string;        // Optional to avoid TS error
-    profilePic?: string;  // Optional to avoid TS error
+    role: string;
+    profilePic: string;
   }>(null);
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-  });
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const storedUser = await AsyncStorage.getItem('user')
         if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-
-          setForm({
-            name: parsedUser.name || '',
-            email: parsedUser.email || '',
-            phone: parsedUser.phone || '',
-          });
+          const parsedUser = JSON.parse(storedUser)
+          console.log('User:', parsedUser);
+          setUser(parsedUser)
         }
       } catch (error) {
         console.error('Failed to load user:', error)
@@ -68,30 +56,11 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('user');
       router.replace('/sign-in');
     } catch (error) {
       console.error("Logout failed:", error);
     }
   }
-
-  const handleSave = async () => {
-    // For now, just update local state & AsyncStorage
-
-    const updatedUser = {
-      ...user,
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      role: user?.role ?? 'customer',
-      profilePic: user?.profilePic ?? '',
-    };
-
-    setUser(updatedUser);
-    await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
-    setIsEditing(false);
-  };
-
   return (
     <SafeAreaView>
       <ScrollView
@@ -101,9 +70,8 @@ const Profile = () => {
         <View className='flex flex-row items-center justify-between mt-5'>
           <Text className='text-xl font-rubik-bold'>Profile</Text>
           <View className='flex-row gap-2'>
-            <TouchableOpacity onPress={() => setIsEditing(prev => !prev)}>
-              <Image source={icons.edit} className='size-5' />
-            </TouchableOpacity>
+            <Image source={icons.bell} className='size-5' />
+            <Image source={icons.edit} className='size-5' />
           </View>
         </View>
         
@@ -118,57 +86,12 @@ const Profile = () => {
               className='size-44 relative rounded-full'
             />
 
-            {isEditing ? (
-              <>
-                <TextInput
-                  value={form.name}
-                  onChangeText={text => setForm({...form, name: text})}
-                  className="text-2xl font-rubik-bold mt-2 border-b border-gray-300 w-60 text-center"
-                  placeholder="Name"
-                />
-                <TextInput
-                  value={form.email}
-                  onChangeText={text => setForm({...form, email: text})}
-                  className="text-base font-rubik text-black-200 mt-1 border-b border-gray-300 w-60 text-center"
-                  placeholder="Email"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-                <TextInput
-                  value={form.phone}
-                  onChangeText={text => setForm({...form, phone: text})}
-                  className="text-base font-rubik text-black-200 mt-1 border-b border-gray-300 w-60 text-center"
-                  placeholder="Phone"
-                  keyboardType="phone-pad"
-                />
-
-                <TouchableOpacity
-                  onPress={handleSave}
-                  className="bg-primary-300 py-3 mt-5 rounded-xl w-40 self-center"
-                >
-                  <Text className="text-white text-center font-rubik-bold text-lg">Save</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => setIsEditing(false)}
-                  className="py-3 mt-3 rounded-xl w-40 self-center border border-gray-400"
-                >
-                  <Text className="text-center font-rubik text-black-300">Cancel</Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <Text className='text-2xl font-rubik-bold mt-2'>
-                  {user?.name}
-                </Text>
-                <Text className='text-base font-rubik text-black-200'>
-                  {user?.email}
-                </Text>
-                <Text className='text-base font-rubik text-black-200 mt-1'>
-                  {user?.phone}
-                </Text>
-              </>
-            )}
+            <Text className='text-2xl font-rubik-bold mt-2'>
+              {user?.name}
+            </Text>
+            <Text className='text-base font-rubik text-black-200'>
+              {user?.email}
+            </Text>
           </View>
         </View>
 
@@ -200,4 +123,4 @@ const Profile = () => {
   )
 }
 
-export default Profile
+export default profile

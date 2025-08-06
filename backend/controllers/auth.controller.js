@@ -1,3 +1,4 @@
+import cloudinary from "../lib/cloudinary.js";
 import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 
@@ -103,5 +104,31 @@ export const checkAuth = (req, res) => {
     } catch (error) {
         console.log("Error in checkAuth controller", error.message);
         res.status(500).json({message: "Internal server error"})
+    }
+}
+
+const uploadImageToCloudinary = async(imageData) => {
+    try {
+        const result = await cloudinary.uploader.upload(imageData, {
+            folder: 'users/profilePics',
+            resource_type: 'image',
+            transformation: [
+                { width: 256, height: 256, crop: 'fill', quality: 'auto' }
+            ]
+        });
+        return result.secure_url;
+    } catch (error) {
+        throw new Error(`Image upload failed: ${error.message}`);
+    }
+}
+
+const deleteImageFromCloudinary = async (imageUrl) => {
+    try {
+        const parts = imageUrl.split('/');
+        const filename = parts.pop();
+        const publicId = `users/profilePics/${filename.split('.')[0]}`;
+        await cloudinary.uploader.destroy(publicId)
+    } catch (error) {
+        console.error('Error deleting image from Cloudinary:', error.message);
     }
 }
