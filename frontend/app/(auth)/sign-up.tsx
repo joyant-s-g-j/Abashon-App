@@ -4,12 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import images from '@/constants/images'
 import { Link, useRouter } from 'expo-router'
+import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
+import CustomDropdown from '@/components/CustomDropdown'
 
 const SignUp = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const router = useRouter()
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
@@ -33,7 +36,6 @@ const SignUp = () => {
       keyboardDidHideListener.remove();
     };
   }, []);
-
   
   const handleSignup = async () => {
     try {
@@ -58,6 +60,12 @@ const SignUp = () => {
       }
     }
   };
+
+  const roleOptions = [
+  { label: "Select Role", value: "" },
+  { label: "Customer", value: "customer" },
+  { label: "Agent", value: "agent" },
+];
 
   return (
     <SafeAreaView className="bg-white h-full">
@@ -93,6 +101,13 @@ const SignUp = () => {
               onChangeText={setName}
               placeholder="Name"
               className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-black-300 font-rubik"
+            />
+            {/* User Role Picker */}
+            <CustomDropdown
+              selectedValue={role}
+              onValueChange={setRole}
+              options={roleOptions}
+              placeholder="Select Role"
             />
             {/* Email Input */}
             <TextInput
