@@ -70,7 +70,8 @@ export const googleAuth = async (req, res) => {
             profilePic: user.profilePic,
             authMethod: user.authMethod,
             googleId: user.googleId,
-            isEmailVerified: user.isEmailVerified
+            isEmailVerified: user.isEmailVerified,
+            role: user.role
         })
     } catch (error) {
         console.log("Error in Google auth controller", error.message);
@@ -143,10 +144,11 @@ export const googleAuthWithAccessToken = async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
-            profilePic: picture || user.profilePic, // ✅ Send Google picture in response
+            profilePic: picture || user.profilePic,
             authMethod: user.authMethod,
             googleId: user.googleId,
-            isEmailVerified: user.isEmailVerified
+            isEmailVerified: user.isEmailVerified,
+            role: user.role
         });
     } catch (error) {
         console.log("Error in Google auth with access token", error.message);
@@ -215,7 +217,8 @@ export const googleAuthWithUserData = async (req, res) => {
             profilePic: user.profilePic,
             authMethod: user.authMethod,
             googleId: user.googleId,
-            isEmailVerified: user.isEmailVerified
+            isEmailVerified: user.isEmailVerified,
+            role: user.role
         });
 
     } catch (error) {
@@ -226,13 +229,9 @@ export const googleAuthWithUserData = async (req, res) => {
 
 export const googleAuthWithCode = async (req, res) => {
     try {
-        console.log('🚀 googleAuthWithCode function called');
-        console.log('📝 Request body:', req.body);
-        
         const { code, redirectUri } = req.body;
 
         if (!code || !redirectUri) {
-            console.log('❌ Missing required fields');
             return res.status(400).json({ message: 'Code and redirectUri are required' });
         }
 
@@ -251,30 +250,19 @@ export const googleAuthWithCode = async (req, res) => {
         });
 
         const tokenData = await tokenResponse.json();
-        console.log('📊 Google token response status:', tokenResponse.status);
-        console.log('📊 Google token response:', tokenData);
 
         if (!tokenData.access_token) {
-            console.log('❌ No access token received from Google');
-            console.log('Error details:', tokenData);
             return res.status(400).json({ 
                 message: 'Failed to get access token from Google',
                 details: tokenData.error_description || tokenData.error 
             });
         }
-
-        console.log('✅ Access token received, calling googleAuthWithAccessToken...');
         
         // Reuse your existing access-token logic
         req.body.accessToken = tokenData.access_token;
         return googleAuthWithAccessToken(req, res);
 
     } catch (error) {
-        console.error('❌ DETAILED ERROR in googleAuthWithCode:');
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-        console.error('Stack trace:', error.stack);
-        
         res.status(500).json({ 
             message: 'Internal server error',
             error: error.message,

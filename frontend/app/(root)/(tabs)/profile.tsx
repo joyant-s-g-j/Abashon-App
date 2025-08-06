@@ -33,6 +33,8 @@ const profile = () => {
   const [user, setUser] = useState<null | {
     name: string;
     email: string;
+    phone: string;
+    role: string;
     profilePic: string;
   }>(null);
 
@@ -42,6 +44,7 @@ const profile = () => {
         const storedUser = await AsyncStorage.getItem('user')
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser)
+          console.log('User:', parsedUser);
           setUser(parsedUser)
         }
       } catch (error) {
@@ -66,7 +69,10 @@ const profile = () => {
       >
         <View className='flex flex-row items-center justify-between mt-5'>
           <Text className='text-xl font-rubik-bold'>Profile</Text>
-          <Image source={icons.bell} className='size-5' />
+          <View className='flex-row gap-2'>
+            <Image source={icons.bell} className='size-5' />
+            <Image source={icons.edit} className='size-5' />
+          </View>
         </View>
         
         <View className='flex-row justify-center flex mt-5'>
@@ -79,9 +85,6 @@ const profile = () => {
               }
               className='size-44 relative rounded-full'
             />
-            {/* <TouchableOpacity className='absolute bottom-11 right-4'>
-              <Image source={icons.edit} className='size-9' />
-            </TouchableOpacity> */}
 
             <Text className='text-2xl font-rubik-bold mt-2'>
               {user?.name}
@@ -95,6 +98,9 @@ const profile = () => {
         <View className='flex flex-col mt-5'>
           <SettingsItem icon={icons.calendar} title='My Bookings' />
           <SettingsItem icon={icons.wallet} title='Payments' />
+          {user?.role?.toLowerCase() === 'admin' && (
+            <SettingsItem icon={icons.filter} title='Admin Management' />
+          )}
         </View>
 
         <View className='flex flex-col mt-5 border-t pt-5 border-primary-200'>
