@@ -1,7 +1,7 @@
 import express from "express"
 import { checkAuth, getProfile, login, logout, signup, updateProfile } from "../controllers/auth.controller.js"
 import { protectRoute } from "../middleware/auth.middleware.js"
-import { googleAuth, googleAuthWithAccessToken, googleAuthWithCode, googleAuthWithUserData } from "../controllers/googleAuth.controller.js"
+import { googleAuth, googleAuthWithAccessToken, googleAuthWithCode, googleAuthWithUserData, updatePhoneNumber } from "../controllers/googleAuth.controller.js"
 
 const router = express.Router()
 
@@ -12,6 +12,7 @@ router.get("/check", protectRoute, checkAuth)
 router.get("/profile", protectRoute, getProfile)
 router.put("/update-profile", protectRoute, updateProfile)
 
+router.put("/update-phone", protectRoute, updatePhoneNumber);
 router.post("/google", googleAuth)
 router.post("/google/access-token", googleAuthWithAccessToken)
 router.post("/google/user-data", googleAuthWithUserData)

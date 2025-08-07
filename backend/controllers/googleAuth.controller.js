@@ -130,7 +130,7 @@ export const googleAuthWithAccessToken = async (req, res) => {
                 googleId,
                 email,
                 name,
-                // ✅ Fix: Set empty string for profilePic if URL is from Google
+                phone: null,
                 profilePic: (picture && !picture.includes('googleusercontent.com')) ? picture : "",
                 authMethod: 'google',
                 isEmailVerified: verified_email || true
@@ -144,6 +144,7 @@ export const googleAuthWithAccessToken = async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
+            phone: user.phone || '',
             profilePic: picture || user.profilePic,
             authMethod: user.authMethod,
             googleId: user.googleId,
@@ -257,12 +258,76 @@ export const googleAuthWithCode = async (req, res) => {
                 details: tokenData.error_description || tokenData.error 
             });
         }
-        
-        // Reuse your existing access-token logic
-        req.body.accessToken = tokenData.access_token;
-        return googleAuthWithAccessToken(req, res);
+
+        // Get user info from Google
+        const userResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+            headers: { Authorization: `Bearer ${tokenData.access_token}` },
+        });
+
+        if (!userResponse.ok) {
+            return res.status(400).json({ message: 'Failed to get user info from Google' });
+        }
+
+        const googleUser = await userResponse.json();
+        const { id: googleId, email, name, picture, verified_email } = googleUser;
+
+        // Find or create user
+        let user = await User.findOne({
+            $or: [
+                { email: email },
+                { googleId: googleId }
+            ]
+        });
+
+        if (user) {
+            if (!user.googleId) {
+                if (user.authMethod === 'local') {
+                    return res.status(400).json({ 
+                        message: "This email is already registered with password. Please login with your password." 
+                    });
+                }
+                user.googleId = googleId;
+                user.authMethod = 'google';
+            }
+            user.name = name;
+            if (picture && !picture.includes('googleusercontent.com')) {
+                user.profilePic = picture;
+            }
+            user.isEmailVerified = verified_email || true;
+            await user.save();
+        } else {
+            user = new User({
+                googleId,
+                email,
+                name,
+                phone: '', // Explicitly set empty string
+                profilePic: (picture && !picture.includes('googleusercontent.com')) ? picture : "",
+                authMethod: 'google',
+                isEmailVerified: verified_email || true
+            });
+            await user.save();
+        }
+
+        // Generate JWT token and get it for mobile response
+        const jwtToken = generateToken(user._id, res, true); // Pass true to get token back
+
+        // Send response with token included for mobile apps
+        res.status(200).json({
+            success: true,
+            token: jwtToken, // Include token in response body for mobile
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone || '',
+            profilePic: picture || user.profilePic,
+            authMethod: user.authMethod,
+            googleId: user.googleId,
+            isEmailVerified: user.isEmailVerified,
+            role: user.role
+        });
 
     } catch (error) {
+        console.error('Error in Google auth with code:', error);
         res.status(500).json({ 
             message: 'Internal server error',
             error: error.message,
@@ -270,3 +335,46 @@ export const googleAuthWithCode = async (req, res) => {
         });
     }
 };
+
+export const updatePhoneNumber = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { phone } = req.body
+
+        if(!phone) {
+            return res.status(400).json({ message: 'Phone number is required' })
+        }
+
+        const existingUser = await User.findOne({ phone, _id: { $ne: userId }});
+        if(existingUser) {
+            return res.status(400).json({ message: 'Phone number is already in use' })
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { phone },
+            { new: true, runValidators: true }
+        )
+
+        if(!user) {
+            return res.status(404).json({ message: 'User not found' })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Phone number updated successfully',
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                profilePic: user.profilePic,
+                authMethod: user.authMethod,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        console.log("Error updating phone number", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

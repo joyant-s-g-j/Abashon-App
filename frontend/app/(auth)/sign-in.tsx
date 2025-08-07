@@ -47,6 +47,7 @@ const SignIn = () => {
   const exchangeCodeForToken = async (code: string) => {
     setIsLoading(true);
     try {
+      await AsyncStorage.multiRemove(['user', 'token']);
       const response = await fetch(`${API_BASE_URL}/api/auth/google/code`, {
         method: 'POST',
         headers: {
@@ -58,19 +59,30 @@ const SignIn = () => {
         }),
       });
 
-      const text = await response.text();
-
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (parseError) {
-        Alert.alert('Error', 'Invalid response from server. Please try again.');
-        return;
-      }
+      const data = await response.json()
 
       if (response.ok && data.success) {
         // Store user data
-        await AsyncStorage.setItem('user', JSON.stringify(data.user || data));
+        const token = data.token;
+        if (!token) {
+          console.error('No token found in response body');
+          Alert.alert('Error', 'Authentication failed - no token received');
+          return;
+        }
+        await AsyncStorage.setItem('token', token);
+
+        const userData = {
+          _id: data._id,
+          name: data.name,
+          email: data.email,
+          phone: data.phone || '', // Ensure phone field is included
+          role: data.role || 'customer',
+          profilePic: data.profilePic || '',
+          authMethod: data.authMethod || 'google',
+          googleId: data.googleId,
+          isEmailVerified: data.isEmailVerified || true
+        };
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
 
         Alert.alert(
           'Success!',
@@ -87,7 +99,6 @@ const SignIn = () => {
       } else {
         Alert.alert('Error', data.message || 'Authentication failed');
       }
-
     } catch (error) {
       console.error('❌ Code exchange error:', error);
       Alert.alert('Error', 'Authentication failed. Please try again.');
@@ -96,9 +107,18 @@ const SignIn = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    setIsLoading(true);
-    setShowWebView(true);
+  const handleGoogleLogin = async () => {
+    try {
+      // Clear any existing data before starting new sign-in
+      await AsyncStorage.multiRemove(['user', 'token']);
+      console.log('Cleared storage before Google login');
+      setIsLoading(true);
+      setShowWebView(true);
+    } catch (error) {
+      console.error('Error clearing storage:', error);
+      setIsLoading(true);
+      setShowWebView(true);
+    }
   };
 
   return (

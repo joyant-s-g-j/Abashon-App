@@ -37,17 +37,13 @@ const EditProfile = () => {
         if(storedUser) {
           const parsedUser = JSON.parse(storedUser)
           setUser(parsedUser)
-          if(!parsedUser.phone) {
-            await fetchUserFromBackend()
-          } else {
-            setFormData({
-              name: parsedUser.name || '',
-              email: parsedUser.email || '',
-              phone: parsedUser.phone || '',
-              role: parsedUser.role || '',
-              profilePic: parsedUser.profilePic || ''
-            })
-          }
+          setFormData({
+            name: parsedUser.name || '',
+            email: parsedUser.email || '',
+            phone: parsedUser.phone || '',
+            role: parsedUser.role || '',
+            profilePic: parsedUser.profilePic || ''
+          })
         }
       } catch (error) {
         console.error('Failed to load user:', error)
@@ -56,68 +52,6 @@ const EditProfile = () => {
     }
     fetchUser()
   }, [])
-
-  const fetchUserFromBackend = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token')
-      if(!token) {
-        console.log('No token found');
-        return
-      }
-      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      const data = await response.json()
-
-      if(data.success && data.user) {
-        await AsyncStorage.setItem('user', JSON.stringify(data.user))
-        setUser(data.user)
-        setFormData({
-          name: data.user.name || '',
-          email: data.user.email || '',
-          phone: data.user.phone || '',
-          role: data.user.role || '',
-          profilePic: data.user.profilePic || ''
-        })
-        console.log('Updated user from backend', data.user);
-      } else {
-        console.error('Error fetching user from backend:', data.message)
-        const storedUser = await AsyncStorage.getItem('user')
-        if(storedUser) {
-          const parsedUser = JSON.parse(storedUser)
-          setFormData({
-            name: parsedUser.name || '',
-            email: parsedUser.email || '',
-            phone: parsedUser.phone || '',
-            role: parsedUser.role || '',
-            profilePic: parsedUser.profilePic || ''
-          })
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching user from backend:', error)
-      try {
-        const storedUser = await AsyncStorage.getItem('user')
-        if(storedUser) {
-          const parsedUser = JSON.parse(storedUser)
-          setFormData({
-            name: parsedUser.name || '',
-            email: parsedUser.email || '',
-            phone: parsedUser.phone || '',
-            role: parsedUser.role || '',
-            profilePic: parsedUser.profilePic || ''
-          })
-        }
-      } catch (storageError) {
-        console.error('Error loading stored user data:', storageError)
-      }
-    }
-  }
 
   const validateForm = () => {
     if (!formData.name.trim()) {
