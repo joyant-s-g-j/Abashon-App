@@ -1,12 +1,26 @@
 import { View, Text, ScrollView, TouchableOpacity, Image, Alert, TextInput } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { router } from 'expo-router'
+import { router, useRouter } from 'expo-router'
 import icons from '@/constants/icons'
 import images from '@/constants/images'
 import * as ImagePicker from 'expo-image-picker'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  profilePic: string;
+  authMethod: string;
+}
 
 const EditProfile = () => {
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,6 +28,30 @@ const EditProfile = () => {
     role: '',
     profilePic: ''
   })
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem('user')
+        if(storedUser) {
+          const parsedUser = JSON.parse(storedUser)
+          setUser(parsedUser)
+          console.log("uuuse", parsedUser);
+          setFormData({
+            name: parsedUser.name || '',
+            email: parsedUser.email || '',
+            phone: parsedUser.phone || '',
+            role: parsedUser.role || '',
+            profilePic: parsedUser.profilePic || ''
+          })
+        }
+      } catch (error) {
+        console.error('Failed to load user:', error)
+        Alert.alert('Error', 'Failed to load user data')
+      }
+    }
+    fetchUser()
+  }, [])
 
   const pickImage = async () => {
     try {
@@ -59,7 +97,7 @@ const EditProfile = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
-        className='px-6'
+        className='px-4'
       >
         {/* Header */}
         <View className='flex-row items-center justify-between mt-4 mb-6'>
@@ -173,6 +211,16 @@ const EditProfile = () => {
             </View>
           </View>
         </View>
+
+        {/* update button */}
+        <TouchableOpacity
+          disabled={loading}
+          className={`mt-8 py-4 rounded-lg ${ loading ? 'bg-primary-200' : 'bg-primary-300' }`}
+        >
+          <Text className='text-white text-center text-lg font-rubik-bold'>
+            {loading ? 'Updating...' : 'Update Profile'}
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   )
