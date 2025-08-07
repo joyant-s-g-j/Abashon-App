@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Image, Alert, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
@@ -15,7 +15,7 @@ const EditProfile = () => {
     profilePic: ''
   })
 
-  const picImage = async () => {
+  const pickImage = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
       if(status !== 'granted') {
@@ -79,10 +79,98 @@ const EditProfile = () => {
               resizeMode='cover'
             />
             <TouchableOpacity
+              onPress={pickImage}
               className='absolute bottom-0 right-0 bg-primary-100 size-10  rounded-full items-center justify-center border-4 border-black-100/70'
             >
               <Image source={icons.edit} className='size-7 rounded-full' />
             </TouchableOpacity>
+          </View>
+          <Text className='text-sm font-rubik text-black-200 mt-2'>
+            Tap to change profile picture
+          </Text>
+        </View>
+
+        {/* Form fields */}
+        <View className='flex-col gap-5'>
+          {/* Name Field */}
+          <View>
+            <Text className='text-base font-rubik-medium text-black-300 mb-2'>
+              Full Name
+            </Text>
+            <TextInput 
+              value={formData.name}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
+              placeholder='Enter your full name'
+              className='border border-primary-200 rounded-lg px-4 py-3 text-base font-rubik text-black-300'
+              placeholderTextColor="#666"
+            />
+          </View>
+          {/* Email field */}
+          <View>
+            <Text className='text-base font-rubik-medium text-black-300 mb-2'>
+              Email Address
+            </Text>
+            <TextInput 
+              value={formData.email}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
+              placeholder='Enter your email'
+              keyboardType="email-address"
+              autoCapitalize='none'
+              className='border border-primary-200 rounded-lg px-4 py-3 text-base font-rubik text-black-300'
+              placeholderTextColor="#666"
+            />
+          </View>
+          {/* Phone Field */}
+          <View>
+            <Text className="text-base font-rubik-medium text-black-300 mb-2">
+              Phone Number
+            </Text>
+            <TextInput
+              value={formData.phone}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, phone: text }))}
+              placeholder="Enter your phone number"
+              keyboardType="phone-pad"
+              className="border border-primary-200 rounded-lg px-4 py-3 text-base font-rubik text-black-300"
+              placeholderTextColor="#666"
+            />
+          </View>
+          {/* Role Field */}
+          <View>
+            <Text className="text-base font-rubik-medium text-black-300 mb-2">
+              Role
+            </Text>
+            <View className='flex-row gap-4'>
+              <TouchableOpacity
+                onPress={() => setFormData(prev => ({ ...prev, role: 'customer' }))}
+                className={`flex-1 py-3 px-4 rounded-lg border ${
+                  formData.role === 'customer'
+                    ? 'bg-primary-100 border-primary-100'
+                    : 'bg-white border-primary-200'
+                }`}
+              >
+                <Text className={`text-center font-rubik-medium ${
+                    formData.role === 'customer' ? 'text-primary-300' : "text-black-200"
+                  }`}
+                >
+                  Customer
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setFormData(prev => ({ ...prev, role: 'agent' }))}
+                className={`flex-1 py-3 px-4 rounded-lg border ${
+                  formData.role === 'agent' 
+                    ? 'bg-primary-100 border-primary-100' 
+                    : 'bg-white border-primary-200'
+                }`}
+              >
+                <Text className={`text-center font-rubik-medium ${
+                  formData.role === 'agent' ? 'text-primary-300' : 'text-black-200'
+                }`}>
+                  Agent
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
