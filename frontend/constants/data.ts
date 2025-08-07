@@ -79,6 +79,7 @@ export const settings = [
   {
     title: "Profile",
     icon: icons.person,
+    route: "edit-profile"
   },
   {
     title: "Notifications",

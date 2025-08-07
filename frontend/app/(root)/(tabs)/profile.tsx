@@ -13,11 +13,21 @@ interface SettingsItemProps {
   onPress?: () => void;
   textStyle?: string;
   showArrow?: boolean;
+  route?: string;
 }
 
-const SettingsItem = ({icon, title, onPress, textStyle, showArrow = true }: SettingsItemProps) => {
+const SettingsItem = ({icon, title, onPress, textStyle, showArrow = true, route }: SettingsItemProps) => {
+  const router = useRouter();
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else if (route) {
+      router.push(route as any); 
+    }
+  };
   return (
-    <TouchableOpacity onPress={onPress} className='flex flex-row items-center justify-between py-3'>
+    <TouchableOpacity onPress={handlePress} className='flex flex-row items-center justify-between py-3'>
       <View className='flex flex-row items-center gap-3'>
         <Image source={icon} className='size-6' resizeMode='contain' />
         <Text className={`text-lg font-rubik-medium text-black-300 ${textStyle}`}>{title}</Text>
@@ -71,7 +81,6 @@ const profile = () => {
           <Text className='text-xl font-rubik-bold'>Profile</Text>
           <View className='flex-row gap-2'>
             <Image source={icons.bell} className='size-5' />
-            <Image source={icons.edit} className='size-5' />
           </View>
         </View>
         
