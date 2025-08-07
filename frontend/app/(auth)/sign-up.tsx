@@ -36,6 +36,7 @@ const SignUp = () => {
 
   const [role, setRole] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
@@ -47,6 +48,36 @@ const SignUp = () => {
       hideSub.remove();
     };
   }, []);
+
+  const validateForm = () => {
+    if(!form.name.trim()) {
+      Alert.alert('Error', 'Please enter your name')
+      return false
+    }
+    if(!form.email.trim()) {
+      Alert.alert('Error', 'Please enter your email');
+      return false;
+    }
+    if (!form.password.trim()) {
+      Alert.alert('Error', 'Please enter your password');
+      return false;
+    }
+    if (!role) {
+      Alert.alert('Error', 'Please select a role');
+      return false;
+    }
+    if (form.password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRegex.test(form.email)) {
+      Alert.alert('Error', 'Please enter a valid email address')
+      return false
+    }
+
+    return true
+  }
 
   const handleSignup = async () => {
     try {

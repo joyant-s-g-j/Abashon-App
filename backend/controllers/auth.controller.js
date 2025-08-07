@@ -20,20 +20,28 @@ export const signup = async (req, res) => {
             email,
             phone,
             password,
-            authMethod: 'local'
+            authMethod: 'local',
+            role: 'customer',
+            profilePic: ''
         })
 
         if(newUser) {
             await newUser.save();
-            generateToken(newUser._id,res);
+            const token = generateToken(newUser._id, res);
             
             res.status(201).json({
-                _id:newUser._id,
-                name: newUser.name,
-                email: newUser.email,
-                phone: newUser.phone,
-                profilePic: newUser.profilePic,
-                authMethod: newUser.authMethod
+                success: true,
+                message: "User created successfully",
+                token: token,
+                user: {
+                    _id: newUser._id,
+                    name: newUser.name,
+                    email: newUser.email,
+                    phone: newUser.phone,
+                    role: newUser.role,
+                    profilePic: newUser.profilePic,
+                    authMethod: newUser.authMethod
+                }
             })
         } else {
             res.status(400).json({message: "Invalid user data" });
@@ -47,6 +55,13 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
     const { email, password } = req.body;
     try {
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required"
+            });
+        }
+
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -64,14 +79,21 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: "Password incorrect" });
         }
 
-        generateToken(user._id, res);
+        const token = generateToken(user._id, res);
 
         res.status(200).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            profilePic: user.profilePic,
-            authMethod: user.authMethod
+            success: true,
+            message: "Login successful",
+            token: token,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                profilePic: user.profilePic,
+                authMethod: user.authMethod
+            }
         });
     } catch (error) {
         console.log("Error in login controller", error.message);
