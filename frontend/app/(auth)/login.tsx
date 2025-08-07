@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, TextInput, Keyboard, Platform} from 'react-native'
+import { View, Text, Image, TouchableOpacity, TextInput, Keyboard, Platform, Alert} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import images from '@/constants/images'
@@ -11,19 +11,12 @@ const login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter()
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow', () => {
-        setKeyboardVisible(true)
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide', () => {
-        setKeyboardVisible(false)
-      }
-    );
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {setKeyboardVisible(true)});
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {setKeyboardVisible(false)});
 
     return () => {
       keyboardDidShowListener.remove()
@@ -31,7 +24,29 @@ const login = () => {
     };
   }, [])
 
+  const validateForm = () => {
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email address');
+      return false;
+    }
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter your password');
+      return false;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleLogin = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true)
     try {
       const response = await axios.post(
         `${API_BASE_URL}/api/auth/login`,
@@ -41,19 +56,52 @@ const login = () => {
         },
         {
           withCredentials: true,
+          timeout: 10000,
         }
       );
 
       console.log('Login Success:', response.data);
-      await AsyncStorage.setItem('user', JSON.stringify(response.data.user || response.data));
-      // Redirect to home (tabs/index)
+      let userData;
+      let token;
+      if(response.data.success) {
+        userData = response.data.user;
+        token = response.data.token;
+      } else if (response.data.user) {
+        userData = response.data.user;
+        token = response.data.token;
+      } else {
+        userData = response.data
+      }
+
+      if(userData) {
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        console.log('Stored user data:', userData);
+      }
+      if (token) {
+        await AsyncStorage.setItem('token', token);
+        console.log('Token stored successfully');
+      }
       router.replace("/(root)/(tabs)");
     } catch (error) {
+      console.error('Login error:', error);
+      
       if (axios.isAxiosError(error)) {
-        console.error('Login Failed:', error?.response?.data || error?.message);
+        if (error.code === 'ECONNABORTED') {
+          Alert.alert('Error', 'Request timeout. Please check your internet connection.');
+        } else if (error.response?.data?.message) {
+          Alert.alert('Error', error.response.data.message);
+        } else if (error.response?.status === 401) {
+          Alert.alert('Error', 'Invalid email or password');
+        } else if (error.response?.status === 400) {
+          Alert.alert('Error', 'Invalid login credentials');
+        } else {
+          Alert.alert('Error', 'Network error. Please check your connection.');
+        }
       } else {
-        console.error('An unexpected error occurred:', error);
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
       }
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -92,7 +140,9 @@ const login = () => {
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
-            className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-black-300 font-rubik"
+            editable={!loading}
+            className={`border border-gray-300 rounded-xl px-4 py-3 mb-4 text-black-300 font-rubik ${loading ? 'opacity-50' : ''}`}
+            placeholderTextColor="#999"
           />
 
           {/* Password Input */}
@@ -101,24 +151,34 @@ const login = () => {
             onChangeText={setPassword}
             placeholder="Password"
             secureTextEntry
-            className="border border-gray-300 rounded-xl px-4 py-3 mb-2 text-black-300 font-rubik"
+            editable={!loading}
+            className={`border border-gray-300 rounded-xl px-4 py-3 mb-2 text-black-300 font-rubik ${loading ? 'opacity-50' : ''}`}
+            placeholderTextColor="#999"
           />
+
+          {/* Forgot Password Link */}
+          <TouchableOpacity className="self-end mb-4">
+            <Text className="text-primary-300 font-rubik-medium">Forgot Password?</Text>
+          </TouchableOpacity>
 
           {/* Login Button */}
           <TouchableOpacity
             onPress={handleLogin}
-            className="bg-primary-300 py-4 mt-6 rounded-xl"
+            disabled={loading}
+            className={`${loading ? 'bg-primary-200' : 'bg-primary-300'} py-4 mt-6 rounded-xl`}
           >
             <Text className="text-white text-center font-rubik-bold text-lg">
-              Login
+              {loading ? 'Signing In...' : 'Login'}
             </Text>
           </TouchableOpacity>
 
           {/* Register Redirect */}
-          <View className="flex-row justify-center mt-6">
-            <Text className="text-black-200 font-rubik">Don’t have an account? </Text>
-            <TouchableOpacity>
-              <Link href="/sign-up" className="text-primary-300 font-rubik-medium">Sign Up</Link>
+          <View className="flex-row justify-center mt-6 mb-8">
+            <Text className="text-black-200 font-rubik">Don't have an account? </Text>
+            <TouchableOpacity disabled={loading}>
+              <Link href="/sign-up" className={`font-rubik-medium ${loading ? 'text-primary-200' : 'text-primary-300'}`}>
+                Sign Up
+              </Link>
             </TouchableOpacity>
           </View>
         </View>
