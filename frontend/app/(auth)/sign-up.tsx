@@ -16,6 +16,7 @@ import axios from 'axios';
 import images from '@/constants/images';
 import CustomDropdown from '@/components/CustomDropdown';
 import CustomInput from '@/components/CustomInput';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type FormFieldKey = 'name' | 'email' | 'phone' | 'password';
 
@@ -80,33 +81,62 @@ const SignUp = () => {
   }
 
   const handleSignup = async () => {
+    if(!validateForm()) return
+
+    setLoading(true)
     try {
       const response = await axios.post(
         `${API_BASE_URL}/api/auth/signup`,
         {
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
+          name: form.name.trim(),
+          email: form.email.trim().toLowerCase(),
+          phone: form.phone.trim(),
           password: form.password,
           role: role,
         },
         {
           withCredentials: true,
+          timeout: 10000,
         }
       );
 
       console.log('Signup Success:', response.data);
-      Alert.alert('Success', `Welcome ${form.name}! You have successfully signed up.`, [
-        { text: 'Go to Login', onPress: () => router.push('/login') },
-      ]);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error('Signup Failed:', error.response?.data || error.message);
-        Alert.alert('Error', error.response?.data?.message || 'Signup failed.');
-      } else {
-        console.error('Unexpected error:', error);
-        Alert.alert('Error', 'An unexpected error occurred.');
+      if(response.data.success) {
+        if(response.data.user) {
+          await AsyncStorage.setItem('user', JSON.stringify(response.data.user))
+        }
+        if(response.data.token) {
+          await AsyncStorage.setItem('token', response.data.token)
+        }
+        Alert.alert(
+          'Success', 
+          `Welcome ${form.name}! You have successfully signed up.`, 
+          [
+            { 
+              text: 'Go to Login', 
+              onPress: () => router.push('/login') 
+            },
+          ]
+        );
       }
+      
+    } catch (error) {
+      console.error('Signup error:', error);
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNABORTED') {
+          Alert.alert('Error', 'Request timeout. Please check your internet connection.');
+        } else if (error.response?.data?.message) {
+          Alert.alert('Error', error.response.data.message);
+        } else if (error.response?.status === 400) {
+          Alert.alert('Error', 'Invalid information provided. Please check your details.');
+        } else {
+          Alert.alert('Error', 'Network error. Please check your connection.');
+        }
+      } else {
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      }
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -114,7 +144,7 @@ const SignUp = () => {
     { key: 'name', placeholder: 'Name', keyboardType: 'default', secure: false },
     { key: 'email', placeholder: 'Email', keyboardType: 'email-address', secure: false },
     { key: 'phone', placeholder: 'Phone Number', keyboardType: 'phone-pad', secure: false },
-    { key: 'password', placeholder: 'Password', keyboardType: 'default', secure: true },
+    { key: 'password', placeholder: 'Password (min. 6 characters)', keyboardType: 'default', secure: true },
   ];
 
   const roleOptions = [
@@ -168,8 +198,14 @@ const SignUp = () => {
           ))}
 
           {/* Signup Button */}
-          <TouchableOpacity onPress={handleSignup} className="bg-primary-300 py-4 mt-6 rounded-xl">
-            <Text className="text-white text-center font-rubik-bold text-lg">Sign Up</Text>
+          <TouchableOpacity 
+            onPress={handleSignup} 
+            disabled={loading}
+            className={`${loading ? 'bg-primary-200' : 'bg-primary-300'} py-4 mt-4 rounded-xl`}
+          >
+            <Text className="text-white text-center font-rubik-bold text-lg">
+              {loading ? 'Creating Account...' : 'Sign Up'}
+            </Text>
           </TouchableOpacity>
 
           {/* Login Redirect */}
