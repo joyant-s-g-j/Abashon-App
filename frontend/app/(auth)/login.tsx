@@ -183,7 +183,6 @@ const login = () => {
           </View>
         </View>
       </KeyboardAwareScrollView>
-      
     </SafeAreaView>
   )
 }

@@ -129,6 +129,32 @@ export const checkAuth = (req, res) => {
     }
 }
 
+export const getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select('-password')
+
+        if(!user) {
+            return res.status(404).json({ success: false, message: "User not found" })
+        }
+        res.status(200).json({
+            success: true,
+            message: "Profile retrieved successfully",
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                profilePic: user.profilePic,
+                authMethod: user.authMethod
+            }
+        });
+    } catch (error) {
+        console.log("Error in getProfile controller", error.message);
+        res.status(500).json({ success: false, message: "Internal server error"})
+    }
+}
+
 const uploadImageToCloudinary = async(imageData) => {
     try {
         const result = await cloudinary.uploader.upload(imageData, {
@@ -164,6 +190,11 @@ export const updateProfile = async (req, res) => {
             return res.status(400).json({ success: false, message: "Name, email and phone are required" })
         }
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!emailRegex.test(email)) {
+            return res.status(400).json({ success: false, message: "Please enter a valid email address" })
+        }
+
         if(role && req.user.role !== 'admin') {
             return res.status(403).json({ success: false, message: 'Not authorized to update role' })
         }
@@ -172,23 +203,35 @@ export const updateProfile = async (req, res) => {
         if(!user) {
             return res.status(404).json({ success: false, message: "User not found" })
         }
-        
-        user.name = name;
-        user.email = email;
-        user.phone = phone;
 
-        if(role) {
+        if(email !== user.email) {
+            const existingUser = await User.findOne({ email, _id: { $ne: userId }})
+            if(existingUser) {
+                return res.status(400).json({ success: false, message: "Email is already in use"})
+            }
+        }
+        
+        user.name = name.trim();
+        user.email = email.trim().toLowerCase();
+        user.phone = phone.trim();
+
+        if(role && req.user.role === 'admin') {
             user.role = role
         }
 
         if(profilePic) {
             if(profilePic.startsWith('data:')) {
-                const newImageUrl = await uploadImageToCloudinary(profilePic)
+                try {
+                    const newImageUrl = await uploadImageToCloudinary(profilePic)
 
-                if(user.profilePic && !user.profilePic.includes('googleusercontent.com')) {
-                    await deleteImageFromCloudinary(user.profilePic)
+                    if(user.profilePic && !user.profilePic.includes('googleusercontent.com')) {
+                        await deleteImageFromCloudinary(user.profilePic)
+                    }
+                    user.profilePic = newImageUrl;
+                } catch (uploadError) {
+                    console.log("Image upload error", uploadError);
+                    return res.status(500).json({ success: false, message: "Failed to upload profile picture" })
                 }
-                user.profilePic = newImageUrl;
             } else if (profilePic !== user.profilePic) {
                 if(user.profilePic && !user.profilePic.includes('googleusercontent.com')) {
                     await deleteImageFromCloudinary(user.profilePic)

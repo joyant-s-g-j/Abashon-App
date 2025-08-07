@@ -7,6 +7,7 @@ import images from '@/constants/images'
 import * as ImagePicker from 'expo-image-picker'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 interface User {
   _id: string;
   name: string;
@@ -36,14 +37,17 @@ const EditProfile = () => {
         if(storedUser) {
           const parsedUser = JSON.parse(storedUser)
           setUser(parsedUser)
-          console.log("uuuse", parsedUser);
-          setFormData({
-            name: parsedUser.name || '',
-            email: parsedUser.email || '',
-            phone: parsedUser.phone || '',
-            role: parsedUser.role || '',
-            profilePic: parsedUser.profilePic || ''
-          })
+          if(!parsedUser.phone) {
+            await fetchUserFromBackend()
+          } else {
+            setFormData({
+              name: parsedUser.name || '',
+              email: parsedUser.email || '',
+              phone: parsedUser.phone || '',
+              role: parsedUser.role || '',
+              profilePic: parsedUser.profilePic || ''
+            })
+          }
         }
       } catch (error) {
         console.error('Failed to load user:', error)
@@ -52,6 +56,101 @@ const EditProfile = () => {
     }
     fetchUser()
   }, [])
+
+  const fetchUserFromBackend = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token')
+      if(!token) {
+        console.log('No token found');
+        return
+      }
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const data = await response.json()
+
+      if(data.success && data.user) {
+        await AsyncStorage.setItem('user', JSON.stringify(data.user))
+        setUser(data.user)
+        setFormData({
+          name: data.user.name || '',
+          email: data.user.email || '',
+          phone: data.user.phone || '',
+          role: data.user.role || '',
+          profilePic: data.user.profilePic || ''
+        })
+        console.log('Updated user from backend', data.user);
+      }
+    } catch (error) {
+      console.error('Error fetching user from backend:', error)
+
+      const storedUser = await AsyncStorage.getItem('user')
+      if(storedUser) {
+        const parsedUser = JSON.parse(storedUser)
+        setFormData({
+          name: parsedUser.name || '',
+          email: parsedUser.email || '',
+          phone: parsedUser.phone || '',
+          role: parsedUser.role || '',
+          profilePic: parsedUser.profilePic || ''
+        })
+      }
+    }
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Sorry, we need camera roll permissions to change your profile picture.')
+        return
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: true
+      })
+
+      if (!result.canceled && result.assets[0]) {
+        const asset = result.assets[0]
+        const base64Image = `data:${asset.type === 'image' ? 'image/jpeg' : asset.type};base64,${asset.base64}`
+        setFormData(prev => ({
+          ...prev,
+          profilePic: base64Image
+        }))
+      }
+    } catch (error) {
+      console.error('Error picking image:', error)
+      Alert.alert('Error', 'Failed to select image')
+    }
+  }
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      Alert.alert('Error', 'Please enter your name')
+      return false
+    }
+    if (!formData.email.trim()) {
+      Alert.alert('Error', 'Please enter your email')
+      return false
+    }
+    if (!formData.phone.trim()) {
+      Alert.alert('Error', 'Please enter your phone number')
+      return false
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      Alert.alert('Error', 'Please enter a valid email address')
+      return false
+    } 
+    return true
+  }
 
   const pickImage = async () => {
     try {
@@ -91,6 +190,60 @@ const EditProfile = () => {
       return { uri: formData.profilePic }
     }
     return images.avatar
+  }
+
+  const handleUpdateProfile = async () => {
+    if (!validateForm()) return
+    setLoading(true)
+    try {
+      const token = await AsyncStorage.getItem('token')
+      if(!token) {
+        Alert.alert('Error', 'Authentication token not found')
+        router.replace('/sign-in')
+        return
+      }
+      const response  = await fetch(`${API_BASE_URL}/api/auth/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim().toLowerCase(),
+          phone: formData.phone.trim(),
+          role: formData.role,
+          profilePic: formData.profilePic
+        })
+      })
+
+      const data = await response.json()
+
+      if(response.ok && data.success) {
+        await AsyncStorage.setItem('user', JSON.stringify(data.user))
+        Alert.alert(
+          'Success',
+          'Profile updated successfully!',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.back()
+            }
+          ]
+        )
+      } else {
+        Alert.alert('Error', data.message || 'Failed to update Profile')
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      if (error instanceof TypeError && error.message.includes('Network request failed')) {
+        Alert.alert('Error', 'Network error. Please check your internet connection.')
+      } else {
+        Alert.alert('Error', 'Failed to update profile. Please try again.')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
   return (
     <SafeAreaView className='flex-1 bg-white'>
@@ -214,6 +367,7 @@ const EditProfile = () => {
 
         {/* update button */}
         <TouchableOpacity
+          onPress={handleUpdateProfile}
           disabled={loading}
           className={`mt-8 py-4 rounded-lg ${ loading ? 'bg-primary-200' : 'bg-primary-300' }`}
         >
