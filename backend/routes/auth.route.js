@@ -10,7 +10,7 @@ router.post("/login", login)
 router.post("/logout", logout)
 router.get("/check", protectRoute, checkAuth)
 router.get("/profile", protectRoute, getProfile)
-router.put("/update", protectRoute, updateProfile)
+router.put("/update-profile", protectRoute, updateProfile)
 
 router.post("/google", googleAuth)
 router.post("/google/access-token", googleAuthWithAccessToken)

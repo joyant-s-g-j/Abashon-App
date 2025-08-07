@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, Image, Alert, TextInput } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { router, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import icons from '@/constants/icons'
 import images from '@/constants/images'
 import * as ImagePicker from 'expo-image-picker'
@@ -85,48 +85,37 @@ const EditProfile = () => {
           profilePic: data.user.profilePic || ''
         })
         console.log('Updated user from backend', data.user);
+      } else {
+        console.error('Error fetching user from backend:', data.message)
+        const storedUser = await AsyncStorage.getItem('user')
+        if(storedUser) {
+          const parsedUser = JSON.parse(storedUser)
+          setFormData({
+            name: parsedUser.name || '',
+            email: parsedUser.email || '',
+            phone: parsedUser.phone || '',
+            role: parsedUser.role || '',
+            profilePic: parsedUser.profilePic || ''
+          })
+        }
       }
     } catch (error) {
       console.error('Error fetching user from backend:', error)
-
-      const storedUser = await AsyncStorage.getItem('user')
-      if(storedUser) {
-        const parsedUser = JSON.parse(storedUser)
-        setFormData({
-          name: parsedUser.name || '',
-          email: parsedUser.email || '',
-          phone: parsedUser.phone || '',
-          role: parsedUser.role || '',
-          profilePic: parsedUser.profilePic || ''
-        })
+      try {
+        const storedUser = await AsyncStorage.getItem('user')
+        if(storedUser) {
+          const parsedUser = JSON.parse(storedUser)
+          setFormData({
+            name: parsedUser.name || '',
+            email: parsedUser.email || '',
+            phone: parsedUser.phone || '',
+            role: parsedUser.role || '',
+            profilePic: parsedUser.profilePic || ''
+          })
+        }
+      } catch (storageError) {
+        console.error('Error loading stored user data:', storageError)
       }
-    }
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-      if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Sorry, we need camera roll permissions to change your profile picture.')
-        return
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-        base64: true
-      })
-
-      if (!result.canceled && result.assets[0]) {
-        const asset = result.assets[0]
-        const base64Image = `data:${asset.type === 'image' ? 'image/jpeg' : asset.type};base64,${asset.base64}`
-        setFormData(prev => ({
-          ...prev,
-          profilePic: base64Image
-        }))
-      }
-    } catch (error) {
-      console.error('Error picking image:', error)
-      Alert.alert('Error', 'Failed to select image')
     }
   }
 
@@ -202,25 +191,56 @@ const EditProfile = () => {
         router.replace('/sign-in')
         return
       }
-      const response  = await fetch(`${API_BASE_URL}/api/auth/update`, {
+
+      const storedUser = await AsyncStorage.getItem('user')
+      const currentUser = storedUser ? JSON.parse(storedUser) : null
+
+      const requestBody: {
+        name: string;
+        email: string;
+        phone: string;
+        profilePic: string;
+        role?: string
+      } = {
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        profilePic: formData.profilePic
+      }
+
+      if(currentUser?.role === 'admin') {
+        requestBody.role = formData.role
+      }
+
+      console.log('Making request to:', `${API_BASE_URL}/api/auth/update-profile`)
+      console.log('Request payload:', {
+        ...requestBody,
+        profilePic: requestBody.profilePic ? 'base64_image_data' : null // Don't log full base64
+      })
+
+      const response  = await fetch(`${API_BASE_URL}/api/auth/update-profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          email: formData.email.trim().toLowerCase(),
-          phone: formData.phone.trim(),
-          role: formData.role,
-          profilePic: formData.profilePic
-        })
+        body: JSON.stringify(requestBody)
       })
 
       const data = await response.json()
+      console.log('Update response:', data);
 
       if(response.ok && data.success) {
         await AsyncStorage.setItem('user', JSON.stringify(data.user))
+
+        setUser(data.user)
+        setFormData({
+          name: data.user.name || '',
+          email: data.user.email || '',
+          phone: data.user.role || '',
+          role: data.user.role || '',
+          profilePic: data.user.profilePic || ''
+        })
         Alert.alert(
           'Success',
           'Profile updated successfully!',
@@ -245,6 +265,8 @@ const EditProfile = () => {
       setLoading(false)
     }
   }
+
+  const isAdmin = user?.role === 'admin'
   return (
     <SafeAreaView className='flex-1 bg-white'>
       <ScrollView
@@ -326,43 +348,46 @@ const EditProfile = () => {
             />
           </View>
           {/* Role Field */}
-          <View>
-            <Text className="text-base font-rubik-medium text-black-300 mb-2">
-              Role
-            </Text>
-            <View className='flex-row gap-4'>
-              <TouchableOpacity
-                onPress={() => setFormData(prev => ({ ...prev, role: 'customer' }))}
-                className={`flex-1 py-3 px-4 rounded-lg border ${
-                  formData.role === 'customer'
-                    ? 'bg-primary-100 border-primary-100'
-                    : 'bg-white border-primary-200'
-                }`}
-              >
-                <Text className={`text-center font-rubik-medium ${
-                    formData.role === 'customer' ? 'text-primary-300' : "text-black-200"
+          {!isAdmin && (
+            <View>
+              <Text className="text-base font-rubik-medium text-black-300 mb-2">
+                Role
+              </Text>
+              <View className='flex-row gap-4'>
+                <TouchableOpacity
+                  onPress={() => setFormData(prev => ({ ...prev, role: 'customer' }))}
+                  className={`flex-1 py-3 px-4 rounded-lg border ${
+                    formData.role === 'customer'
+                      ? 'bg-primary-100 border-primary-100'
+                      : 'bg-white border-primary-200'
                   }`}
                 >
-                  Customer
-                </Text>
-              </TouchableOpacity>
+                  <Text className={`text-center font-rubik-medium ${
+                      formData.role === 'customer' ? 'text-primary-300' : "text-black-200"
+                    }`}
+                  >
+                    Customer
+                  </Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => setFormData(prev => ({ ...prev, role: 'agent' }))}
-                className={`flex-1 py-3 px-4 rounded-lg border ${
-                  formData.role === 'agent' 
-                    ? 'bg-primary-100 border-primary-100' 
-                    : 'bg-white border-primary-200'
-                }`}
-              >
-                <Text className={`text-center font-rubik-medium ${
-                  formData.role === 'agent' ? 'text-primary-300' : 'text-black-200'
-                }`}>
-                  Agent
-                </Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setFormData(prev => ({ ...prev, role: 'agent' }))}
+                  className={`flex-1 py-3 px-4 rounded-lg border ${
+                    formData.role === 'agent' 
+                      ? 'bg-primary-100 border-primary-100' 
+                      : 'bg-white border-primary-200'
+                  }`}
+                >
+                  <Text className={`text-center font-rubik-medium ${
+                    formData.role === 'agent' ? 'text-primary-300' : 'text-black-200'
+                  }`}>
+                    Agent
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          )}
+          
         </View>
 
         {/* update button */}

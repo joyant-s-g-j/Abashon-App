@@ -195,8 +195,12 @@ export const updateProfile = async (req, res) => {
             return res.status(400).json({ success: false, message: "Please enter a valid email address" })
         }
 
-        if(role && req.user.role !== 'admin') {
-            return res.status(403).json({ success: false, message: 'Not authorized to update role' })
+        if(role && req.user.role === 'admin') {
+            return res.status(403).json({ success: false, message: 'Admin role cannot be changed' })
+        }
+
+        if(role && req.user.role !== 'admin'  && !['customer', 'agent'].includes(role)) {
+            return res.status(400).json({ success: false, message: 'Invalid role. Only customer and agent roles are allowed' })
         }
 
         const user = await User.findById(userId);
