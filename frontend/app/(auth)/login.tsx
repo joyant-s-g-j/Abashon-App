@@ -59,8 +59,6 @@ const login = () => {
           timeout: 10000,
         }
       );
-
-      console.log('Login Success:', response.data);
       let userData;
       let token;
       if(response.data.success) {
@@ -75,11 +73,9 @@ const login = () => {
 
       if(userData) {
         await AsyncStorage.setItem('user', JSON.stringify(userData));
-        console.log('Stored user data:', userData);
       }
       if (token) {
         await AsyncStorage.setItem('token', token);
-        console.log('Token stored successfully');
       }
       router.replace("/(root)/(tabs)");
     } catch (error) {
@@ -157,7 +153,7 @@ const login = () => {
           />
 
           {/* Forgot Password Link */}
-          <TouchableOpacity className="self-end mb-4">
+          <TouchableOpacity className="mb-4">
             <Text className="text-primary-300 font-rubik-medium">Forgot Password?</Text>
           </TouchableOpacity>
 
@@ -165,7 +161,7 @@ const login = () => {
           <TouchableOpacity
             onPress={handleLogin}
             disabled={loading}
-            className={`${loading ? 'bg-primary-200' : 'bg-primary-300'} py-4 mt-6 rounded-xl`}
+            className="bg-primary-300 py-4 mt-6 rounded-xl"
           >
             <Text className="text-white text-center font-rubik-bold text-lg">
               {loading ? 'Signing In...' : 'Login'}
@@ -176,7 +172,7 @@ const login = () => {
           <View className="flex-row justify-center mt-6 mb-8">
             <Text className="text-black-200 font-rubik">Don't have an account? </Text>
             <TouchableOpacity disabled={loading}>
-              <Link href="/sign-up" className={`font-rubik-medium ${loading ? 'text-primary-200' : 'text-primary-300'}`}>
+              <Link href="/sign-up" className="font-rubik-medium text-primary-300">
                 Sign Up
               </Link>
             </TouchableOpacity>

@@ -54,7 +54,6 @@ const profile = () => {
         const storedUser = await AsyncStorage.getItem('user')
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser)
-          console.log('User:', parsedUser);
           setUser(parsedUser)
         }
       } catch (error) {

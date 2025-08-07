@@ -149,7 +149,7 @@ const EditProfile = () => {
         return
       }
 
-      const result = await ImagePicker.launchCameraAsync({
+      const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
@@ -212,12 +212,6 @@ const EditProfile = () => {
         requestBody.role = formData.role
       }
 
-      console.log('Making request to:', `${API_BASE_URL}/api/auth/update-profile`)
-      console.log('Request payload:', {
-        ...requestBody,
-        profilePic: requestBody.profilePic ? 'base64_image_data' : null // Don't log full base64
-      })
-
       const response  = await fetch(`${API_BASE_URL}/api/auth/update-profile`, {
         method: 'PUT',
         headers: {
@@ -228,7 +222,6 @@ const EditProfile = () => {
       })
 
       const data = await response.json()
-      console.log('Update response:', data);
 
       if(response.ok && data.success) {
         await AsyncStorage.setItem('user', JSON.stringify(data.user))
@@ -276,7 +269,7 @@ const EditProfile = () => {
       >
         {/* Header */}
         <View className='flex-row items-center justify-between mt-4 mb-6'>
-          <TouchableOpacity onPress={() => router.back()} className='flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center'>
+          <TouchableOpacity onPress={() => router.push("/profile")} className='flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center'>
             <Image source={icons.backArrow} className='size-6' />
           </TouchableOpacity>
           <Text className='text-xl font-rubik-bold text-black-300'>Edit Profile</Text>
@@ -394,7 +387,7 @@ const EditProfile = () => {
         <TouchableOpacity
           onPress={handleUpdateProfile}
           disabled={loading}
-          className={`mt-8 py-4 rounded-lg ${ loading ? 'bg-primary-200' : 'bg-primary-300' }`}
+          className="mt-8 py-4 rounded-lg bg-primary-300"
         >
           <Text className='text-white text-center text-lg font-rubik-bold'>
             {loading ? 'Updating...' : 'Update Profile'}

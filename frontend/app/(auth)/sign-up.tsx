@@ -201,7 +201,7 @@ const SignUp = () => {
           <TouchableOpacity 
             onPress={handleSignup} 
             disabled={loading}
-            className={`${loading ? 'bg-primary-200' : 'bg-primary-300'} py-4 mt-4 rounded-xl`}
+            className="bg-primary-300 py-4 mt-4 rounded-xl"
           >
             <Text className="text-white text-center font-rubik-bold text-lg">
               {loading ? 'Creating Account...' : 'Sign Up'}
