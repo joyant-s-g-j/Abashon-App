@@ -1,10 +1,28 @@
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 import icons from '@/constants/icons'
+import images from '@/constants/images'
 
 const EditProfile = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    role: '',
+    profilePic: ''
+  })
+
+  const getCurrentProfileImage = () => {
+    if(formData.profilePic && formData.profilePic.startsWith('data:')) {
+      return { uri: formData.profilePic }
+    }
+    if(formData.profilePic && formData.profilePic !== "local") {
+      return { uri: formData.profilePic }
+    }
+    return images.avatar
+  }
   return (
     <SafeAreaView className='flex-1 bg-white'>
       <ScrollView
@@ -21,8 +39,8 @@ const EditProfile = () => {
           <View className='w-10' />
         </View>
 
-        {/* Profile picture section */}\
-        
+        {/* Profile picture section */}
+
       </ScrollView>
     </SafeAreaView>
   )
