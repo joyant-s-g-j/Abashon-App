@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Modal } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
@@ -21,7 +21,7 @@ const CategoryManagement = () => {
   const router = useRouter()
   const [categories, setCategories] = useState([])
   const [isLoading, setIsLoading] = useState('')
-  const [searchQuery, setSearchQuery] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [newCategory, setNewCategory] = useState({
@@ -29,6 +29,10 @@ const CategoryManagement = () => {
     description: '',
     icon: '📂'
   })
+
+  const filteredCategories = categories.filter((category: any) => 
+    category.name.toLowerCase().includes(searchQuery.toLowerCase()) 
+  )
   return (
     <SafeAreaView className='flex-1 bg-gray-50'>
       <Header title='Category Management' backRoute='/admin-dashboard' rightIcon={<AddButton onPress={() => setShowAddModal(true)} />} />
@@ -57,6 +61,48 @@ const CategoryManagement = () => {
             <Text className='text-sm font-rubik text-black-200'>Active Categories</Text>
           </View>
         </View>
+        {/* Categories List */}
+        <View>
+          <Text className='text-lg font-rubik-semibold text-black-300 mb-4'>
+            All Categories ({filteredCategories.length})
+          </Text>
+          {isLoading ? (
+            <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
+              <Text className='text-primary-300 font-rubik-medium'>Loading categories</Text>
+            </View>
+          ) : filteredCategories.length === 0 ? (
+            <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
+              <Text className='text-3xl mb-2'>📂</Text>
+              <Text className='text-black-300 font-rubik-medium mb-1'>No categories found</Text>
+              <Text className='text-black-200 font-rubik text-center'>
+                {searchQuery ? 'Try adjusting your search' : 'Add your first category to get started' }
+              </Text>
+            </View>
+          ) : (
+            filteredCategories.map((category, index) => (
+              <View></View>
+            ))
+          )}
+        </View>
+
+        {/* Add Category Modal */}
+        <Modal
+          visible={showAddModal}
+          animationType='slide'
+          transparent={true}
+          onRequestClose={() => setShowAddModal(false)}
+        >
+          <View className='flex-1 justify-end bg-black/50'>
+            <View className='bg-white rounded-t-3xl p-6 max-h-[80%]'>
+              <View className='flex-row items-center justify-between mb-6'>
+                <Text className='text-xl font-rubik-bold text-black-300'>Add New Category</Text>
+                <TouchableOpacity onPress={() => setShowAddModal(false)}>
+                  <Text className='text-black-200 text-4xl'>×</Text>
+                </TouchableOpacity>
+              </View> 
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
     
