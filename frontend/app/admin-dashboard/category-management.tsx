@@ -9,7 +9,7 @@ interface AddButtonProps {
 }
 
 type Category = {
-  id: number;
+  _id: number;
   name: string;
   isActive: boolean;
 };
@@ -30,7 +30,7 @@ const CategoryManagement = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<{ name: string } | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [newCategory, setNewCategory] = useState({
     name: '',
   })
@@ -87,6 +87,44 @@ const CategoryManagement = () => {
       }
     } catch (error) {
       console.error('Error adding category:', error)
+      Alert.alert('Error', 'Failed to connect to server')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleUpdateCategory = async () => {
+    if(!selectedCategory?.name?.trim()) {
+      Alert.alert('Error', 'Category name is required')
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/categories/${selectedCategory._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: selectedCategory.name.trim() })
+      })
+
+      const result = await response.json()
+
+      if(result.success) {
+        setCategories(prev => 
+          prev.map(cat => 
+            cat._id === selectedCategory._id ? result.data : cat
+          )
+        )
+        setShowEditModal(false)
+        setSelectedCategory(null)
+        Alert.alert('Success', result.message || "Category updated successfully!")
+      } else {
+        Alert.alert('Error', result.message || 'Failed to update category')
+      }
+    } catch (error) {
+      console.error('Error updating category:', error)
       Alert.alert('Error', 'Failed to connect to server')
     } finally {
       setIsLoading(false)
@@ -273,9 +311,13 @@ const CategoryManagement = () => {
                     <TextInput
                       className='bg-gray-100 rounded-xl px-4 py-3 text-base font-rubik text-black-300'
                       placeholder='Enter category name'
-                      value={newCategory.name}
-                      onChangeText={(text) => setSelectedCategory(prev => ({ ...prev, name: text}))}
+                      value={selectedCategory.name}
                       editable={!isLoading}
+                      onChangeText={(text) =>
+                        setSelectedCategory(prev =>
+                          prev ? { ...prev, name: text } : prev
+                        )
+                      }
                     />
                   </View>
 
@@ -289,6 +331,7 @@ const CategoryManagement = () => {
                       <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
+                      onPress={handleUpdateCategory}
                       className='flex-1 bg-primary-300 py-4 rounded-xl'
                       disabled={isLoading}
                     >
