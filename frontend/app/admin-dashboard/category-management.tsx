@@ -44,6 +44,19 @@ const CategoryManagement = () => {
             placeholder='Search Categories...'
           />
         </View>
+        {/* Stats Header */}
+        <View className='flex-row justify-between mb-6'>
+          <View className='bg-white rounded-xl p-4 flex-1 mr-2 shadow-sm'>
+            <Text className='text-2xl font-rubik-bold text-black-300'>{categories.length}</Text>
+            <Text className='text-sm font-rubik text-black-200'>Total Categories</Text>
+          </View>
+          <View className='bg-white rounded-xl p-4 flex-1 ml-2 shadow-sm'>
+            <Text className='text-2xl font-rubik-bold text-green-600'>
+              {categories.filter((cat: any) => cat.isActive).length}
+            </Text>
+            <Text className='text-sm font-rubik text-black-200'>Active Categories</Text>
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
     
