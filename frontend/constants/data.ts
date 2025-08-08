@@ -178,20 +178,35 @@ export const adminDashboard = [
     title: 'Property',
     icon: '🏢',
     description: 'Manage property listings',
-    route: '/admin-dashboard/property-management'
+    route: '/admin-dashboard/property-management',
   },
   {
     id: 'category',
     title: 'Category',
     icon: '📂',
     description: 'Configure categories',
-    route: '/admin-dashboard/category-management'
+    route: '/admin-dashboard/category-management',
   },
   {
     id: 'facility',
     title: 'Facility',
     icon: '🏊',
     description: 'Update facilities',
-    route: '/admin-dashboard/facility-management'
-  }
+    route: '/admin-dashboard/facility-management',
+  },
+  {
+    id: 'users',
+    title: 'Customer Management',
+    icon: '👥',
+    description: 'Browse and manage registered customers',
+    route: '/admin-dashboard/user-management',
+  },
+  {
+    id: 'agents',
+    title: 'Agent Directory',
+    icon: '🧑‍💼',
+    description: 'Review and manage verified agents',
+    route: '/admin-dashboard/agent-management',
+  },
 ];
+

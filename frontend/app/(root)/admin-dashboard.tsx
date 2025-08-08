@@ -16,18 +16,22 @@ const AdminDashboard = () => {
           contentContainerStyle={{ paddingBottom: 30 }}
         >
           {/* header */}
-          <View className='py-6'>
-            <Text className='text-3xl font-rubik-bold text-black-300 mb-2'>
-              Admin Dashboard
-            </Text>
-            <Text className='text-base font-rubik-semibold text-black-300'>
+          <View className='flex-row items-center justify-between mt-4'>
+            <TouchableOpacity onPress={() => router.push("/profile")} className='flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center'>
+              <Image source={icons.backArrow} className='size-6' />
+            </TouchableOpacity>
+            <Text className='text-xl font-rubik-bold text-black-300'>Admin Dashboard</Text>
+            <View className='w-10' />
+          </View>
+          <View className='pb-6'>
+            <Text className='text-base text-center font-rubik-semibold mb-6 text-black-300'>
               Manage your system configurations
             </Text>
           </View>
 
           {/* stats cards */}
           <View>
-            <Text className='text-xl font-semibold text-black-300 mb-4'>
+            <Text className='text-xl font-rubik-semibold text-black-300 mb-4'>
               Quick Stats
             </Text>
             <View className='flex-row flex-wrap justify-between'>
@@ -69,7 +73,7 @@ const AdminDashboard = () => {
                       <Text className='text-2xl font-rubik-semibold text-black-300 mb-1'>
                         {option.title}
                       </Text>
-                      <Text className='text-sm text-black-200'>
+                      <Text className='text-sm font-rubik text-black-200'>
                         {option.description}
                       </Text>
                     </View>
@@ -81,6 +85,7 @@ const AdminDashboard = () => {
               </TouchableOpacity>
             ))}
           </View>
+
         </ScrollView>
     </SafeAreaView>
   )
