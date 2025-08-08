@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
@@ -32,9 +32,19 @@ const CategoryManagement = () => {
   return (
     <SafeAreaView className='flex-1 bg-gray-50'>
       <Header title='Category Management' backRoute='/admin-dashboard' rightIcon={<AddButton onPress={() => setShowAddModal(true)} />} />
-      <View>
-        <Text>CategoryManagement</Text>
-      </View>
+      <ScrollView
+        className='flex-1 px-4'
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{paddingBottom: 32 }}
+      >
+        {/* Search Bar */}
+        <View className='bg-white rounded-xl px-4 py-3 mb-6 shadow-md border border-gray-100'>
+          <TextInput
+            className='text-base font-rubik text-black-300'
+            placeholder='Search Categories...'
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
     
   )
