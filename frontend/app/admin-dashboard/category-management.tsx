@@ -131,6 +131,41 @@ const CategoryManagement = () => {
     }
   }
 
+  const handleDeleteCategory = async (category: any) => {
+    Alert.alert(
+      'Delete Category',
+      `Are you sure you want to delete "${category.name}"?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            setIsLoading(true)
+            try {
+              const response = await fetch(`${API_BASE_URL}/api/categories/${category._id}`, {
+                method: 'DELETE'
+              })
+              const result = await response.json()
+
+              if(result.success) {
+                setCategories(prev => prev.filter(cat => cat._id !== category._id))
+                Alert.alert('Success', result.message || 'Category deleted successfully!')
+              } else {
+                Alert.alert('Error', result.message || 'Failed to delete category')
+              }
+            } catch (error) {
+              console.error('Error deleting category:', error)
+              Alert.alert('Error', 'Failed to connect to server')
+            } finally {
+              setIsLoading(false)
+            }
+          }
+        }
+      ]
+    )
+  }
+
   const openEditModal = (category: any) => {
     setSelectedCategory({...category})
     setShowEditModal(true)
@@ -225,6 +260,8 @@ const CategoryManagement = () => {
                   </TouchableOpacity>
 
                   <TouchableOpacity
+                    disabled={isLoading}
+                    onPress={() => handleDeleteCategory(category)}
                     className='flex-1 bg-red-50 py-3 px-4 rounded-lg ml-2'
                   >
                     <Text className='text-center text-red-700 font-rubik-semibold text-sm'>Delete</Text>
