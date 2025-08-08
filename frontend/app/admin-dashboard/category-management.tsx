@@ -26,8 +26,6 @@ const CategoryManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [newCategory, setNewCategory] = useState({
     name: '',
-    description: '',
-    icon: '📂'
   })
 
   const filteredCategories = categories.filter((category: any) => 
@@ -100,6 +98,37 @@ const CategoryManagement = () => {
                   <Text className='text-black-200 text-4xl'>×</Text>
                 </TouchableOpacity>
               </View> 
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {/* Category Name */}
+                <View className='mb-4'>
+                  <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Category Name *</Text>
+                  <TextInput
+                    className='bg-gray-100 rounded-xl px-4 py-3 text-base font-rubik text-black-300'
+                    placeholder='Enter category name'
+                    value={newCategory.name}
+                    onChangeText={(text) => setNewCategory(prev => ({ ...prev, name: text}))}
+                  />
+                </View>
+
+                {/* Action Buttons */}
+                <View className='flex-row gap-3'>
+                  <TouchableOpacity
+                    // onPress={() => }
+                    className='flex-1 bg-gray-100 py-4 rounded-xl'
+                  >
+                    <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className='flex-1 bg-primary-300 py-4 rounded-xl'
+                    // disabled={isLoading}
+                  >
+                    <Text className='text-center font-rubik-bold text-white'>
+                      {isLoading ? 'Adding...' : 'Add Category'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
             </View>
           </View>
         </Modal>
