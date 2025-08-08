@@ -164,7 +164,7 @@ const EditProfile = () => {
         setFormData({
           name: data.user.name || '',
           email: data.user.email || '',
-          phone: data.user.role || '',
+          phone: data.user.phone || '',
           role: data.user.role || '',
           profilePic: data.user.profilePic || ''
         })

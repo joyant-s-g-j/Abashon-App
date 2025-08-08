@@ -111,7 +111,6 @@ const SignIn = () => {
     try {
       // Clear any existing data before starting new sign-in
       await AsyncStorage.multiRemove(['user', 'token']);
-      console.log('Cleared storage before Google login');
       setIsLoading(true);
       setShowWebView(true);
     } catch (error) {
