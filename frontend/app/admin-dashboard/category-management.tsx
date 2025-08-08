@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Modal } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Modal, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import Header from '@/components/Header'
@@ -20,13 +20,38 @@ const AddButton: React.FC<AddButtonProps> = ({ onPress }) => (
 const CategoryManagement = () => {
   const router = useRouter()
   const [categories, setCategories] = useState([])
-  const [isLoading, setIsLoading] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [newCategory, setNewCategory] = useState({
     name: '',
   })
+
+  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
+
+  useEffect(() => {
+    loadCategories()
+  }, [])
+
+  const loadCategories = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/categories`)
+      const result = await response.json()
+
+      if(result.success) {
+        setCategories(result.data)
+      } else {
+        Alert.alert('Error', 'Failed to load categories')
+      }
+    } catch (error) {
+      console.error('Error loading categories:', error)
+      Alert.alert('Error', 'Failed to connect to server')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const filteredCategories = categories.filter((category: any) => 
     category.name.toLowerCase().includes(searchQuery.toLowerCase()) 
@@ -129,6 +154,59 @@ const CategoryManagement = () => {
                   </TouchableOpacity>
                 </View>
               </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Edit Category Modal */}
+        <Modal
+          visible={showAddModal}
+          animationType='slide'
+          transparent={true}
+          // onRequestClose={() => setShowEditModal(false)}
+        >
+          <View className='flex-1 justify-end bg-black/50'>
+            <View className='bg-white rounded-t-3xl p-6 max-h-[80%]'>
+              <View className='flex-row items-center justify-between mb-6'>
+                <Text className='text-xl font-rubik-bold text-black-300'>Add New Category</Text>
+                <TouchableOpacity 
+                  // onPress={() => setShowEditModal(false)}
+                >
+                  <Text className='text-black-200 text-4xl'>×</Text>
+                </TouchableOpacity>
+              </View> 
+              {selectedCategory && (
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  {/* Category Name */}
+                  <View className='mb-4'>
+                    <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Category Name *</Text>
+                    <TextInput
+                      className='bg-gray-100 rounded-xl px-4 py-3 text-base font-rubik text-black-300'
+                      placeholder='Enter category name'
+                      value={newCategory.name}
+                      // onChangeText={(text) => setSelectedCategory(prev => ({ ...prev, name: text}))}
+                    />
+                  </View>
+
+                  {/* Action Buttons */}
+                  <View className='flex-row gap-3'>
+                    <TouchableOpacity
+                      // onPress={() => setShowEditModal(false)}
+                      className='flex-1 bg-gray-100 py-4 rounded-xl'
+                    >
+                      <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className='flex-1 bg-primary-300 py-4 rounded-xl'
+                      // disabled={isLoading}
+                    >
+                      <Text className='text-center font-rubik-bold text-white'>
+                        {isLoading ? 'Updating...' : 'Update Category'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
+              )}  
             </View>
           </View>
         </Modal>

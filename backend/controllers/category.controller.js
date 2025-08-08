@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Category from "../models/category.model.js"
 
-export const getallCategories = async (req, res) => {
+export const getAllCategories = async (req, res) => {
     try {
         const categories = await Category.find().sort({name: 1});
         res.status(200).json({ success: true, data: categories })
@@ -29,7 +29,7 @@ export const getCategoryById = async (req, res) => {
     }
 }
 
-export const createCatgory = async (req, res) => {
+export const createCategory = async (req, res) => {
     try {
         const { name } = req.body;
 
