@@ -107,7 +107,7 @@ const profile = () => {
           <SettingsItem icon={icons.calendar} title='My Bookings' />
           <SettingsItem icon={icons.wallet} title='Payments' />
           {user?.role?.toLowerCase() === 'admin' && (
-            <SettingsItem icon={icons.filter} title='Admin Management' />
+            <SettingsItem icon={icons.filter} route="admin-dashboard" title='Admin Dashboard' />
           )}
         </View>
 

@@ -164,3 +164,34 @@ export const gallery = [
     image: images.japan,
   },
 ];
+
+export const stats = [
+  { label: 'Total Properties', value: '247', color: 'bg-blue-500' },
+  { label: 'Categories', value: '12', color: 'bg-green-500' },
+  { label: 'Facilities', value: '38', color: 'bg-purple-500' },
+  { label: 'Active Listings', value: '189', color: 'bg-orange-500' }
+]
+
+export const adminDashboard = [
+  {
+    id: 'property',
+    title: 'Property',
+    icon: '🏢',
+    description: 'Manage property listings',
+    route: 'property-management'
+  },
+  {
+    id: 'category',
+    title: 'Category',
+    icon: '📂',
+    description: 'Configure categories',
+    route: 'category-management'
+  },
+  {
+    id: 'facility',
+    title: 'Facility',
+    icon: '🏊',
+    description: 'Update facilities',
+    route: 'facility-management'
+  }
+]
