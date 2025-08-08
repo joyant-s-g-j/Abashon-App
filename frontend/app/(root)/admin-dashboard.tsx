@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { adminDashboard, stats } from '@/constants/data'
+import { adminDashboard, instructionSections, stats } from '@/constants/data'
 import { useRouter } from 'expo-router'
 import icons from '@/constants/icons'
 
@@ -60,7 +60,7 @@ const AdminDashboard = () => {
             {adminDashboard.map((option, index) => (
               <TouchableOpacity
                 key={option.id}
-                className='bg-white rounded-xl p-6 mb-4 shadow-sm border border-gray-100'
+                className='bg-white rounded-xl px-6 py-4 mb-4 shadow-sm border border-gray-100'
                 onPress={() => router.push(option.route as any)}
                 activeOpacity={0.7}
               >
@@ -70,7 +70,7 @@ const AdminDashboard = () => {
                       <Text className='text-4xl'>{option.icon}</Text>
                     </View>
                     <View className='flex-1'>
-                      <Text className='text-2xl font-rubik-semibold text-black-300 mb-1'>
+                      <Text className='text-xl font-rubik-semibold text-black-300 mb-1'>
                         {option.title}
                       </Text>
                       <Text className='text-sm font-rubik text-black-200'>
@@ -78,14 +78,31 @@ const AdminDashboard = () => {
                       </Text>
                     </View>
                   </View>
-                  <View className='flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center'>
-                    <Image source={icons.rightArrow} className='size-6' />
+                  <View className='flex flex-row bg-primary-200 rounded-full size-8 items-center justify-center'>
+                    <Image source={icons.rightArrow} className='size-5' />
                   </View>
                 </View>
               </TouchableOpacity>
             ))}
           </View>
+            <View className="bg-primary-200 rounded-md p-6 mb-6">
+              <View className='flex-row items-center mb-4'>
+                <Text className='text-3xl mr-4'>{instructionSections.emoji}</Text>
+                <Text className="text-lg font-rubik-semibold text-black-300">
+                  {instructionSections.title}
+                </Text>
+              </View>
 
+              <View className='gap-1'>
+                {instructionSections.points.map((point, i) => (
+                  <View key={i} className='flex-row items-start'>
+                    <Text className="text-sm font-rubik flex-1 leading-5 text-black-300">
+                      {point}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
         </ScrollView>
     </SafeAreaView>
   )

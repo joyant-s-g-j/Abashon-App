@@ -210,3 +210,15 @@ export const adminDashboard = [
   },
 ];
 
+export const instructionSections = {
+    title: 'Core Responsibilities',
+    emoji: '📋',
+    points: [
+      'Ensure all necessary facilities and category are created before allowing property creation',
+      'Verify that all required property details are properly added',
+      'Confirm that an agent is assigned to the property before publishing',
+      'Validate the assigned agent’s phone number and email for accuracy',
+    ]
+}
+
+
