@@ -178,20 +178,20 @@ export const adminDashboard = [
     title: 'Property',
     icon: '🏢',
     description: 'Manage property listings',
-    route: 'property-management'
+    route: '/admin-dashboard/property-management'
   },
   {
     id: 'category',
     title: 'Category',
     icon: '📂',
     description: 'Configure categories',
-    route: 'category-management'
+    route: '/admin-dashboard/category-management'
   },
   {
     id: 'facility',
     title: 'Facility',
     icon: '🏊',
     description: 'Update facilities',
-    route: 'facility-management'
+    route: '/admin-dashboard/facility-management'
   }
-]
+];
