@@ -1,32 +1,24 @@
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native'
-import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { adminDashboard, instructionSections, stats } from '@/constants/data'
 import { useRouter } from 'expo-router'
 import icons from '@/constants/icons'
+import Header from '@/components/Header'
 
 const AdminDashboard = () => {
   const router = useRouter();
   return (
     <SafeAreaView className='flex-1 bg-gray-50'>
+        <Header title="Admin Dashboard" backRoute="/profile" />
+
         <ScrollView
           className='flex-1 px-4'
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 30 }}
         >
-          {/* header */}
-          <View className='flex-row items-center justify-between mt-4'>
-            <TouchableOpacity onPress={() => router.push("/profile")} className='flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center'>
-              <Image source={icons.backArrow} className='size-6' />
-            </TouchableOpacity>
-            <Text className='text-xl font-rubik-bold text-black-300'>Admin Dashboard</Text>
-            <View className='w-10' />
-          </View>
-          <View className='pb-6'>
-            <Text className='text-base text-center font-rubik-semibold mb-6 text-black-300'>
-              Manage your system configurations
-            </Text>
-          </View>
+          <Text className='text-2xl font-rubik-semibold mb-4 text-black-300'>
+            Manage your system configurations
+          </Text>
 
           {/* stats cards */}
           <View>

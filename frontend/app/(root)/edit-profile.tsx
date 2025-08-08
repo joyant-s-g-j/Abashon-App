@@ -6,6 +6,7 @@ import icons from '@/constants/icons'
 import images from '@/constants/images'
 import * as ImagePicker from 'expo-image-picker'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Header from '@/components/Header'
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 interface User {
@@ -196,20 +197,12 @@ const EditProfile = () => {
   const isAdmin = user?.role === 'admin'
   return (
     <SafeAreaView className='flex-1 bg-white'>
+      <Header title='Edit Profile' backRoute='/profile' />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
         className='px-4'
       >
-        {/* Header */}
-        <View className='flex-row items-center justify-between mt-4 mb-6'>
-          <TouchableOpacity onPress={() => router.push("/profile")} className='flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center'>
-            <Image source={icons.backArrow} className='size-6' />
-          </TouchableOpacity>
-          <Text className='text-xl font-rubik-bold text-black-300'>Edit Profile</Text>
-          <View className='w-10' />
-        </View>
-
         {/* Profile picture section */}
         <View className='items-center mb-8'>
           <View className='relative'>
