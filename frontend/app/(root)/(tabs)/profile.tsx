@@ -6,6 +6,7 @@ import images from '@/constants/images'
 import { settings } from '@/constants/data'
 import { useRouter } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Header from '@/components/Header'
 
 interface SettingsItemProps {
   icon: ImageSourcePropType;
@@ -72,18 +73,12 @@ const profile = () => {
   }
   return (
     <SafeAreaView>
+      <Header title='Profile' backRoute='/' rightIcon={<Image source={icons.bell} className='size-5' />} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerClassName='pb-32 px-7'
-      >
-        <View className='flex flex-row items-center justify-between mt-5'>
-          <Text className='text-xl font-rubik-bold'>Profile</Text>
-          <View className='flex-row gap-2'>
-            <Image source={icons.bell} className='size-5' />
-          </View>
-        </View>
-        
-        <View className='flex-row justify-center flex mt-5'>
+      > 
+        <View className='flex-row justify-center flex'>
           <View className='flex flex-col items-center relative mt-5'>
             <Image
               source={
