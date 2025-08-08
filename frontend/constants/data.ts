@@ -166,11 +166,13 @@ export const gallery = [
 ];
 
 export const stats = [
-  { label: 'Total Properties', value: '247', color: 'bg-blue-500' },
-  { label: 'Categories', value: '12', color: 'bg-green-500' },
-  { label: 'Facilities', value: '38', color: 'bg-purple-500' },
-  { label: 'Active Listings', value: '189', color: 'bg-orange-500' }
+  { label: 'Total Properties', value: '247' },
+  { label: 'Categories', value: '12' },
+  { label: 'Facilities', value: '38' },
+  { label: 'Agents', value: '23' },
+  { label: 'Customers', value: '140' }
 ]
+
 
 export const adminDashboard = [
   {

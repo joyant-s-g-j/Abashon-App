@@ -6,7 +6,6 @@ import { useRouter } from 'expo-router'
 import icons from '@/constants/icons'
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('')
   const router = useRouter();
   return (
     <SafeAreaView className='flex-1 bg-gray-50'>
@@ -37,7 +36,6 @@ const AdminDashboard = () => {
             <View className='flex-row flex-wrap justify-between'>
               {stats.map((stat, index ) => (
                 <View key={index} className='w-[48%] flex-row items-center gap-2 bg-white rounded-xl p-4 mb-4 shadow-sm'>
-                  <View className={`w-3 h-3 rounded-full ${stat.color} mb-2`} />
                   <View>
                     <Text className='text-2xl font-rubik-bold text-black-300 mb-1'>
                       {stat.value}
