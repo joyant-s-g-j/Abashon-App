@@ -8,6 +8,12 @@ interface AddButtonProps {
   onPress: () => void;
 }
 
+type Category = {
+  id: number;
+  name: string;
+  isActive: boolean;
+};
+
 const AddButton: React.FC<AddButtonProps> = ({ onPress }) => (
   <TouchableOpacity
     onPress={onPress}
@@ -19,7 +25,7 @@ const AddButton: React.FC<AddButtonProps> = ({ onPress }) => (
 
 const CategoryManagement = () => {
   const router = useRouter()
-  const [categories, setCategories] = useState([])
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
@@ -47,6 +53,39 @@ const CategoryManagement = () => {
       }
     } catch (error) {
       console.error('Error loading categories:', error)
+      Alert.alert('Error', 'Failed to connect to server')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleAddCategory = async () => {
+    if(!newCategory.name.trim()) {
+      Alert.alert('Error', 'Category name is required')
+      return
+    }
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/categories`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: newCategory.name.trim() })
+      })
+
+      const result = await response.json()
+
+      if(result.success) {
+        setCategories(prev => [...prev, result.data])
+        setNewCategory({ name: '' })
+        setShowAddModal(false)
+        Alert.alert('Success', result.message || 'Category added successfully!')
+      } else {
+        Alert.alert('Error', result.message || 'Failed to add category')
+      }
+    } catch (error) {
+      console.error('Error adding category:', error)
       Alert.alert('Error', 'Failed to connect to server')
     } finally {
       setIsLoading(false)
