@@ -195,6 +195,8 @@ const CategoryManagement = () => {
         {/* Search Bar */}
         <View className='bg-white rounded-xl px-4 py-3 mb-6 shadow-md border border-gray-100'>
           <TextInput
+            value={searchQuery}
+            onChangeText={setSearchQuery}
             className='text-base font-rubik text-black-300'
             placeholder='Search Categories...'
           />
