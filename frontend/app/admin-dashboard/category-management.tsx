@@ -92,6 +92,11 @@ const CategoryManagement = () => {
     }
   }
 
+  const cancelAddModal = () => {
+    setNewCategory({ name: '' })
+    setShowAddModal(false)
+  }
+
   const filteredCategories = categories.filter((category: any) => 
     category.name.toLowerCase().includes(searchQuery.toLowerCase()) 
   )
@@ -141,8 +146,42 @@ const CategoryManagement = () => {
               </Text>
             </View>
           ) : (
-            filteredCategories.map((category, index) => (
-              <View></View>
+            filteredCategories.map((category: any, index) => (
+              <View key={index} className='bg-white rounded-xl p-6 mb-4 shadow-sm border border-gray-100'>
+                <View className='flex-row items-center justify-between mb-4'>
+                  <View className='flex-row items-center flex-1'>
+                    <View className='size-12 bg-primary-100 rounded-xl items-center justify-center mr-4'>
+                      <Text className='text-2xl'>📂</Text>
+                    </View>
+                    <View className='flex-1'>
+                      <Text className='text-lg font-rubik-semibold text-black-300'>{category.name}</Text>
+                      <Text className='text-xs font-rubik text-black-200 mt-1'>ID: {category._id}</Text>
+                      {category.createdAt && (
+                        <Text className='text-xs font-rubik text-black-200 mt-1'>
+                          Created: {new Date(category.createdAt).toLocaleDateString()}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                </View>
+
+                {/* Action Buttons */}
+                <View className='flex-row justify-between items-center pt-4 border-t border-gray-100'>
+                  <TouchableOpacity
+                    // onPress={() => }
+                    disabled={isLoading}
+                    className='flex-1 bg-blue-50 py-3 px-4 rounded-lg mr-2'
+                  >
+                    <Text className='text-center text-primary-300 font-rubik-semibold text-sm'>Edit</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    className='flex-1 bg-red-50 py-3 px-4 rounded-lg ml-2'
+                  >
+                    <Text className='text-center text-red-700 font-rubik-semibold text-sm'>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             ))
           )}
         </View>
@@ -152,13 +191,13 @@ const CategoryManagement = () => {
           visible={showAddModal}
           animationType='slide'
           transparent={true}
-          onRequestClose={() => setShowAddModal(false)}
+          onRequestClose={cancelAddModal}
         >
           <View className='flex-1 justify-end bg-black/50'>
             <View className='bg-white rounded-t-3xl p-6 max-h-[80%]'>
               <View className='flex-row items-center justify-between mb-6'>
                 <Text className='text-xl font-rubik-bold text-black-300'>Add New Category</Text>
-                <TouchableOpacity onPress={() => setShowAddModal(false)}>
+                <TouchableOpacity onPress={cancelAddModal}>
                   <Text className='text-black-200 text-4xl'>×</Text>
                 </TouchableOpacity>
               </View> 
@@ -172,20 +211,23 @@ const CategoryManagement = () => {
                     placeholder='Enter category name'
                     value={newCategory.name}
                     onChangeText={(text) => setNewCategory(prev => ({ ...prev, name: text}))}
+                    editable={!isLoading}
                   />
                 </View>
 
                 {/* Action Buttons */}
                 <View className='flex-row gap-3'>
                   <TouchableOpacity
-                    // onPress={() => }
+                    onPress={cancelAddModal}
+                    disabled={isLoading}
                     className='flex-1 bg-gray-100 py-4 rounded-xl'
                   >
                     <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     className='flex-1 bg-primary-300 py-4 rounded-xl'
-                    // disabled={isLoading}
+                    disabled={isLoading}
+                    onPress={handleAddCategory}
                   >
                     <Text className='text-center font-rubik-bold text-white'>
                       {isLoading ? 'Adding...' : 'Add Category'}
@@ -197,58 +239,7 @@ const CategoryManagement = () => {
           </View>
         </Modal>
 
-        {/* Edit Category Modal */}
-        <Modal
-          visible={showAddModal}
-          animationType='slide'
-          transparent={true}
-          // onRequestClose={() => setShowEditModal(false)}
-        >
-          <View className='flex-1 justify-end bg-black/50'>
-            <View className='bg-white rounded-t-3xl p-6 max-h-[80%]'>
-              <View className='flex-row items-center justify-between mb-6'>
-                <Text className='text-xl font-rubik-bold text-black-300'>Add New Category</Text>
-                <TouchableOpacity 
-                  // onPress={() => setShowEditModal(false)}
-                >
-                  <Text className='text-black-200 text-4xl'>×</Text>
-                </TouchableOpacity>
-              </View> 
-              {selectedCategory && (
-                <ScrollView showsVerticalScrollIndicator={false}>
-                  {/* Category Name */}
-                  <View className='mb-4'>
-                    <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Category Name *</Text>
-                    <TextInput
-                      className='bg-gray-100 rounded-xl px-4 py-3 text-base font-rubik text-black-300'
-                      placeholder='Enter category name'
-                      value={newCategory.name}
-                      // onChangeText={(text) => setSelectedCategory(prev => ({ ...prev, name: text}))}
-                    />
-                  </View>
-
-                  {/* Action Buttons */}
-                  <View className='flex-row gap-3'>
-                    <TouchableOpacity
-                      // onPress={() => setShowEditModal(false)}
-                      className='flex-1 bg-gray-100 py-4 rounded-xl'
-                    >
-                      <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      className='flex-1 bg-primary-300 py-4 rounded-xl'
-                      // disabled={isLoading}
-                    >
-                      <Text className='text-center font-rubik-bold text-white'>
-                        {isLoading ? 'Updating...' : 'Update Category'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </ScrollView>
-              )}  
-            </View>
-          </View>
-        </Modal>
+        
       </ScrollView>
     </SafeAreaView>
     
