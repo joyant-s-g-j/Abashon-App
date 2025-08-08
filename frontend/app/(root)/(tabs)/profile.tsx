@@ -73,7 +73,7 @@ const profile = () => {
   }
   return (
     <SafeAreaView>
-      <Header title='Profile' backRoute='/' rightIcon={<Image source={icons.bell} className='size-5' />} />
+      <Header title='Profile' backRoute='/' rightIcon={icons.bell} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerClassName='pb-32 px-7'

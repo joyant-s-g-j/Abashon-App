@@ -11,7 +11,7 @@ import Header from '@/components/Header'
 const explore = () => {
   return (
     <SafeAreaView className="bg-white h-full">
-      <Header title='Search for Your Ideal Home' backRoute='/' rightIcon={<Image source={icons.bell} className="size-6" />} />
+      <Header title='Search for Your Ideal Home' backRoute='/' rightIcon={icons.bell} />
       <FlatList
         data={[1, 2, 3, 4]}
         renderItem={({item}) => <ExploreCard id={item.toString()} />}
@@ -20,13 +20,6 @@ const explore = () => {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View>
-            {/* <View className="flex flex-row items-center justify-between mt-5">
-              <TouchableOpacity onPress={() => router.back()} className='flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center'>
-                <Image source={icons.backArrow} className='size-6' />
-              </TouchableOpacity>
-              <Text className='text-base mr-2 text-center font-rubik-medium text-black-300'>Search for Your Ideal Home</Text>
-              <Image source={icons.bell} className="size-6" />
-            </View> */}
 
             <Search />
 
