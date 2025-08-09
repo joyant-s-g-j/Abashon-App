@@ -1,6 +1,6 @@
+import StatCard from "@/components/ReusableComponent/StatCard";
 import { View } from "react-native";
 import { Facility } from "../types/facility";
-import StatCard from "@/components/StatCard";
 
 interface FacilityStatsProps {
   facilities: Facility[];

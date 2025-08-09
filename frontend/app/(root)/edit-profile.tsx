@@ -1,12 +1,12 @@
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert, TextInput } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
+import Header from '@/components/ReusableComponent/Header'
 import icons from '@/constants/icons'
 import images from '@/constants/images'
-import * as ImagePicker from 'expo-image-picker'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Header from '@/components/Header'
+import * as ImagePicker from 'expo-image-picker'
+import { useRouter } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 interface User {

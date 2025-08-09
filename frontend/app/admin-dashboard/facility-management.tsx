@@ -1,17 +1,10 @@
-import { useFacilities } from "@/components/FacilityMangement/hooks/useFacilities";
-import { useFacilityModals } from "@/components/FacilityMangement/hooks/useFacilityModals";
-import { useImagePicker } from "@/components/FacilityMangement/hooks/useImagePicker";
-import { filterFacilities } from "@/components/FacilityMangement/utils/facilityUtils";
-import Header from "@/components/Header";
-import { useState } from "react";
-import { ScrollView } from "react-native";
-import { AddButton } from "./category-management";
+
+import { Facility, FacilityList, FacilityStats, filterFacilities, useFacilities, useFacilityModals, useImagePicker } from "@/components/FacilityMangement";
 import SearchInput from "@/components/SearchInput";
-import FacilityStats from "@/components/FacilityMangement/FacilityComponent/FacilityStats";
-import FacilityList from "@/components/FacilityMangement/FacilityComponent/FacilityList";
-import ItemModal from "@/components/ItemModal";
-import { Facility } from "@/components/FacilityMangement/types/facility";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native";
+import { AddButton, Header, ItemModal } from "@/components/ReusableComponent";
 
 const FacilityManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');

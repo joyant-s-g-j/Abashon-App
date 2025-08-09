@@ -1,12 +1,12 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, ImageSourcePropType } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Header from '@/components/ReusableComponent/Header'
+import { settings } from '@/constants/data'
 import icons from '@/constants/icons'
 import images from '@/constants/images'
-import { settings } from '@/constants/data'
-import { useRouter } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Header from '@/components/Header'
+import { useRouter } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { Image, ImageSourcePropType, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 interface SettingsItemProps {
   icon: ImageSourcePropType;

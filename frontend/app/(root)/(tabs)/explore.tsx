@@ -1,12 +1,11 @@
-import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native'
-import React from 'react'
-import { Link, router } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Card, ExploreCard, FeaturedCard } from '@/components/Cards'
-import icons from '@/constants/icons'
-import Search from '@/components/Search'
+import { ExploreCard } from '@/components/Cards'
 import Filters from '@/components/Filters'
-import Header from '@/components/Header'
+import Header from '@/components/ReusableComponent/Header'
+import Search from '@/components/Search'
+import icons from '@/constants/icons'
+import React from 'react'
+import { FlatList, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const explore = () => {
   return (
