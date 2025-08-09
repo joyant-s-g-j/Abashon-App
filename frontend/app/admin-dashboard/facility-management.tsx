@@ -7,6 +7,7 @@ import SearchInput from '@/components/SearchInput';
 import StatCard from '@/components/StatCard';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system'
+import ItemModal from '@/components/ItemModal';
 
 type Facility = {
   _id: string;
@@ -371,84 +372,19 @@ const FacilityManagement = () => {
         </View>
 
         {/* Add facility modal */}
-        <Modal
+        <ItemModal 
           visible={showAddModal}
-          animationType='slide'
-          transparent={true}
-          onRequestClose={cancelAddModal}
-        >
-          <View className='flex-1 justify-end bg-black/50'>
-            <View className='bg-white rounded-t-3xl p-6 max-h-[80%]'>
-              <View className='flex-row items-center justify-between mb-6'>
-                <Text className='text-xl font-rubik-bold text-black-300'>Add New Facility</Text>
-                <TouchableOpacity onPress={cancelAddModal}>
-                  <Text className='text-black-200 text-4xl'>×</Text>
-                </TouchableOpacity>
-              </View> 
-
-              <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Facility Name */}
-                <View className='mb-4'>
-                  <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Facility Name *</Text>
-                  <TextInput
-                    className='bg-gray-100 rounded-xl px-4 py-3 text-base font-rubik text-black-300'
-                    placeholder='Enter facility name'
-                    value={newFacility.name}
-                    onChangeText={(text) => setNewFacility(prev => ({ ...prev, name: text}))}
-                    editable={!isLoading}
-                  />
-                </View>
-
-                <View className='mb-6'>
-                  <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Facility Icon *</Text>
-                  
-                  {/* Image Preview */}
-                  {newFacility.imageUri && (
-                    <View className='mb-4'>
-                      <Image 
-                        source={{ uri: newFacility.imageUri }} 
-                        className='w-24 h-24 rounded-xl'
-                        resizeMode='cover'
-                      />
-                    </View>
-                  )}
-                  
-                  {/* Image Picker Button */}
-                  <TouchableOpacity
-                    onPress={() => pickImage(false)}
-                    disabled={isLoading}
-                    className='bg-gray-100 rounded-xl px-4 py-3 flex-row items-center justify-center'
-                  >
-                    <Text className='text-base font-rubik text-black-300 mr-2'>
-                      {newFacility.imageUri ? 'Change Image' : 'Select Image'}
-                    </Text>
-                    <Text className='text-lg'>📷</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Action Buttons */}
-                <View className='flex-row gap-3'>
-                  <TouchableOpacity
-                    onPress={cancelAddModal}
-                    disabled={isLoading}
-                    className='flex-1 bg-gray-100 py-4 rounded-xl'
-                  >
-                    <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className='flex-1 bg-primary-300 py-4 rounded-xl'
-                    disabled={isLoading}
-                    onPress={handleAddFacility}
-                  >
-                    <Text className='text-center font-rubik-bold text-white'>
-                      {isLoading ? 'Adding...' : 'Add Facility'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
+          onClose={cancelAddModal}
+          title='Facility'
+          nameValue={newFacility.name}
+          onNameChange={text => setNewFacility(prev => ({ ...prev, name: text }))}
+          imageUri={newFacility.imageUri}
+          onPickImage={() => pickImage(false)}
+          onSubmit={handleAddFacility}
+          progressButtonLabel='Adding'
+          submitButtonLabel='Add Facility'
+          isLoading={isLoading}
+        />
 
         {/* Edit facility modal */}
         <Modal
