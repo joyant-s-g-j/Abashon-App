@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import Header from '@/components/Header'
 import SearchInput from '@/components/SearchInput';
 import StatCard from '@/components/StatCard';
+import ItemModal from '@/components/ItemModal';
 
 interface AddButtonProps {
   onPress: () => void;
@@ -273,116 +274,29 @@ const CategoryManagement = () => {
           )}
         </View>
 
-        {/* Add Category Modal */}
-        <Modal
+        <ItemModal
           visible={showAddModal}
-          animationType='slide'
-          transparent={true}
-          onRequestClose={cancelAddModal}
-        >
-          <View className='flex-1 justify-end bg-black/50'>
-            <View className='bg-white rounded-t-3xl p-6 max-h-[80%]'>
-              <View className='flex-row items-center justify-between mb-6'>
-                <Text className='text-xl font-rubik-bold text-black-300'>Add New Category</Text>
-                <TouchableOpacity onPress={cancelAddModal}>
-                  <Text className='text-black-200 text-4xl'>×</Text>
-                </TouchableOpacity>
-              </View> 
+          onClose={cancelAddModal}
+          title='Category'
+          nameValue={newCategory.name}
+          onNameChange={text => setNewCategory(prev => ({ ...prev, name: text }))}
+          onSubmit={handleAddCategory}
+          progressButtonLabel='Adding'
+          submitButtonLabel='Add Category'
+          isLoading={isLoading}
+        />
 
-              <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Category Name */}
-                <View className='mb-4'>
-                  <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Category Name *</Text>
-                  <TextInput
-                    className='bg-gray-100 rounded-xl px-4 py-3 text-base font-rubik text-black-300'
-                    placeholder='Enter category name'
-                    value={newCategory.name}
-                    onChangeText={(text) => setNewCategory(prev => ({ ...prev, name: text}))}
-                    editable={!isLoading}
-                  />
-                </View>
-
-                {/* Action Buttons */}
-                <View className='flex-row gap-3'>
-                  <TouchableOpacity
-                    onPress={cancelAddModal}
-                    disabled={isLoading}
-                    className='flex-1 bg-gray-100 py-4 rounded-xl'
-                  >
-                    <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className='flex-1 bg-primary-300 py-4 rounded-xl'
-                    disabled={isLoading}
-                    onPress={handleAddCategory}
-                  >
-                    <Text className='text-center font-rubik-bold text-white'>
-                      {isLoading ? 'Adding...' : 'Add Category'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Edit Category Modal */}
-        <Modal
+        <ItemModal
           visible={showEditModal}
-          animationType='slide'
-          transparent={true}
-          onRequestClose={cancelEditModal}
-        >
-          <View className='flex-1 justify-end bg-black/50'>
-            <View className='bg-white rounded-t-3xl p-6 max-h-[80%]'>
-              <View className='flex-row items-center justify-between mb-6'>
-                <Text className='text-xl font-rubik-bold text-black-300'>Edit Category</Text>
-                <TouchableOpacity onPress={cancelEditModal}>
-                  <Text className='text-black-200 text-4xl'>×</Text>
-                </TouchableOpacity>
-              </View> 
-              {selectedCategory && (
-                <ScrollView showsVerticalScrollIndicator={false}>
-                  {/* Category Name */}
-                  <View className='mb-4'>
-                    <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Category Name *</Text>
-                    <TextInput
-                      className='bg-gray-100 rounded-xl px-4 py-3 text-base font-rubik text-black-300'
-                      placeholder='Enter category name'
-                      value={selectedCategory.name}
-                      editable={!isLoading}
-                      onChangeText={(text) =>
-                        setSelectedCategory(prev =>
-                          prev ? { ...prev, name: text } : prev
-                        )
-                      }
-                    />
-                  </View>
-
-                  {/* Action Buttons */}
-                  <View className='flex-row gap-3'>
-                    <TouchableOpacity
-                      onPress={cancelEditModal}
-                      className='flex-1 bg-gray-100 py-4 rounded-xl'
-                      disabled={isLoading}
-                    >
-                      <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={handleUpdateCategory}
-                      className='flex-1 bg-primary-300 py-4 rounded-xl'
-                      disabled={isLoading}
-                    >
-                      <Text className='text-center font-rubik-bold text-white'>
-                        {isLoading ? 'Updating...' : 'Update Category'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </ScrollView>
-              )}  
-            </View>
-          </View>
-        </Modal>
+          onClose={cancelEditModal}
+          title='Category'
+          nameValue={selectedCategory?.name ?? ''}
+          onNameChange={text => setSelectedCategory(prev => (prev ? { ...prev, name: text } : prev ))}
+          onSubmit={handleUpdateCategory}
+          progressButtonLabel='Updating'
+          submitButtonLabel='Update Category'
+          isLoading={isLoading}
+        />
       </ScrollView>
     </SafeAreaView>
     
