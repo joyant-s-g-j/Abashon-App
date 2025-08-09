@@ -35,10 +35,14 @@ const AdminDashboard = () => {
 
       const categoriesResponse = await fetch(`${API_BASE_URL}/api/categories`, { headers })
       const usersResponse = await fetch(`${API_BASE_URL}/api/auth/users`, { headers })
+      const facilitiesResponse = await fetch(`${API_BASE_URL}/api/facilities`, { headers })
+
       const categoriesResult = await categoriesResponse.json()
       const usersResult = await usersResponse.json()
+      const facilitiesResult = await facilitiesResponse.json()
 
       const categoriesCount = categoriesResult.success ? categoriesResult.data.length : 0
+      const facilitiesCount = facilitiesResult.success ? facilitiesResult.data.length : 0
       
       let customersCount = 0
       let agentCount = 0
@@ -50,11 +54,11 @@ const AdminDashboard = () => {
       }
 
       setStats([
-        { label: 'Total Properties', value: '247' }, // Keep static for now
-        { label: 'Categories', value: categoriesCount.toString() }, // Dynamic from API
-        { label: 'Facilities', value: '8' },
-        { label: 'Agents', value: agentCount.toString() }, // Keep static for now
-        { label: 'Customers', value: customersCount.toString() } // Keep static for now
+        { label: 'Total Properties', value: '247' },
+        { label: 'Categories', value: categoriesCount.toString() },
+        { label: 'Facilities', value: facilitiesCount.toString() },
+        { label: 'Agents', value: agentCount.toString() },
+        { label: 'Customers', value: customersCount.toString() }
       ])
     } catch (error) {
       console.error('Error loading dashboard stats:', error)
