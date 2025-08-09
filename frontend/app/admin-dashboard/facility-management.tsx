@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '@/components/Header';
 import { AddButton } from './category-management';
 import SearchInput from '@/components/SearchInput';
+import StatCard from '@/components/StatCard';
 
 type Facility = {
   _id: string;
@@ -59,6 +60,19 @@ const FacilityManagement = () => {
           onChangeText={setSearchQuery}
           placeholder="Search Facilities..."
         />
+        <View className="flex-row justify-between mb-6">
+          <StatCard
+            value={facilities.length}
+            label="Total Facilities"
+            style="flex-1 mr-2"
+          />
+          <StatCard
+            value={facilities.filter((cat: any) => cat.isActive).length}
+            label="Active Facilities"
+            valueColor="text-green-600"
+            style="flex-1 ml-2"
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   )
