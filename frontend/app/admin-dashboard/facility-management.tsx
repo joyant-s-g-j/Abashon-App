@@ -5,7 +5,8 @@ import Header from '@/components/Header';
 import { AddButton } from './category-management';
 import SearchInput from '@/components/SearchInput';
 import StatCard from '@/components/StatCard';
-import * as ImagePicker from 'expo-image-picker'
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system'
 
 type Facility = {
   _id: string;
@@ -70,12 +71,24 @@ const FacilityManagement = () => {
       })
 
       if(!result.canceled && result.assets[0]) {
-        const asset = result.assets[0]
-        const base64Image = `data:${asset.type === 'image' ? 'image/jpeg': asset.type};base64,${asset.base64}`
-        setNewFacility(prev => ({
-          ...prev,
-          icon: base64Image
-        }))
+        const imageUri = result.assets[0].uri
+        try {
+          const base64 = await FileSystem.readAsStringAsync(imageUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          })
+
+          const base64WithPrefix = `data:image/jpeg;base64,${base64}`
+
+          setNewFacility(prev => ({
+            ...prev,
+            imageUri: imageUri,
+            iconBase64: base64WithPrefix,
+            icon: base64WithPrefix
+          }))
+        } catch (error) {
+          console.error('Error converting image to base64:', error)
+          Alert.alert('Error', 'Failed to process image')
+        }
       }
     } catch (error) {
       console.error('Error picking image:', error)
@@ -178,7 +191,11 @@ const FacilityManagement = () => {
                 <View className='flex-row items-center justify-between mb-4'>
                   <View className='flex-row items-center flex-1'>
                     <View className='size-12 bg-primary-100 rounded-xl items-center justify-center mr-4'>
-                      <Text className='text-2xl'>🏊</Text>
+                      <Image
+                        source={{ uri: facility.icon }}
+                        className='size-8'
+                        resizeMode="contain"
+                      />
                     </View>
                     <View className='flex-1'>
                       <Text className='text-lg font-rubik-semibold text-black-300'>{facility.name}</Text>

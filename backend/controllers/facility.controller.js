@@ -7,8 +7,16 @@ const uploadIconToCloudinary = async (iconData) => {
         const result = await cloudinary.uploader.upload(iconData, {
             folder: 'facilities/icons',
             resource_type: 'image',
+            format: 'png',
             transformation: [
-                { width: 64, height: 64, crop: 'fill', quality: 'auto' }
+                { 
+                    width: 64, 
+                    height: 64, 
+                    crop: 'fit', 
+                    quality: 'auto',
+                    background: 'transparent',
+                    flags: 'preserve_transparency'
+                }
             ]
         });
         return result.secure_url;
