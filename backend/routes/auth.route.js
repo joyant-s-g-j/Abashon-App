@@ -1,5 +1,5 @@
 import express from "express"
-import { checkAuth, getProfile, login, logout, signup, updateProfile } from "../controllers/auth.controller.js"
+import { checkAuth, getAllUsers, getProfile, login, logout, signup, updateProfile } from "../controllers/auth.controller.js"
 import { protectRoute } from "../middleware/auth.middleware.js"
 import { googleAuth, googleAuthWithAccessToken, googleAuthWithCode, googleAuthWithUserData, updatePhoneNumber } from "../controllers/googleAuth.controller.js"
 
@@ -11,6 +11,7 @@ router.post("/logout", logout)
 router.get("/check", protectRoute, checkAuth)
 router.get("/profile", protectRoute, getProfile)
 router.put("/update-profile", protectRoute, updateProfile)
+router.get("/users", protectRoute, getAllUsers)
 
 router.put("/update-phone", protectRoute, updatePhoneNumber);
 router.post("/google", googleAuth)

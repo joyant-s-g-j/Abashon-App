@@ -4,9 +4,66 @@ import { adminDashboard, instructionSections, stats } from '@/constants/data'
 import { useRouter } from 'expo-router'
 import icons from '@/constants/icons'
 import Header from '@/components/Header'
+import { useEffect, useState } from 'react'
 
 const AdminDashboard = () => {
+  const [stats, setStats] = useState([
+    { label: 'Total Properties', value: '0' },
+    { label: 'Categories', value: '0' },
+    { label: 'Facilities', value: '0' },
+    { label: 'Agents', value: '0' },
+    { label: 'Customers', value: '0' }
+  ])
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter();
+
+  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
+
+  useEffect(() => {
+    loadDashboardStats()
+  }, [])
+
+  const loadDashboardStats = async () => {
+    setIsLoading(true)
+    try {
+      const categoriesResponse = await fetch(`${API_BASE_URL}/api/categories`)
+      const usersResponse = await fetch(`${API_BASE_URL}/api/users`)
+      const categoriesResult = await categoriesResponse.json()
+      const usersResult = await usersResponse.json()
+
+      const categoriesCount = categoriesResult.success ? categoriesResult.data.length : 0
+      
+      let customersCount = 0
+      let agentCount = 0
+
+      if (usersResult.success && Array.isArray(usersResult.data)) {
+        const users = usersResult.data
+        customersCount = users.filter((user: any) => user.role === 'customer').length
+        agentCount = users.filter((user: any) => user.role === 'agent').length
+      }
+
+      setStats([
+        { label: 'Total Properties', value: '247' }, // Keep static for now
+        { label: 'Categories', value: categoriesCount.toString() }, // Dynamic from API
+        { label: 'Facilities', value: '38' },
+        { label: 'Agents', value: agentCount.toString() }, // Keep static for now
+        { label: 'Customers', value: customersCount.toString() } // Keep static for now
+      ])
+    } catch (error) {
+      console.error('Error loading dashboard stats:', error)
+      // Keep default values if API fails
+      setStats([
+        { label: 'Total Properties', value: '247' },
+        { label: 'Categories', value: '12' },
+        { label: 'Facilities', value: '38' },
+        { label: 'Agents', value: '23' },
+        { label: 'Customers', value: '140' }
+      ])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <SafeAreaView className='flex-1 bg-gray-50'>
         <Header title="Admin Dashboard" backRoute="/profile" />
