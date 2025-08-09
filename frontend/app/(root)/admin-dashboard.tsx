@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router'
 import icons from '@/constants/icons'
 import Header from '@/components/Header'
 import { useEffect, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState([
@@ -26,8 +27,14 @@ const AdminDashboard = () => {
   const loadDashboardStats = async () => {
     setIsLoading(true)
     try {
-      const categoriesResponse = await fetch(`${API_BASE_URL}/api/categories`)
-      const usersResponse = await fetch(`${API_BASE_URL}/api/users`)
+      const token = await AsyncStorage.getItem('token')
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      }
+
+      const categoriesResponse = await fetch(`${API_BASE_URL}/api/categories`, { headers })
+      const usersResponse = await fetch(`${API_BASE_URL}/api/auth/users`, { headers })
       const categoriesResult = await categoriesResponse.json()
       const usersResult = await usersResponse.json()
 
