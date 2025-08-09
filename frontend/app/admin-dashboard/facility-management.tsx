@@ -449,6 +449,38 @@ const FacilityManagement = () => {
             </View>
           </View>
         </Modal>
+
+        {/* Edit facility modal */}
+        <Modal
+          visible={showEditModal}
+          animationType='slide'
+          transparent={true}
+          onRequestClose={cancelEditModal}
+        >
+          <View className='flex-1 justify-end bg-black/50'>
+            <View className='bg-white rounded-t-3xl p-6 max-h-[80%]'>
+              <View className='flex-row items-center justify-between mb-6'>
+                <Text className='text-xl font-rubik-bold text-black-300'>Edit Facility</Text>
+                <TouchableOpacity onPress={cancelEditModal}>
+                  <Text className='text-black-200 text-4xl'>×</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View className='mb-4'>
+                  <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Facility Name *</Text>
+                  <TextInput 
+                    className='bg-gray-100 rounded-xl p-4 text-base font-rubik text-black-300'
+                    placeholder='Enter facility name'
+                    value={editFacility.name}
+                    onChangeText={(text) => setEditFacility(prev => ({ ...prev, name: text}))}
+                    editable={!isLoading}
+                  />
+                </View>
+              </ScrollView> 
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   )
