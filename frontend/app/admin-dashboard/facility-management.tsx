@@ -8,6 +8,7 @@ import StatCard from '@/components/StatCard';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system'
 import ItemModal from '@/components/ItemModal';
+import ActionButtons from '@/components/ActionButtons';
 
 type Facility = {
   _id: string;
@@ -349,23 +350,11 @@ const FacilityManagement = () => {
                 </View>
 
                 {/* Action Buttons */}
-                <View className='flex-row justify-between items-center pt-4 border-t border-gray-100'>
-                  <TouchableOpacity
-                    onPress={() => openEditModal(facility)}
-                    disabled={isLoading}
-                    className='flex-1 bg-blue-50 py-3 px-4 rounded-lg mr-2'
-                  >
-                    <Text className='text-center text-primary-300 font-rubik-semibold text-sm'>Edit</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    disabled={isLoading}
-                    onPress={() => handleDeleteFacility(facility)}
-                    className='flex-1 bg-red-50 py-3 px-4 rounded-lg ml-2'
-                  >
-                    <Text className='text-center text-red-700 font-rubik-semibold text-sm'>Delete</Text>
-                  </TouchableOpacity>
-                </View>
+                <ActionButtons
+                  onEdit={() => openEditModal(facility)}
+                  onDelete={() => handleDeleteFacility(facility)}
+                  disabled={isLoading}
+                />
               </View>
             ))
           )}
