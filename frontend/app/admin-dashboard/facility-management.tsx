@@ -11,7 +11,7 @@ import * as FileSystem from 'expo-file-system'
 type Facility = {
   _id: string;
   name: string;
-  icon: ImageSourcePropType;
+  icon: string | ImageSourcePropType;
   isActive?: boolean
 }
 
@@ -27,6 +27,13 @@ const FacilityManagement = () => {
     icon: '',
     imageUri: null as string | null,
     iconBase64: null as string | null
+  })
+  const [editFacility, setEditFacility] = useState({
+    name: '',
+    icon: '',
+    imageUri: null as string | null,
+    iconBase64: null as string | null,
+    originalIcon: ''
   })
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
@@ -53,7 +60,7 @@ const FacilityManagement = () => {
     }
   }
 
-  const pickImage = async () => {
+  const pickImage = async (isEdit = false) => {
     try {
       // Request permission
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
@@ -79,12 +86,21 @@ const FacilityManagement = () => {
 
           const base64WithPrefix = `data:image/jpeg;base64,${base64}`
 
-          setNewFacility(prev => ({
-            ...prev,
-            imageUri: imageUri,
-            iconBase64: base64WithPrefix,
-            icon: base64WithPrefix
-          }))
+          if(isEdit) {
+            setNewFacility(prev => ({
+              ...prev,
+              imageUri: imageUri,
+              iconBase64: base64WithPrefix,
+              icon: base64WithPrefix
+            }))
+          } else {
+            setNewFacility(prev => ({
+              ...prev,
+              imageUri: imageUri,
+              iconBase64: base64WithPrefix,
+              icon: base64WithPrefix
+            }))
+          }
         } catch (error) {
           console.error('Error converting image to base64:', error)
           Alert.alert('Error', 'Failed to process image')
@@ -134,9 +150,131 @@ const FacilityManagement = () => {
     }
   }
 
+  const handleEditFacility = async () => {
+    if(!selectedFacility) return
+
+    if(!editFacility.name.trim()) {
+      Alert.alert('Error', 'Facility name is required')
+      return
+    }
+
+    if(!editFacility.icon.trim()) {
+      Alert.alert('Error', 'Facility icon is required')
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/facilities/${selectedFacility._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: editFacility.name.trim(),
+          icon: editFacility.icon.trim(),
+          origianlIcon: editFacility.originalIcon
+        })
+      })
+
+      const result = await response.json()
+
+      if(response.ok && result.success) {
+        setFacilities(prev => 
+          prev.map(facility => 
+            facility._id === selectedFacility._id
+              ? { ...facility, name: editFacility.name.trim(), icon: editFacility.icon.trim() }
+              : facility
+          )
+        )
+        setShowEditModal(false)
+        setSelectedFacility(null)
+        setEditFacility({
+          name: '',
+          icon: '',
+          imageUri: null,
+          iconBase64: null,
+          originalIcon: ''
+        })
+        Alert.alert('Success', 'Facility updated successfully')
+      } else {
+        Alert.alert('Error', result.message || 'Failed to update facility')
+      }
+    } catch (error) {
+      console.error('Error updating facility:', error)
+      Alert.alert('Error', 'Failed to connect to server')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleDeleteFacility = (facility: Facility) => {
+    Alert.alert(
+      'Delete Facility',
+      `Are you sure you want to delete "${facility.name}"? This action cannot be undone.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => confrimDeleteFacility(facility)
+        }
+      ]
+    )
+  }
+
+  const confrimDeleteFacility = async (facility: Facility) => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/facilities/${facility._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          icon: facility.icon
+        })
+      })
+      const result = await response.json()
+
+      if(response.ok && result.success) {
+        setFacilities(prev => prev.filter(f => f._id !== facility._id))
+        Alert.alert('Success', 'Facility deleted successfully')
+      } else {
+        Alert.alert('Error', result.message || 'Failed to delete facility')
+      }
+    } catch (error) {
+      console.error('Error deleting facility:', error)
+      Alert.alert('Error', 'Failed to connect to server')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const cancelAddModal = () => {
     setNewFacility({ name: '', icon: '', imageUri: null, iconBase64: null })
     setShowAddModal(false)
+  }
+
+  const openEditModal = (facility: Facility) => {
+    setSelectedFacility(facility)
+    setEditFacility({
+      name: facility.name,
+      icon: facility.icon as string,
+      imageUri: facility.icon as string,
+      iconBase64: null,
+      originalIcon: facility.icon as string
+    })
+    setShowEditModal(true)
+  }
+
+  const cancelEditModal = () => {
+    setEditFacility({ name: '', icon: '', imageUri: null, iconBase64: null, originalIcon: '' })
+    setSelectedFacility(null)
+    setShowEditModal(false)
   }
 
   const filteredFacilities = facilities.filter((facility: any) => 
@@ -212,7 +350,7 @@ const FacilityManagement = () => {
                 {/* Action Buttons */}
                 <View className='flex-row justify-between items-center pt-4 border-t border-gray-100'>
                   <TouchableOpacity
-                    // onPress={() => openEditModal(category)}
+                    onPress={() => openEditModal(facility)}
                     disabled={isLoading}
                     className='flex-1 bg-blue-50 py-3 px-4 rounded-lg mr-2'
                   >
@@ -221,7 +359,7 @@ const FacilityManagement = () => {
 
                   <TouchableOpacity
                     disabled={isLoading}
-                    // onPress={() => handleDeleteCategory(category)}
+                    onPress={() => handleDeleteFacility(facility)}
                     className='flex-1 bg-red-50 py-3 px-4 rounded-lg ml-2'
                   >
                     <Text className='text-center text-red-700 font-rubik-semibold text-sm'>Delete</Text>
@@ -277,7 +415,7 @@ const FacilityManagement = () => {
                   
                   {/* Image Picker Button */}
                   <TouchableOpacity
-                    onPress={pickImage}
+                    onPress={() => pickImage(false)}
                     disabled={isLoading}
                     className='bg-gray-100 rounded-xl px-4 py-3 flex-row items-center justify-center'
                   >
