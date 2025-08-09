@@ -48,6 +48,44 @@ const FacilityManagement = () => {
     }
   }
 
+  const handleAddFacility = async () => {
+    if(!newFacility.icon.trim()) {
+      Alert.alert('Error', 'Facility icon is required')
+      return
+    }
+    if(!newFacility.name.trim()) {
+      Alert.alert('Error', 'Facility name is required')
+      return
+    }
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/facilities`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newFacility.name.trim(),
+          icon: newFacility.icon.trim()
+        })
+      })
+      const result = await response.json()
+      if(response.ok && result.success) {
+        setFacilities(prev => [...prev, result.data])
+        setNewFacility({ name: '', icon: '' })
+        setShowAddModal(false)
+        Alert.alert('Success', 'Facility added successfully')
+      } else {
+        Alert.alert('Error', result.message || 'Failed to add facility')
+      }
+    } catch (error) {
+      console.error('Error adding facility:', error)
+      Alert.alert('Error', 'Failed to connect to server')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const filteredFacilities = facilities.filter((facility: any) => 
     facility.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
