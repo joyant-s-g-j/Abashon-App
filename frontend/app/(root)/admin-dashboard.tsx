@@ -52,7 +52,7 @@ const AdminDashboard = () => {
       setStats([
         { label: 'Total Properties', value: '247' }, // Keep static for now
         { label: 'Categories', value: categoriesCount.toString() }, // Dynamic from API
-        { label: 'Facilities', value: '38' },
+        { label: 'Facilities', value: '8' },
         { label: 'Agents', value: agentCount.toString() }, // Keep static for now
         { label: 'Customers', value: customersCount.toString() } // Keep static for now
       ])

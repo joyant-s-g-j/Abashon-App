@@ -1,7 +1,6 @@
 import { View, Text, TouchableOpacity, ScrollView, TextInput, Modal, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
 import Header from '@/components/Header'
 
 interface AddButtonProps {
@@ -9,12 +8,12 @@ interface AddButtonProps {
 }
 
 type Category = {
-  _id: number;
+  _id: string;
   name: string;
   isActive: boolean;
 };
 
-const AddButton: React.FC<AddButtonProps> = ({ onPress }) => (
+export const AddButton: React.FC<AddButtonProps> = ({ onPress }) => (
   <TouchableOpacity
     onPress={onPress}
     className="flex flex-row bg-primary-300 rounded-full size-11 items-center justify-center"
