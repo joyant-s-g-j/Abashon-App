@@ -1,396 +1,146 @@
-import { View, Text, ImageSourcePropType, Alert, ScrollView, TouchableOpacity, Modal, TextInput, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '@/components/Header';
-import { AddButton } from './category-management';
-import SearchInput from '@/components/SearchInput';
-import StatCard from '@/components/StatCard';
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system'
-import ItemModal from '@/components/ItemModal';
-import ActionButtons from '@/components/ActionButtons';
+import { useFacilities } from "@/components/FacilityMangement/hooks/useFacilities";
+import { useFacilityModals } from "@/components/FacilityMangement/hooks/useFacilityModals";
+import { useImagePicker } from "@/components/FacilityMangement/hooks/useImagePicker";
+import { filterFacilities } from "@/components/FacilityMangement/utils/facilityUtils";
+import Header from "@/components/Header";
+import { useState } from "react";
+import { ScrollView } from "react-native";
+import { AddButton } from "./category-management";
+import SearchInput from "@/components/SearchInput";
+import FacilityStats from "@/components/FacilityMangement/FacilityComponent/FacilityStats";
+import FacilityList from "@/components/FacilityMangement/FacilityComponent/FacilityList";
+import ItemModal from "@/components/ItemModal";
+import { Facility } from "@/components/FacilityMangement/types/facility";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-type Facility = {
-  _id: string;
-  name: string;
-  icon: string | ImageSourcePropType;
-  isActive?: boolean
-}
+const FacilityManagement: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const {
+    facilities,
+    isLoading,
+    addFacility,
+    updateFacility,
+    deleteFacility
+  } = useFacilities();
 
-const FacilityManagement = () => {
-  const [facilities, setFacilities] = useState<Facility[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null)
-  const [newFacility, setNewFacility] = useState({
-    name: '',
-    icon: '',
-    imageUri: null as string | null,
-    iconBase64: null as string | null
-  })
-  const [editFacility, setEditFacility] = useState({
-    name: '',
-    icon: '',
-    imageUri: null as string | null,
-    iconBase64: null as string | null,
-    originalIcon: ''
-  })
-  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
+  const { pickImage } = useImagePicker();
 
-  useEffect(() => {
-    loadFacilities()
-  }, [])
+  const {
+    showAddModal,
+    showEditModal,
+    selectedFacility,
+    newFacility,
+    editFacility,
+    openAddModal,
+    closeAddModal,
+    openEditModal,
+    closeEditModal,
+    handleDeleteFacility,
+    setNewFacility,
+    setEditFacility,
+    updateNewFacilityImage,
+    updateEditFacilityImage
+  } = useFacilityModals();
 
-  const loadFacilities = async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/facilities`)
-      const result = await response.json()
+  const filteredFacilities = filterFacilities(facilities, searchQuery);
 
-      if(result.success) {
-        setFacilities(result.data)
+  const handlePickImage = async (isEdit = false) => {
+    const imageData = await pickImage();
+    if (imageData) {
+      if (isEdit) {
+        updateEditFacilityImage(imageData);
       } else {
-        Alert.alert('Error', 'Faild to load facilities')
+        updateNewFacilityImage(imageData);
       }
-    } catch (error) {
-      console.error('Error loading facilities', error)
-      Alert.alert('Error', 'Faild to connect to server')
-    } finally {
-      setIsLoading(false)
     }
-  }
-
-  const pickImage = async (isEdit = false) => {
-    try {
-      // Request permission
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-      if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Please grant camera roll permissions to select images')
-        return
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1], // Square aspect ratio
-        quality: 0.8,
-        base64: true
-      })
-
-      if(!result.canceled && result.assets[0]) {
-        const imageUri = result.assets[0].uri
-        try {
-          const base64 = await FileSystem.readAsStringAsync(imageUri, {
-            encoding: FileSystem.EncodingType.Base64,
-          })
-
-          const base64WithPrefix = `data:image/jpeg;base64,${base64}`
-
-          if(isEdit) {
-            setEditFacility(prev => ({
-              ...prev,
-              imageUri: imageUri,
-              iconBase64: base64WithPrefix,
-              icon: base64WithPrefix
-            }))
-          } else {
-            setNewFacility(prev => ({
-              ...prev,
-              imageUri: imageUri,
-              iconBase64: base64WithPrefix,
-              icon: base64WithPrefix
-            }))
-          }
-        } catch (error) {
-          console.error('Error converting image to base64:', error)
-          Alert.alert('Error', 'Failed to process image')
-        }
-      }
-    } catch (error) {
-      console.error('Error picking image:', error)
-      Alert.alert('Error', 'Failed to pick image')
-    }
-  }
+  };
 
   const handleAddFacility = async () => {
-    if(!newFacility.icon.trim()) {
-      Alert.alert('Error', 'Facility icon is required')
-      return
+    const success = await addFacility(newFacility.name, newFacility.icon);
+    if (success) {
+      closeAddModal();
     }
-    if(!newFacility.name.trim()) {
-      Alert.alert('Error', 'Facility name is required')
-      return
-    }
-    setIsLoading(true)
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/facilities`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: newFacility.name.trim(),
-          icon: newFacility.icon.trim()
-        })
-      })
-      const result = await response.json()
-      if(response.ok && result.success) {
-        setFacilities(prev => [...prev, result.data])
-        setNewFacility({ name: '', icon: '', imageUri: null, iconBase64: null})
-        setShowAddModal(false)
-        Alert.alert('Success', 'Facility added successfully')
-      } else {
-        Alert.alert('Error', result.message || 'Failed to add facility')
-      }
-    } catch (error) {
-      console.error('Error adding facility:', error)
-      Alert.alert('Error', 'Failed to connect to server')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  };
 
   const handleEditFacility = async () => {
-    if(!selectedFacility) return
-
-    if(!editFacility.name.trim()) {
-      Alert.alert('Error', 'Facility name is required')
-      return
+    if (!selectedFacility) return;
+    
+    const success = await updateFacility(
+      selectedFacility._id,
+      editFacility.name,
+      editFacility.icon,
+      editFacility.originalIcon
+    );
+    
+    if (success) {
+      closeEditModal();
     }
+  };
 
-    if(!editFacility.icon.trim()) {
-      Alert.alert('Error', 'Facility icon is required')
-      return
-    }
+  const handleConfirmDelete = (facility: Facility) => {
+    deleteFacility(facility);
+  };
 
-    setIsLoading(true)
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/facilities/${selectedFacility._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: editFacility.name.trim(),
-          icon: editFacility.icon.trim(),
-          originalIcon: editFacility.originalIcon
-        })
-      })
-
-      const result = await response.json()
-
-      if(response.ok && result.success) {
-        setFacilities(prev => 
-          prev.map(facility => 
-            facility._id === selectedFacility._id
-              ? { ...facility, name: editFacility.name.trim(), icon: editFacility.icon.trim() }
-              : facility
-          )
-        )
-        setShowEditModal(false)
-        setSelectedFacility(null)
-        setEditFacility({
-          name: '',
-          icon: '',
-          imageUri: null,
-          iconBase64: null,
-          originalIcon: ''
-        })
-        Alert.alert('Success', 'Facility updated successfully')
-      } else {
-        Alert.alert('Error', result.message || 'Failed to update facility')
-      }
-    } catch (error) {
-      console.error('Error updating facility:', error)
-      Alert.alert('Error', 'Failed to connect to server')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleDeleteFacility = (facility: Facility) => {
-    Alert.alert(
-      'Delete Facility',
-      `Are you sure you want to delete "${facility.name}"? This action cannot be undone.`,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel'
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => confirmDeleteFacility(facility)
-        }
-      ]
-    )
-  }
-
-  const confirmDeleteFacility = async (facility: Facility) => {
-    setIsLoading(true)
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/facilities/${facility._id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          icon: facility.icon
-        })
-      })
-      const result = await response.json()
-
-      if(response.ok && result.success) {
-        setFacilities(prev => prev.filter(f => f._id !== facility._id))
-        Alert.alert('Success', 'Facility deleted successfully')
-      } else {
-        Alert.alert('Error', result.message || 'Failed to delete facility')
-      }
-    } catch (error) {
-      console.error('Error deleting facility:', error)
-      Alert.alert('Error', 'Failed to connect to server')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const cancelAddModal = () => {
-    setNewFacility({ name: '', icon: '', imageUri: null, iconBase64: null })
-    setShowAddModal(false)
-  }
-
-  const openEditModal = (facility: Facility) => {
-    setSelectedFacility(facility)
-    setEditFacility({
-      name: facility.name,
-      icon: facility.icon as string,
-      imageUri: facility.icon as string,
-      iconBase64: null,
-      originalIcon: facility.icon as string
-    })
-    setShowEditModal(true)
-  }
-
-  const cancelEditModal = () => {
-    setEditFacility({ name: '', icon: '', imageUri: null, iconBase64: null, originalIcon: '' })
-    setSelectedFacility(null)
-    setShowEditModal(false)
-  }
-
-  const filteredFacilities = facilities.filter((facility: any) => 
-    facility.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
   return (
     <SafeAreaView className='flex-1 bg-gray-50'>
-      <Header title='Facility Management' backRoute='/admin-dashboard' rightIcon={<AddButton onPress={() => setShowAddModal(true)} />} />
+      <Header
+        title='Facility Management'
+        backRoute='/admin-dashboard'
+        rightIcon={<AddButton onPress={openAddModal} />}
+      />
+      
       <ScrollView
         className='flex-1 px-4'
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: 32 }}
+        contentContainerStyle={{ paddingBottom: 32 }}
       >
         <SearchInput
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Search Facilities..."
         />
-        <View className="flex-row justify-between mb-6">
-          <StatCard
-            value={facilities.length}
-            label="Total Facilities"
-            style="flex-1 mr-2"
-          />
-          <StatCard
-            value={facilities.filter((faci: any) => faci.isActive).length}
-            label="Active Facilities"
-            valueColor="text-primary-300"
-            style="flex-1 ml-2"
-          />
-        </View>
 
-        <View>
-          <Text className='text-lg font-rubik-semibold text-black-300 mb-4'>
-            All Facilities ({filteredFacilities.length})
-          </Text>
-          {isLoading ? (
-            <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
-              <Text className='text-primary-300 font-rubik-medium'>Loading facilities</Text>
-            </View>
-          ) : filteredFacilities.length === 0 ? (
-            <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
-              <Text className='text-3xl mb-2'>🏊</Text>
-              <Text className='text-black-300 font-rubik-medium mb-1'>No Facilities found</Text>
-              <Text className='text-black-200 font-rubik text-center'>
-                {searchQuery ? 'Try adjusting your search' : 'Add your first facility to get started' }
-              </Text>
-            </View>
-          ) : (
-            filteredFacilities.map((facility: any, index) => (
-              <View key={index} className='bg-white rounded-xl p-6 mb-4 shadow-sm border border-gray-100'>
-                <View className='flex-row items-center justify-between mb-4'>
-                  <View className='flex-row items-center flex-1'>
-                    <View className='size-12 bg-primary-100 rounded-xl items-center justify-center mr-4'>
-                      <Image
-                        source={{ uri: facility.icon }}
-                        className='size-8'
-                        resizeMode="contain"
-                      />
-                    </View>
-                    <View className='flex-1'>
-                      <Text className='text-lg font-rubik-semibold text-black-300'>{facility.name}</Text>
-                      <Text className='text-xs font-rubik text-black-200 mt-1'>ID: {facility._id}</Text>
-                      {facility.createdAt && (
-                        <Text className='text-xs font-rubik text-black-200 mt-1'>
-                          Created: {new Date(facility.createdAt).toLocaleDateString()}
-                        </Text>
-                      )}
-                    </View>
-                  </View>
-                </View>
+        <FacilityStats facilities={facilities} />
 
-                {/* Action Buttons */}
-                <ActionButtons
-                  onEdit={() => openEditModal(facility)}
-                  onDelete={() => handleDeleteFacility(facility)}
-                  disabled={isLoading}
-                />
-              </View>
-            ))
-          )}
-        </View>
+        <FacilityList
+          facilities={filteredFacilities}
+          searchQuery={searchQuery}
+          isLoading={isLoading}
+          onEditFacility={openEditModal}
+          onDeleteFacility={(facility) => handleDeleteFacility(facility, handleConfirmDelete)}
+        />
 
-        {/* Add facility modal */}
-        <ItemModal 
+        <ItemModal
           visible={showAddModal}
-          onClose={cancelAddModal}
+          onClose={closeAddModal}
           title='Facility'
           nameValue={newFacility.name}
-          onNameChange={text => setNewFacility(prev => ({ ...prev, name: text }))}
+          onNameChange={(text) => setNewFacility(prev => ({ ...prev, name: text }))}
           imageUri={newFacility.imageUri}
-          onPickImage={() => pickImage(false)}
+          onPickImage={() => handlePickImage(false)}
           onSubmit={handleAddFacility}
           progressButtonLabel='Adding'
           submitButtonLabel='Add Facility'
           isLoading={isLoading}
         />
 
-        <ItemModal 
+        <ItemModal
           visible={showEditModal}
-          onClose={cancelEditModal}
+          onClose={closeEditModal}
           title='Facility'
           nameValue={editFacility.name}
-          onNameChange={text => setEditFacility(prev => ({ ...prev, name: text}))}
+          onNameChange={(text) => setEditFacility(prev => ({ ...prev, name: text }))}
           imageUri={editFacility.imageUri}
-          onPickImage={() => pickImage(true)}
+          onPickImage={() => handlePickImage(true)}
           onSubmit={handleEditFacility}
           progressButtonLabel='Updating'
           submitButtonLabel='Update Facility'
-          isLoading={isLoading}        
+          isLoading={isLoading}
         />
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default FacilityManagement
+export default FacilityManagement;
