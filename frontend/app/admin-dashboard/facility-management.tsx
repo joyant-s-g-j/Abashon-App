@@ -1,15 +1,17 @@
-import { View, Text, ImageSourcePropType, Alert, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, ImageSourcePropType, Alert, ScrollView, TouchableOpacity, Modal, TextInput, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '@/components/Header';
 import { AddButton } from './category-management';
 import SearchInput from '@/components/SearchInput';
 import StatCard from '@/components/StatCard';
+import * as ImagePicker from 'expo-image-picker'
 
 type Facility = {
   _id: string;
   name: string;
-  icon: ImageSourcePropType
+  icon: ImageSourcePropType;
+  isActive?: boolean
 }
 
 const FacilityManagement = () => {
@@ -21,7 +23,9 @@ const FacilityManagement = () => {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null)
   const [newFacility, setNewFacility] = useState({
     name: '',
-    icon: ''
+    icon: '',
+    imageUri: null as string | null,
+    iconBase64: null as string | null
   })
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
@@ -45,6 +49,37 @@ const FacilityManagement = () => {
       Alert.alert('Error', 'Faild to connect to server')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const pickImage = async () => {
+    try {
+      // Request permission
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      if (status !== 'granted') {
+        Alert.alert('Permission needed', 'Please grant camera roll permissions to select images')
+        return
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1], // Square aspect ratio
+        quality: 0.8,
+        base64: true
+      })
+
+      if(!result.canceled && result.assets[0]) {
+        const asset = result.assets[0]
+        const base64Image = `data:${asset.type === 'image' ? 'image/jpeg': asset.type};base64,${asset.base64}`
+        setNewFacility(prev => ({
+          ...prev,
+          icon: base64Image
+        }))
+      }
+    } catch (error) {
+      console.error('Error picking image:', error)
+      Alert.alert('Error', 'Failed to pick image')
     }
   }
 
@@ -72,7 +107,7 @@ const FacilityManagement = () => {
       const result = await response.json()
       if(response.ok && result.success) {
         setFacilities(prev => [...prev, result.data])
-        setNewFacility({ name: '', icon: '' })
+        setNewFacility({ name: '', icon: '', imageUri: null, iconBase64: null})
         setShowAddModal(false)
         Alert.alert('Success', 'Facility added successfully')
       } else {
@@ -84,6 +119,11 @@ const FacilityManagement = () => {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const cancelAddModal = () => {
+    setNewFacility({ name: '', icon: '', imageUri: null, iconBase64: null })
+    setShowAddModal(false)
   }
 
   const filteredFacilities = facilities.filter((facility: any) => 
@@ -133,7 +173,7 @@ const FacilityManagement = () => {
               </Text>
             </View>
           ) : (
-            filteredFacilities.map((category: any, index) => (
+            filteredFacilities.map((facility: any, index) => (
               <View key={index} className='bg-white rounded-xl p-6 mb-4 shadow-sm border border-gray-100'>
                 <View className='flex-row items-center justify-between mb-4'>
                   <View className='flex-row items-center flex-1'>
@@ -141,11 +181,11 @@ const FacilityManagement = () => {
                       <Text className='text-2xl'>🏊</Text>
                     </View>
                     <View className='flex-1'>
-                      <Text className='text-lg font-rubik-semibold text-black-300'>{category.name}</Text>
-                      <Text className='text-xs font-rubik text-black-200 mt-1'>ID: {category._id}</Text>
-                      {category.createdAt && (
+                      <Text className='text-lg font-rubik-semibold text-black-300'>{facility.name}</Text>
+                      <Text className='text-xs font-rubik text-black-200 mt-1'>ID: {facility._id}</Text>
+                      {facility.createdAt && (
                         <Text className='text-xs font-rubik text-black-200 mt-1'>
-                          Created: {new Date(category.createdAt).toLocaleDateString()}
+                          Created: {new Date(facility.createdAt).toLocaleDateString()}
                         </Text>
                       )}
                     </View>
@@ -174,6 +214,86 @@ const FacilityManagement = () => {
             ))
           )}
         </View>
+
+        {/* Add facility modal */}
+        <Modal
+          visible={showAddModal}
+          animationType='slide'
+          transparent={true}
+          onRequestClose={cancelAddModal}
+        >
+          <View className='flex-1 justify-end bg-black/50'>
+            <View className='bg-white rounded-t-3xl p-6 max-h-[80%]'>
+              <View className='flex-row items-center justify-between mb-6'>
+                <Text className='text-xl font-rubik-bold text-black-300'>Add New Facility</Text>
+                <TouchableOpacity onPress={cancelAddModal}>
+                  <Text className='text-black-200 text-4xl'>×</Text>
+                </TouchableOpacity>
+              </View> 
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {/* Facility Name */}
+                <View className='mb-4'>
+                  <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Facility Name *</Text>
+                  <TextInput
+                    className='bg-gray-100 rounded-xl px-4 py-3 text-base font-rubik text-black-300'
+                    placeholder='Enter facility name'
+                    value={newFacility.name}
+                    onChangeText={(text) => setNewFacility(prev => ({ ...prev, name: text}))}
+                    editable={!isLoading}
+                  />
+                </View>
+
+                <View className='mb-6'>
+                  <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Facility Icon *</Text>
+                  
+                  {/* Image Preview */}
+                  {newFacility.imageUri && (
+                    <View className='mb-4'>
+                      <Image 
+                        source={{ uri: newFacility.imageUri }} 
+                        className='w-24 h-24 rounded-xl'
+                        resizeMode='cover'
+                      />
+                    </View>
+                  )}
+                  
+                  {/* Image Picker Button */}
+                  <TouchableOpacity
+                    onPress={pickImage}
+                    disabled={isLoading}
+                    className='bg-gray-100 rounded-xl px-4 py-3 flex-row items-center justify-center'
+                  >
+                    <Text className='text-base font-rubik text-black-300 mr-2'>
+                      {newFacility.imageUri ? 'Change Image' : 'Select Image'}
+                    </Text>
+                    <Text className='text-lg'>📷</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Action Buttons */}
+                <View className='flex-row gap-3'>
+                  <TouchableOpacity
+                    onPress={cancelAddModal}
+                    disabled={isLoading}
+                    className='flex-1 bg-gray-100 py-4 rounded-xl'
+                  >
+                    <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className='flex-1 bg-primary-300 py-4 rounded-xl'
+                    disabled={isLoading}
+                    onPress={handleAddFacility}
+                  >
+                    <Text className='text-center font-rubik-bold text-white'>
+                      {isLoading ? 'Adding...' : 'Add Facility'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   )
