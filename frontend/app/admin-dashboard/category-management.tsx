@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView, TextInput, Modal, Alert } fro
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Header from '@/components/Header'
+import SearchInput from '@/components/SearchInput';
 
 interface AddButtonProps {
   onPress: () => void;
@@ -191,14 +192,11 @@ const CategoryManagement = () => {
         contentContainerStyle={{paddingBottom: 32 }}
       >
         {/* Search Bar */}
-        <View className='bg-white rounded-xl px-4 py-3 mb-6 shadow-md border border-gray-100'>
-          <TextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            className='text-base font-rubik text-black-300'
-            placeholder='Search Categories...'
-          />
-        </View>
+        <SearchInput
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search Categories..."
+        />
         {/* Stats Header */}
         <View className='flex-row justify-between mb-6'>
           <View className='bg-white rounded-xl p-4 flex-1 mr-2 shadow-sm'>

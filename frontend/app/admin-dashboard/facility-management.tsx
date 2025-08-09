@@ -1,8 +1,9 @@
-import { View, Text, ImageSourcePropType, Alert } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, ImageSourcePropType, Alert, ScrollView } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '@/components/Header';
 import { AddButton } from './category-management';
+import SearchInput from '@/components/SearchInput';
 
 type Facility = {
   _id: string;
@@ -23,6 +24,10 @@ const FacilityManagement = () => {
   })
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
+  useEffect(() => {
+    loadFacilities()
+  }, [])
+
   const loadFacilities = async () => {
     setIsLoading(true)
     try {
@@ -42,8 +47,19 @@ const FacilityManagement = () => {
     }
   }
   return (
-    <SafeAreaView>
+    <SafeAreaView className='flex-1 bg-gray-50'>
       <Header title='Facility Management' backRoute='/admin-dashboard' rightIcon={<AddButton onPress={() => setShowAddModal(true)} />} />
+      <ScrollView
+        className='flex-1 px-4'
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{paddingBottom: 32 }}
+      >
+        <SearchInput
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search Facilities..."
+        />
+      </ScrollView>
     </SafeAreaView>
   )
 }
