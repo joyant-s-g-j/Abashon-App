@@ -87,7 +87,7 @@ const FacilityManagement = () => {
           const base64WithPrefix = `data:image/jpeg;base64,${base64}`
 
           if(isEdit) {
-            setNewFacility(prev => ({
+            setEditFacility(prev => ({
               ...prev,
               imageUri: imageUri,
               iconBase64: base64WithPrefix,
@@ -173,7 +173,7 @@ const FacilityManagement = () => {
         body: JSON.stringify({
           name: editFacility.name.trim(),
           icon: editFacility.icon.trim(),
-          origianlIcon: editFacility.originalIcon
+          originalIcon: editFacility.originalIcon
         })
       })
 
@@ -220,13 +220,13 @@ const FacilityManagement = () => {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => confrimDeleteFacility(facility)
+          onPress: () => confirmDeleteFacility(facility)
         }
       ]
     )
   }
 
-  const confrimDeleteFacility = async (facility: Facility) => {
+  const confirmDeleteFacility = async (facility: Facility) => {
     setIsLoading(true)
     try {
       const response = await fetch(`${API_BASE_URL}/api/facilities/${facility._id}`, {
@@ -476,6 +476,50 @@ const FacilityManagement = () => {
                     onChangeText={(text) => setEditFacility(prev => ({ ...prev, name: text}))}
                     editable={!isLoading}
                   />
+                </View>
+
+                <View className='mb-6'>
+                  <Text className='text-base font-rubik-semibold text-black-300 mb-2'>Facility Icon *</Text>
+
+                  {editFacility.imageUri && (
+                    <View className='mb-4'>
+                      <Image 
+                        source={{ uri: editFacility.imageUri }}
+                        className='size-24 rounded-xl'
+                        resizeMode='cover'
+                      />
+                    </View>
+                  )}
+
+                  <TouchableOpacity
+                    onPress={() => pickImage(true)}
+                    disabled={isLoading}
+                    className='bg-gray-100 rounded-xl p-4 flex-row items-center justify-center'
+                  >
+                    <Text className='text-base font-rubik text-black-300 mr-2'>
+                      {editFacility.iconBase64 ? 'Change Image' : 'Update Image'}
+                    </Text>
+                    <Text className='text-lg'>📷</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View className='flex-row gap-3'>
+                  <TouchableOpacity
+                    onPress={cancelEditModal}
+                    disabled={isLoading}
+                    className='flex-1 bg-gray-100 py-4 rounded-xl'
+                  >
+                    <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className='flex-1 bg-primary-300 py-4 rounded-xl'
+                    disabled={isLoading}
+                    onPress={handleEditFacility}
+                  >
+                    <Text className='text-center font-rubik-bold text-white'>
+                      {isLoading ? 'Updating...' : 'Update Facility'}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </ScrollView> 
             </View>
