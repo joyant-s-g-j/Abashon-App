@@ -55,18 +55,6 @@ export const featuredCards = [
   },
 ];
 
-export const categories = [
-  { title: "All", category: "All" },
-  { title: "Houses", category: "House" },
-  { title: "Condos", category: "Condos" },
-  { title: "Duplexes", category: "Duplexes" },
-  { title: "Studios", category: "Studios" },
-  { title: "Villas", category: "Villa" },
-  { title: "Apartments", category: "Apartments" },
-  { title: "Townhomes", category: "Townhomes" },
-  { title: "Others", category: "Others" },
-];
-
 export const settings = [
   {
     title: "My Bookings",
@@ -164,14 +152,6 @@ export const gallery = [
     image: images.japan,
   },
 ];
-
-export const stats = [
-  { label: 'Total Properties', value: '247' },
-  { label: 'Categories', value: '12' },
-  { label: 'Facilities', value: '38' },
-  { label: 'Agents', value: '23' },
-  { label: 'Customers', value: '140' }
-]
 
 
 export const adminDashboard = [

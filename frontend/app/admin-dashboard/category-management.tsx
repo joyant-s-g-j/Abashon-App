@@ -24,7 +24,6 @@ const AddButton: React.FC<AddButtonProps> = ({ onPress }) => (
 );
 
 const CategoryManagement = () => {
-  const router = useRouter()
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
