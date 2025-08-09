@@ -74,9 +74,9 @@ const ItemModal: React.FC<ItemModalProps> = ({
                         
                         {/* Image Picker Button */}
                         <TouchableOpacity
-                        onPress={onPickImage}
-                        disabled={isLoading}
-                        className='bg-gray-100 rounded-xl px-4 py-3 flex-row items-center justify-center'
+                            onPress={onPickImage}
+                            disabled={isLoading}
+                            className='bg-gray-100 rounded-xl px-4 py-3 flex-row items-center justify-center'
                         >
                         <Text className='text-base font-rubik text-black-300 mr-2'>
                             {imageUri ? 'Change Image' : 'Select Image'}
@@ -89,9 +89,9 @@ const ItemModal: React.FC<ItemModalProps> = ({
                 {/* Action Buttons */}
                 <View className='flex-row gap-3'>
                     <TouchableOpacity
-                    onPress={onClose}
-                    disabled={isLoading}
-                    className='flex-1 bg-gray-100 py-4 rounded-xl'
+                        onPress={onClose}
+                        disabled={isLoading}
+                        className='flex-1 bg-gray-100 py-4 rounded-xl'
                     >
                     <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
                     </TouchableOpacity>
