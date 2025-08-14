@@ -59,5 +59,61 @@ export const useProperties = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const updatePorperty = async(id: string, propertyData: PropertyFormData) => {
+        if(!propertyData) {
+            Alert.alert('Error', 'Property data are required')
+            return false;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/properties/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(propertyData)
+            });
+
+            const result = await response.json();
+
+            if(response.ok && result.success) {
+                setProperties(prev =>
+                    prev.map(property => 
+                        property._id === id
+                        ? {...property,
+                            name: propertyData.name || property.name,
+                            thumbnailImage: propertyData.thumbnailImage || property.thumbnailImage,
+                            type: propertyData.type || property.type,
+                            specifications: propertyData.specifications || property.specifications,
+                            description: propertyData.description || property.description,
+                            facilities: propertyData.facilities || property.facilities,
+                            galleryImages: propertyData.galleryImages || property.galleryImages,
+                            location: propertyData.location ? {
+                                address: propertyData.location.address,
+                                latitude: parseFloat(propertyData.location.latitude),
+                                longitude: parseFloat(propertyData.location.longitude),
+                            } : property.location,
+                            price: propertyData.price ? parseFloat(propertyData.price) : property.price,
+                            isFeatued: propertyData.isFeatured !== undefined ? propertyData.isFeatured : property.isFeatured,
+                            updatedAt: new Date()
+                        } : property
+                    )
+                );
+                Alert.alert('Success', 'Facility updated successfully')
+                return true;
+            } else {
+                Alert.alert('Error', result.message || 'Failed to update facility');
+                return false
+            }
+        } catch (error) {
+            console.log('Error updating property', error)
+            Alert.alert('Error', 'Failed to connect to server');
+            return false;
+        } finally {
+            setIsLoading(false)
+        }
     }
 }

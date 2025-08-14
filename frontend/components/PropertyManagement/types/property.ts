@@ -34,6 +34,7 @@ export type Property = {
     name: string;
     thumbnailImage: string | ImageSourcePropType;
     type: string | Category;
+    specifications: string | Specifications;
     ratings: Rating[];
     averageRating: number;
     owner: string | User;
