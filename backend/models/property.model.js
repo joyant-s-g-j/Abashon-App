@@ -5,7 +5,7 @@ const propertySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    thumnailImage: {
+    thumbnailImage: {
         type: String,
         required: true
     },
@@ -78,7 +78,7 @@ const propertySchema = new mongoose.Schema({
             type: Number,
             required: true,
         },
-        longtitude: {
+        longitude: {
             type: Number,
             required: true
         }

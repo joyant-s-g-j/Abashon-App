@@ -26,13 +26,13 @@ export interface Specifications {
 export interface Location {
   address: string;
   latitude: number;
-  longtitude: number;
+  longitude: number;
 }
 
 export type Property = {
     _id: string;
     name: string;
-    thumnailImage: string | ImageSourcePropType;
+    thumbnailImage: string | ImageSourcePropType;
     type: string | Category;
     ratings: Rating[];
     averageRating: number;
@@ -49,7 +49,7 @@ export type Property = {
 
 export interface PropertyFormData {
     name: string;
-    thumnailImage: string;
+    thumbnailImage: string;
     type: string;
     specifications: {
         bed: string;
@@ -62,7 +62,7 @@ export interface PropertyFormData {
     location: {
         address: string;
         latitude: string;
-        longtitude: string;
+        longitude: string;
     };
     price: string;
     isFeatured: boolean;
@@ -70,7 +70,7 @@ export interface PropertyFormData {
 
 export interface PropertyCreateData {
     name: string;
-    thumnailImage: string;
+    thumbnailImage: string;
     type: string;
     specifications: {
         bed: string;
@@ -83,7 +83,7 @@ export interface PropertyCreateData {
     location: {
         address: string;
         latitude: number;
-        longtitude: number;
+        longitude: number;
     };
     price: number;
     isFeatured: boolean;

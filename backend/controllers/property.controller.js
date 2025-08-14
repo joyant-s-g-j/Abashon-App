@@ -1,6 +1,6 @@
-import mongoose from "mongoose"
-import Property from "../models/property.model.js"
-import cloudinary from "../lib/cloudinary.js"
+import mongoose from "mongoose";
+import cloudinary from "../lib/cloudinary.js";
+import Property from "../models/property.model.js";
 
 const uploadToCloudinary = async(imageData, folder = 'properties') => {
     try {
@@ -120,13 +120,13 @@ export const getPropertyById = async (req, res) => {
 
 export const createProperty = async (req, res) => {
     try {
-        const { name, thumnailImage, type, specifications, owner, description, facilities, galleryImages, location, price, isFeatured } = req.body;
+        const { name, thumbnailImage, type, specifications, owner, description, facilities, galleryImages, location, price, isFeatured } = req.body;
 
-        if( !name || !thumnailImage || !specifications || !description || !location || !price) {
+        if( !name || !thumbnailImage || !specifications || !description || !location || !price) {
             return res.status(400).json({ success: false, message: "Please provide all required fields" });
         }
 
-        if(!location.latitude || !location.longtitude || !location.address) {
+        if(!location.latitude || !location.longitude || !location.address) {
             return res.status(400).json({ success: false, message: "Please provide complete location information"})
         }
 
@@ -148,7 +148,7 @@ export const createProperty = async (req, res) => {
 
         let uploadedThumbnail;
         try {
-            uploadedThumbnail = await uploadToCloudinary(thumnailImage, 'properties/thumbnails')
+            uploadedThumbnail = await uploadToCloudinary(thumbnailImage, 'properties/thumbnails')
         } catch (error) {
             return res.status(400).json({ success: false, message: error.message });
         }
@@ -166,7 +166,7 @@ export const createProperty = async (req, res) => {
 
         const property = await Property.create({
             name,
-            thumnailImage: uploadedThumbnail,
+            thumbnailImage: uploadedThumbnail,
             type,
             specifications,
             owner,
@@ -205,14 +205,14 @@ export const updateProperty = async (req, res) => {
 
         const updateData = { ...req.body };
 
-        if(req.body.thumnailImage && req.body.thumnailImage !== property.thumnailImage) {
+        if(req.body.thumbnailImage && req.body.thumbnailImage !== property.thumbnailImage) {
             try {
-                const newThumnail = await uploadToCloudinary(req.body.thumnailImage, 'properties/thumbnails')
+                const newThumnail = await uploadToCloudinary(req.body.thumbnailImage, 'properties/thumbnails')
 
-                if(property.thumnailImage) {
-                    await deleteFromCloudinary(property.thumnailImage)
+                if(property.thumbnailImage) {
+                    await deleteFromCloudinary(property.thumbnailImage)
                 }
-                updateData.thumnailImage = newThumnail
+                updateData.thumbnailImage = newThumnail
             } catch (error) {
                 return res.status(400).json({ success: false, message: `Thumbnail update failed: ${error.message}` });
             }
@@ -259,8 +259,8 @@ export const deleteProperty = async (req, res) => {
             return res.status(404).json({ success: false, message: "Property not found" })
         }
 
-        if(property.thumnailImage) {
-            await deleteFromCloudinary(property.thumnailImage)
+        if(property.thumbnailImage) {
+            await deleteFromCloudinary(property.thumbnailImage)
         }
 
         if(property.galleryImages && property.galleryImages.length > 0) {
