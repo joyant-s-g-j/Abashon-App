@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Property, PropertyFormData } from "../types/property";
 import { Alert } from "react-native";
 
@@ -115,5 +115,48 @@ export const useProperties = () => {
         } finally {
             setIsLoading(false)
         }
+    }
+
+    const deleteProperty = async (property: Property) => {
+        setIsLoading(true)
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/facilities/${property._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(property)
+            })
+
+            const result = await response.json();
+
+            if(response.ok && result.success) {
+                setProperties(prev => prev.filter(p => p._id !== property._id))
+                Alert.alert('Success', 'Facility deleted successfully');
+                return true;
+            } else {
+                Alert.alert('Error', result.message || 'Failed to delete property');
+                return false;
+            }
+        } catch (error) {
+            console.log('Error deleting property', error)
+            Alert.alert('Error', 'Failed to connect to server')
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadProperties()
+    }, []);
+
+    return {
+        properties,
+        isLoading,
+        loadProperties,
+        addProperty,
+        updatePorperty,
+        deleteProperty
     }
 }
