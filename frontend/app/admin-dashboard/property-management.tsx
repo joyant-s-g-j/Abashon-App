@@ -4,9 +4,20 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Header, StatCard } from '@/components/ReusableComponent'
 import icons from '@/constants/icons'
 import SearchInput from '@/components/SearchInput'
+import PropertyStats from '@/components/PropertyManagement/PorpertyComponent/PropertyStats'
+import { useProperties } from '@/components/PropertyManagement/hooks/useProperty'
 
 const PropertyMangement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+
+  const {
+    properties,
+    isLoading,
+    loadProperties,
+    addProperty,
+    updatePorperty,
+    deleteProperty
+  } = useProperties()
   return (
     <SafeAreaView>
       <Header 
@@ -24,22 +35,9 @@ const PropertyMangement: React.FC = () => {
           onChangeText={setSearchQuery}
           placeholder="Search Properties..."
         />
-        <View className="flex-row justify-between mb-6">
-          <StatCard
-            value="10"
-            label="Total Properties"
-            style="flex-1 mr-2"
-          />
-          <StatCard
-            value="5"
-            label="Featured Properties"
-            valueColor="text-primary-300"
-            style="flex-1 ml-2"
-          />
-        </View>
-        <Text className='text-lg font-rubik-semibold text-black-300 mb-4'>
-          All Properties
-        </Text>
+        
+        <PropertyStats properties={properties} />
+
       </ScrollView>
     </SafeAreaView>
   )
