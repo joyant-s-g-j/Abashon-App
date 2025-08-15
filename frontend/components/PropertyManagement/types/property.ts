@@ -45,7 +45,7 @@ export type Property = {
     price: number;
     isFeatured: boolean;
     createdAt?: Date;
-    upadatedAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface PropertyFormData {

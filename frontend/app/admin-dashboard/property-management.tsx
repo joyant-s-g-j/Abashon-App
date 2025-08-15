@@ -1,11 +1,9 @@
-import { View, Text, Image, TextInput, ScrollView } from 'react-native'
+import { Text, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Header, StatCard } from '@/components/ReusableComponent'
-import icons from '@/constants/icons'
+import { Header } from '@/components/ReusableComponent'
 import SearchInput from '@/components/SearchInput'
-import PropertyStats from '@/components/PropertyManagement/PorpertyComponent/PropertyStats'
-import { useProperties } from '@/components/PropertyManagement/hooks/useProperty'
+import { filterProperties, PropertyList, PropertyStats, useProperties } from '@/components/PropertyManagement'
 
 const PropertyMangement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,6 +16,8 @@ const PropertyMangement: React.FC = () => {
     updatePorperty,
     deleteProperty
   } = useProperties()
+
+  const filteredProperties = filterProperties(properties, searchQuery)
   return (
     <SafeAreaView>
       <Header 
@@ -37,6 +37,13 @@ const PropertyMangement: React.FC = () => {
         />
         
         <PropertyStats properties={properties} />
+
+        {/* <PropertyList 
+          properties={filteredProperties}
+          searchQuery={searchQuery}
+          isLoading={isLoading}
+          onEditProperty={}
+        /> */}
       </ScrollView>
     </SafeAreaView>
   )
