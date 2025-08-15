@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 import { Category } from "../types/category";
 import CategoryCard from "./CategoryCard";
+import { EmptyState, LoadingBox } from "@/components/ReusableComponent";
 
 interface CategoryListProps {
   categories: Category[];
@@ -17,27 +18,20 @@ const CategoryList: React.FC<CategoryListProps> = ({
   onEditCategory,
   onDeleteCategory
 }) => {
-  if (isLoading) {
-    return (
-      <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
-        <Text className='text-primary-300 font-rubik-medium'>Loading categories</Text>
-      </View>
-    );
-  }
-
-  if (categories.length === 0) {
-    return (
-      <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
-        <Text className='text-3xl mb-2'>📂</Text>
-        <Text className='text-black-300 font-rubik-medium mb-1'>No categories found</Text>
-        <Text className='text-black-200 font-rubik text-center'>
-          {searchQuery ? 'Try adjusting your search' : 'Add your first category to get started'}
-        </Text>
-      </View>
-    );
-  }
-
   return (
+  <>
+    <LoadingBox isLoading={isLoading} message="Loading Categories" />
+
+    <EmptyState
+      isEmpty={categories.length === 0}
+      emoji="📂"
+      title="No categories found"
+      message={
+        searchQuery 
+          ? 'Try adjusting your search' 
+          : 'Add your first category to get started'
+      }
+    />
     <View>
       <Text className='text-lg font-rubik-semibold text-black-300 mb-4'>
         All Categories ({categories.length})
@@ -52,6 +46,7 @@ const CategoryList: React.FC<CategoryListProps> = ({
         />
       ))}
     </View>
+  </>
   );
 };
 

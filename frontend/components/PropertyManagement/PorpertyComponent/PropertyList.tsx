@@ -19,6 +19,10 @@ const PropertyList: React.FC<PropertyListProps> = ({
     onDeleteProperty
 }) => {
   <LoadingBox isLoading={isLoading} message="Loading properties" />
+
+  if(properties.length === 0) {
+    
+  }
   return (
     <View>
         <Text className='text-lg font-rubik-semibold text-black-300 mb-4'>
