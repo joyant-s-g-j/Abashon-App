@@ -67,6 +67,9 @@ export interface PropertyFormData {
     };
     price: string;
     isFeatured: boolean;
+    imageUri: string | null;
+    imageBase64: string | null;
+    originalImage?: string | null;
 }
 
 export interface PropertyCreateData {

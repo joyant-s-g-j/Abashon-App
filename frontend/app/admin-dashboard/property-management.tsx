@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Header } from '@/components/ReusableComponent'
 import SearchInput from '@/components/SearchInput'
 import { filterProperties, PropertyList, PropertyStats, useProperties } from '@/components/PropertyManagement'
+import { useImagePicker } from '@/components/FacilityMangement'
 
 const PropertyMangement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,7 +16,9 @@ const PropertyMangement: React.FC = () => {
     addProperty,
     updatePorperty,
     deleteProperty
-  } = useProperties()
+  } = useProperties();
+
+  const { pickImage } = useImagePicker()
 
   const filteredProperties = filterProperties(properties, searchQuery)
   return (
