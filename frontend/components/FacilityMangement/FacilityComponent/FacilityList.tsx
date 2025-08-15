@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 import { Facility } from "../types/facility";
 import FacilityCard from "./FacilityCard";
+import { LoadingBox } from "@/components/ReusableComponent";
 
 interface FacilityListProps {
   facilities: Facility[];
@@ -17,14 +18,8 @@ const FacilityList: React.FC<FacilityListProps> = ({
   onEditFacility,
   onDeleteFacility
 }) => {
-  if (isLoading) {
-    return (
-      <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
-        <Text className='text-primary-300 font-rubik-medium'>Loading facilities</Text>
-      </View>
-    );
-  }
-
+  <LoadingBox isLoading={isLoading} message="Loading facilities" />
+  
   if (facilities.length === 0) {
     return (
       <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
