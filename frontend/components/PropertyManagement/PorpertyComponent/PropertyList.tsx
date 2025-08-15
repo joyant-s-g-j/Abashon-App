@@ -2,6 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { Property } from '../types/property'
 import { EmptyState, LoadingBox, SectionTitle } from '@/components/ReusableComponent';
+import PropertyCard from './PropertyCard';
 
 interface PropertyListProps {
     properties: Property[];
@@ -35,6 +36,15 @@ const PropertyList: React.FC<PropertyListProps> = ({
   
         <View>
             <SectionTitle title="All Properties" count={properties.length} />
+            {properties.map((property, index) => (
+                <PropertyCard 
+                    key={property._id || index}
+                    property={property}
+                    onEdit={() => onEditProperty(property)}
+                    onDelete={() => onDeleteProperty(property)}
+                    isLoading={isLoading}
+                />
+            ))}
         </View>
     </>
   )

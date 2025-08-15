@@ -1,4 +1,3 @@
-
 import { Facility, FacilityList, FacilityStats, filterFacilities, useFacilities, useFacilityModals, useImagePicker } from "@/components/FacilityMangement";
 import SearchInput from "@/components/SearchInput";
 import { useState } from "react";

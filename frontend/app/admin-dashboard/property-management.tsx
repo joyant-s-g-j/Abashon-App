@@ -1,9 +1,9 @@
 import { Text, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Header } from '@/components/ReusableComponent'
+import { AddButton, Header } from '@/components/ReusableComponent'
 import SearchInput from '@/components/SearchInput'
-import { filterProperties, PropertyList, PropertyStats, useProperties } from '@/components/PropertyManagement'
+import { filterProperties, Property, PropertyList, PropertyStats, useProperties, usePropertyModals } from '@/components/PropertyManagement'
 import { useImagePicker } from '@/components/FacilityMangement'
 
 const PropertyMangement: React.FC = () => {
@@ -20,12 +20,33 @@ const PropertyMangement: React.FC = () => {
 
   const { pickImage } = useImagePicker()
 
+  const {
+    showAddModal,
+    showEditModal,
+    selectedProperty,
+    newProperty,
+    editProperty,
+    openAddModal,
+    closeAddModal,
+    openEditModal,
+    closeEditModal,
+    handleDeleteProperty,
+    setNewProperty,
+    setEditProperty,
+    updateNewPropertyImage,
+    updateEditPropertyImage
+  } = usePropertyModals()
+
   const filteredProperties = filterProperties(properties, searchQuery)
+
+  const handleConfirmDelete = (property: Property) => {
+    deleteProperty(property)
+  }
   return (
     <SafeAreaView>
       <Header 
         backRoute='/admin-dashboard' 
-        rightIcon={<Text className='bg-primary-300 text-3xl font-rubik-bold text-white px-3.5 py-1.5 rounded-full'>+</Text>} 
+        rightIcon={<AddButton onPress={openAddModal} />} 
         title='Property Management' 
       />
       <ScrollView 
@@ -41,12 +62,13 @@ const PropertyMangement: React.FC = () => {
         
         <PropertyStats properties={properties} />
 
-        {/* <PropertyList 
+        <PropertyList 
           properties={filteredProperties}
           searchQuery={searchQuery}
           isLoading={isLoading}
-          onEditProperty={}
-        /> */}
+          onEditProperty={openEditModal}
+          onDeleteProperty={(property) => handleDeleteProperty(property, handleConfirmDelete)}
+        />
       </ScrollView>
     </SafeAreaView>
   )
