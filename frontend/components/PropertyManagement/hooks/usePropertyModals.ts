@@ -15,6 +15,7 @@ export const usePropertyModals = () => {
             bath: '',
             area: '',
         },
+        owner: '',
         description: '',
         facilities: '',
         galleryImages: [],
@@ -37,6 +38,7 @@ export const usePropertyModals = () => {
             bath: '',
             area: '',
         },
+        owner: '',
         description: '',
         facilities: '',
         galleryImages: [],
@@ -64,6 +66,7 @@ export const usePropertyModals = () => {
                 bath: '',
                 area: '',
             },
+            owner: '',
             description: '',
             facilities: '',
             galleryImages: [],
@@ -99,6 +102,9 @@ export const usePropertyModals = () => {
                 bath: specs.bath || '',
                 area: specs.area || '',
             },
+            owner: typeof property.owner === 'string'
+                ? property.owner
+                : property.owner._id || '',
             description: property.description || '',
             facilities: typeof property.facilities === 'string'
                 ? property.facilities
@@ -130,6 +136,7 @@ export const usePropertyModals = () => {
                 bath: '',
                 area: '',
             },
+            owner: '',
             description: '',
             facilities: '',
             galleryImages: [],

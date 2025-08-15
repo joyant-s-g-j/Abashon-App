@@ -57,6 +57,7 @@ export interface PropertyFormData {
         bath: string;
         area: string;
     };
+    owner: string;
     description: string;
     facilities: string;
     galleryImages: string[];
