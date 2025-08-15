@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { Facility } from "../types/facility";
 import FacilityCard from "./FacilityCard";
-import { EmptyState, LoadingBox } from "@/components/ReusableComponent";
+import { EmptyState, LoadingBox, SectionTitle } from "@/components/ReusableComponent";
 
 interface FacilityListProps {
   facilities: Facility[];
@@ -34,9 +34,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
     />
 
     <View>
-      <Text className='text-lg font-rubik-semibold text-black-300 mb-4'>
-        All Facilities ({facilities.length})
-      </Text>
+      <SectionTitle title="All Facilities" count={facilities.length} />
       {facilities.map((facility, index) => (
         <FacilityCard
           key={facility._id || index}

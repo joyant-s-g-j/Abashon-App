@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { Category } from "../types/category";
 import CategoryCard from "./CategoryCard";
-import { EmptyState, LoadingBox } from "@/components/ReusableComponent";
+import { EmptyState, LoadingBox, SectionTitle } from "@/components/ReusableComponent";
 
 interface CategoryListProps {
   categories: Category[];
@@ -33,9 +33,7 @@ const CategoryList: React.FC<CategoryListProps> = ({
       }
     />
     <View>
-      <Text className='text-lg font-rubik-semibold text-black-300 mb-4'>
-        All Categories ({categories.length})
-      </Text>
+      <SectionTitle title="All Categories" count={categories.length} />
       {categories.map((category, index) => (
         <CategoryCard
           key={category._id || index}

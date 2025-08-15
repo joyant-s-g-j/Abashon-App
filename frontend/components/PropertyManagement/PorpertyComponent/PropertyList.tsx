@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import { Property } from '../types/property'
-import { LoadingBox } from '@/components/ReusableComponent';
+import { EmptyState, LoadingBox, SectionTitle } from '@/components/ReusableComponent';
 
 interface PropertyListProps {
     properties: Property[];
@@ -18,17 +18,25 @@ const PropertyList: React.FC<PropertyListProps> = ({
     onEditProperty,
     onDeleteProperty
 }) => {
-  <LoadingBox isLoading={isLoading} message="Loading properties" />
-
-  if(properties.length === 0) {
-    
-  }
   return (
-    <View>
-        <Text className='text-lg font-rubik-semibold text-black-300 mb-4'>
-            All Properties
-        </Text>
-    </View>
+    <>
+        <LoadingBox isLoading={isLoading} message="Loading properties" />
+
+        <EmptyState 
+            isEmpty={properties.length === 0}
+            emoji='🏡'
+            title='No Properties found'
+            message={
+                searchQuery
+                  ? "Try adjusting you search"
+                  : "Add your first properties to get started"
+            }
+        />
+  
+        <View>
+            <SectionTitle title="All Properties" count={properties.length} />
+        </View>
+    </>
   )
 }
 

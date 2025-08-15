@@ -37,7 +37,6 @@ const PropertyMangement: React.FC = () => {
         />
         
         <PropertyStats properties={properties} />
-
       </ScrollView>
     </SafeAreaView>
   )
