@@ -1,8 +1,8 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text } from 'react-native'
+import React from 'react'
 import { InputField } from '@/components/ReusableComponent'
 import { PropertyFormData } from '../../types/property'
-import { filterCategories, useCategories } from '@/components/CategoryManagement';
+import { useCategories } from '@/components/CategoryManagement';
 import { TowColumnCheckbox } from '@/components/ReusableComponent/TowColumnCheckbox';
 
 interface RenderStepOneProps {

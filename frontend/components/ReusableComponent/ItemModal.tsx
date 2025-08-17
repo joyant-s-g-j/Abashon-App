@@ -1,5 +1,7 @@
 import { View, Text, Modal, TouchableOpacity, ScrollView, TextInput, Image } from 'react-native'
 import React from 'react'
+import InputField from './InputField'
+import LabelText from './LabelText'
 
 type ItemModalProps = {
     visible: boolean
@@ -45,22 +47,17 @@ const ItemModal: React.FC<ItemModalProps> = ({
                 </View> 
 
                 <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Category Name */}
-                <View className='mb-4'>
-                    <Text className='text-base font-rubik-semibold text-black-300 mb-2'>{title} Name *</Text>
-                    <TextInput
-                        className='bg-gray-100 rounded-xl px-4 py-3 text-base font-rubik text-black-300'
-                        placeholder={`Enter ${title.toLowerCase()} name`}
+                    <InputField 
+                        label={`${title} Name *`}
                         value={nameValue}
                         onChangeText={onNameChange}
                         editable={!isLoading}
+                        placeholder={`Enter ${title.toLowerCase()} name`}
                     />
-                </View>
 
                 {onPickImage && (
                     <View className='mb-6'>
-                        <Text className='text-base font-rubik-semibold text-black-300 mb-2'>{title} Icon *</Text>
-                        
+                        <LabelText text={`${title} Icon *`} />
                         {/* Image Preview */}
                         {imageUri && (
                             <View className='mb-4'>
@@ -93,16 +90,16 @@ const ItemModal: React.FC<ItemModalProps> = ({
                         disabled={isLoading}
                         className='flex-1 bg-gray-100 py-4 rounded-xl'
                     >
-                    <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
+                        <Text className='text-center font-rubik-semibold text-black-200'>Cancel</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         className='flex-1 bg-primary-300 py-4 rounded-xl'
                         disabled={isLoading}
                         onPress={onSubmit}
                     >
-                    <Text className='text-center font-rubik-bold text-white'>
-                        {isLoading ? `${progressButtonLabel}...` : submitButtonLabel}
-                    </Text>
+                        <Text className='text-center font-rubik-bold text-white'>
+                            {isLoading ? `${progressButtonLabel}...` : submitButtonLabel}
+                        </Text>
                     </TouchableOpacity>
                 </View>
                 </ScrollView>

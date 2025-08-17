@@ -1,5 +1,6 @@
 import React from "react";
 import { TextInput, Text, View, TextInputProps } from "react-native";
+import LabelText from "./LabelText";
 
 interface InputFieldProps extends TextInputProps {
   label?: string;
@@ -20,9 +21,7 @@ const InputField: React.FC<InputFieldProps> = ({
   return (
     <View className="mb-4">
       {label && (
-        <Text className="text-sm font-rubik-medium text-black-300 mb-2">
-          {label}
-        </Text>
+        <LabelText text={label} />
       )}
       <TextInput
         value={value}
