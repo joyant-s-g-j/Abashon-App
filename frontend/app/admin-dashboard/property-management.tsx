@@ -5,6 +5,7 @@ import { AddButton, Header } from '@/components/ReusableComponent'
 import SearchInput from '@/components/SearchInput'
 import { filterProperties, Property, PropertyList, PropertyStats, useProperties, usePropertyModals } from '@/components/PropertyManagement'
 import { useImagePicker } from '@/components/FacilityMangement'
+import PropertyModal from '@/components/PropertyManagement/PorpertyComponent/PropertyModal'
 
 const PropertyMangement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,6 +71,11 @@ const PropertyMangement: React.FC = () => {
           onDeleteProperty={(property) => handleDeleteProperty(property, handleConfirmDelete)}
         />
       </ScrollView>
+
+      <PropertyModal
+        visible={showAddModal || showEditModal}
+        // onClose={}
+      />
     </SafeAreaView>
   )
 }
