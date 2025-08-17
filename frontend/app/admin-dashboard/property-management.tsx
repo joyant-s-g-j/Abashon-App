@@ -6,11 +6,35 @@ import SearchInput from '@/components/SearchInput'
 import { filterProperties, Property, PropertyList, PropertyStats, useProperties, usePropertyModals } from '@/components/PropertyManagement'
 import { useImagePicker } from '@/components/FacilityMangement'
 import PropertyModal from '@/components/PropertyManagement/PorpertyComponent/PropertyModal'
-import { PropertyStep } from '@/components/PropertyManagement/types/property'
+import { PropertyFormData, PropertyStep } from '@/components/PropertyManagement/types/property'
 
 const PropertyMangement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentStep, setCurrentStep] = useState<PropertyStep>(1)
+  const [formData, setFormData] = useState<PropertyFormData>({
+    name: '',
+    thumbnailImage: '',
+    type: '',
+    specifications: {
+      bed: '',
+      bath: '',
+      area: ''
+    },
+    owner: '',
+    description: '',
+    facilities: '',
+    galleryImages: [],
+    location: {
+      address: '',
+      latitude: '',
+      longitude: '',
+    },
+    price: '',
+    isFeatured: false,
+    imageUri: null,
+    imageBase64: null,
+    originalImage: null
+  })
 
   const {
     properties,
@@ -45,6 +69,45 @@ const PropertyMangement: React.FC = () => {
   const handleConfirmDelete = (property: Property) => {
     deleteProperty(property)
   }
+
+  const resetFormData = () => {
+    setFormData({
+      name: '',
+      thumbnailImage: '',
+      type: '',
+      specifications: {
+        bed: '',
+        bath: '',
+        area: ''
+      },
+      owner: '',
+      description: '',
+      facilities: '',
+      galleryImages: [],
+      location: {
+        address: '',
+        latitude: '',
+        longitude: ''
+      },
+      price: '',
+      isFeatured: false,
+      imageUri: null,
+      imageBase64: null,
+      originalImage: null
+    });
+    setCurrentStep(1);
+  }
+
+  const handleOpenAddModal = () => {
+    resetFormData();
+    openAddModal();
+  }
+
+  const handleModalClose = () => {
+    resetFormData();
+    closeAddModal();
+    closeEditModal()
+  }
   return (
     <SafeAreaView>
       <Header 
@@ -76,6 +139,7 @@ const PropertyMangement: React.FC = () => {
 
       <PropertyModal
         visible={showAddModal || showEditModal}
+        onClose={handleModalClose}
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
       />

@@ -1,10 +1,10 @@
-import { View, Text, Alert, Modal, TouchableOpacity } from 'react-native'
+import { View, Text, Alert, Modal, TouchableOpacity, ScrollView } from 'react-native'
 import React from 'react'
 import { Property, PropertyFormData, PropertyStep } from '../types/property';
 
 interface PropertyModalProps {
     visible: boolean;
-    onClose?: () => void;
+    onClose: () => void;
     onSubmit?: (data: PropertyFormData) => void;
     property?: Property | null;
     isEdit?: boolean;
@@ -121,6 +121,10 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                 ))}
             </View>
 
+            {/* content */}
+            <ScrollView>
+
+            </ScrollView>
         </View>
     </Modal>
   )
