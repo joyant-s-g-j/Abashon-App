@@ -6,9 +6,11 @@ import SearchInput from '@/components/SearchInput'
 import { filterProperties, Property, PropertyList, PropertyStats, useProperties, usePropertyModals } from '@/components/PropertyManagement'
 import { useImagePicker } from '@/components/FacilityMangement'
 import PropertyModal from '@/components/PropertyManagement/PorpertyComponent/PropertyModal'
+import { PropertyStep } from '@/components/PropertyManagement/types/property'
 
 const PropertyMangement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentStep, setCurrentStep] = useState<PropertyStep>(1)
 
   const {
     properties,
@@ -74,7 +76,8 @@ const PropertyMangement: React.FC = () => {
 
       <PropertyModal
         visible={showAddModal || showEditModal}
-        // onClose={}
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
       />
     </SafeAreaView>
   )
