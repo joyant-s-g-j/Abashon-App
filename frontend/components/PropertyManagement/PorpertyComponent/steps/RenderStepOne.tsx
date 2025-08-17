@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { InputField } from '@/components/ReusableComponent'
 import { PropertyFormData } from '../../types/property'
 import { filterCategories, useCategories } from '@/components/CategoryManagement';
+import { TowColumnCheckbox } from '@/components/ReusableComponent/TowColumnCheckbox';
 
 interface RenderStepOneProps {
     formData: PropertyFormData;
@@ -29,27 +30,13 @@ const RenderStepOne: React.FC<RenderStepOneProps> = ({formData, updateFormData})
         Select Category *
       </Text>
 
-      <View>
-        {categories.map((category, index) => {
-          const isSelected = formData.type === category._id
-          return (
-            <TouchableOpacity
-              key={index}
-              className={`flex-row items-center`}
-              onPress={() => updateFormData('type', category._id)}
-            >
-              <Text className='text-xl mr-2'>
-                {isSelected ? '✅' : '⬜'}
-              </Text>
-              <Text className={`text-base font-rubik ${
-                isSelected ? 'text-primary-300 font-rubik-semibold' : "text-black-300"
-              }`}>
-                {category.name}
-              </Text>
-            </TouchableOpacity>
-          )
-        })}
-      </View>
+      <TowColumnCheckbox
+        items={categories}
+        selectedId={formData.type}
+        onSelect={(id) => updateFormData('type', id)}
+        getId={(item) => item._id}
+        getLabel={(item) => item.name}
+      />
     </View>
   )
 }
