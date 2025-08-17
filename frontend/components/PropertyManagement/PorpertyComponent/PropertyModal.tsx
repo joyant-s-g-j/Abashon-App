@@ -1,6 +1,7 @@
 import { View, Text, Alert, Modal, TouchableOpacity, ScrollView } from 'react-native'
 import React from 'react'
 import { Property, PropertyFormData, PropertyStep } from '../types/property';
+import PropertySteps from './PropertySteps';
 
 interface PropertyModalProps {
     visible: boolean;
@@ -9,8 +10,8 @@ interface PropertyModalProps {
     property?: Property | null;
     isEdit?: boolean;
     isLoading?: boolean;
-    formData?: PropertyFormData;
-    setFormData?: (data: PropertyFormData) => void;
+    formData: PropertyFormData;
+    setFormData: (data: PropertyFormData) => void;
     currentStep: PropertyStep;
     setCurrentStep: (step: PropertyStep) => void;
     onImagePick?: () => void;
@@ -122,8 +123,17 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
             </View>
 
             {/* content */}
-            <ScrollView>
-
+            <ScrollView
+                className='flex-1 p-4'
+                showsVerticalScrollIndicator={false}
+            >
+                <PropertySteps 
+                    currentStep={currentStep}
+                    formData={formData}
+                    setFormData={setFormData}
+                    onImagePick={onImagePick}
+                    isEdit={isEdit}
+                />
             </ScrollView>
         </View>
     </Modal>

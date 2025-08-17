@@ -142,6 +142,8 @@ const PropertyMangement: React.FC = () => {
         onClose={handleModalClose}
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
+        formData={formData}
+        setFormData={setFormData}
       />
     </SafeAreaView>
   )
