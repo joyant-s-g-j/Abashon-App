@@ -7,14 +7,14 @@ interface PropertyModalProps {
     visible: boolean;
     onClose: () => void;
     onSubmit?: (data: PropertyFormData) => void;
-    property?: Property | null;
-    isEdit?: boolean;
-    isLoading?: boolean;
+    property: Property | null;
+    isEdit: boolean;
+    isLoading: boolean;
     formData: PropertyFormData;
     setFormData: (data: PropertyFormData) => void;
     currentStep: PropertyStep;
     setCurrentStep: (step: PropertyStep) => void;
-    onImagePick?: () => void;
+    onImagePick: () => void;
 }
 
 const PropertyModal: React.FC<PropertyModalProps> = ({

@@ -75,10 +75,10 @@ const ItemModal: React.FC<ItemModalProps> = ({
                             disabled={isLoading}
                             className='bg-gray-100 rounded-xl px-4 py-3 flex-row items-center justify-center'
                         >
-                        <Text className='text-base font-rubik text-black-300 mr-2'>
-                            {imageUri ? 'Change Image' : 'Select Image'}
-                        </Text>
-                        <Text className='text-lg'>📷</Text>
+                            <Text className='text-base font-rubik text-black-300 mr-2'>
+                                {imageUri ? 'Change Image' : 'Select Image'}
+                            </Text>
+                            <Text className='text-lg'>📷</Text>
                         </TouchableOpacity>
                     </View>
                 )}

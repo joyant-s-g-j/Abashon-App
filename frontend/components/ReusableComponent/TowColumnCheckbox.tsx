@@ -1,7 +1,9 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
+import LabelText from './LabelText'
 
 interface TowColumnCheckboxProps<T> {
+    label: string
     items: T[]
     selectedId: string | number | null
     onSelect: (id: string | number | null) => void
@@ -10,6 +12,7 @@ interface TowColumnCheckboxProps<T> {
 }
 
 export function TowColumnCheckbox<T>({
+    label,
     items,
     selectedId,
     onSelect,
@@ -49,9 +52,13 @@ export function TowColumnCheckbox<T>({
     )
   }
   return (
-    <View className='flex-row justify-between w-full'>
-      <View className='flex-1 gap-3'>{leftColumn.map(renderItem)}</View>
-      <View className='flex-1 gap-3'>{rightColumn.map(renderItem)}</View>
+    <View>
+        <LabelText text={label} />
+        <View className='flex-row justify-between w-full'>
+            <View className='flex-1 gap-3'>{leftColumn.map(renderItem)}</View>
+            <View className='flex-1 gap-3'>{rightColumn.map(renderItem)}</View>
+        </View>
     </View>
+    
   )
 }

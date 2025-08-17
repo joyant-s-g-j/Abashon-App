@@ -11,30 +11,6 @@ import { PropertyFormData, PropertyStep } from '@/components/PropertyManagement/
 const PropertyMangement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentStep, setCurrentStep] = useState<PropertyStep>(1)
-  const [formData, setFormData] = useState<PropertyFormData>({
-    name: '',
-    thumbnailImage: '',
-    type: '',
-    specifications: {
-      bed: '',
-      bath: '',
-      area: ''
-    },
-    owner: '',
-    description: '',
-    facilities: '',
-    galleryImages: [],
-    location: {
-      address: '',
-      latitude: '',
-      longitude: '',
-    },
-    price: '',
-    isFeatured: false,
-    imageUri: null,
-    imageBase64: null,
-    originalImage: null
-  })
 
   const {
     properties,
@@ -70,43 +46,44 @@ const PropertyMangement: React.FC = () => {
     deleteProperty(property)
   }
 
-  const resetFormData = () => {
-    setFormData({
-      name: '',
-      thumbnailImage: '',
-      type: '',
-      specifications: {
-        bed: '',
-        bath: '',
-        area: ''
-      },
-      owner: '',
-      description: '',
-      facilities: '',
-      galleryImages: [],
-      location: {
-        address: '',
-        latitude: '',
-        longitude: ''
-      },
-      price: '',
-      isFeatured: false,
-      imageUri: null,
-      imageBase64: null,
-      originalImage: null
-    });
-    setCurrentStep(1);
-  }
 
   const handleOpenAddModal = () => {
-    resetFormData();
     openAddModal();
   }
 
   const handleModalClose = () => {
-    resetFormData();
+    setCurrentStep(1)
     closeAddModal();
     closeEditModal()
+  }
+
+  const handlePickImage = async (isEdit = false) => {
+    try {
+        const imageData = await pickImage()
+        
+        if(imageData) {
+          if(isEdit) {
+            updateEditPropertyImage(imageData)
+          } else {
+            updateNewPropertyImage(imageData)
+          }            
+        }
+    } catch (error) {
+        console.log('Error in handlePickImage:', error);
+    }
+    console.log('=== handlePickImage end ===');
+  }
+
+  const getCurrentFormData = (): PropertyFormData => {
+    return showEditModal ? editProperty : newProperty
+  }
+
+  const setCurrentFormData = (data: PropertyFormData) => {
+    if(showEditModal) {
+      setEditProperty(data as any)
+    } else {
+      setNewProperty(data)
+    }
   }
   return (
     <SafeAreaView>
@@ -140,10 +117,14 @@ const PropertyMangement: React.FC = () => {
       <PropertyModal
         visible={showAddModal || showEditModal}
         onClose={handleModalClose}
+        property={selectedProperty}
+        isEdit={showEditModal}
+        isLoading={isLoading}
+        formData={getCurrentFormData()}
+        setFormData={setCurrentFormData}
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
-        formData={formData}
-        setFormData={setFormData}
+        onImagePick={() => handlePickImage(false)}
       />
     </SafeAreaView>
   )

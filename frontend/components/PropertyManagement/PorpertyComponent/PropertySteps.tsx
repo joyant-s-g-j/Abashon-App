@@ -7,7 +7,7 @@ interface PropertyStepsProps {
     currentStep: PropertyStep;
     formData: PropertyFormData;
     setFormData: (data: PropertyFormData) => void;
-    onImagePick?: () => void;
+    onImagePick: () => void;
     isEdit?: boolean;
 }
 
@@ -40,6 +40,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
                 <RenderStepOne 
                     formData={formData}
                     updateFormData={updateFormData}
+                    onImagePick={onImagePick}
                 />
             )
         default:
@@ -47,6 +48,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
                 <RenderStepOne 
                     formData={formData}
                     updateFormData={updateFormData}
+                    onImagePick={onImagePick}
                 />
             )
     }

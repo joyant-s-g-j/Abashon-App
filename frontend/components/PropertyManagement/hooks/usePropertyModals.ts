@@ -178,7 +178,7 @@ export const usePropertyModals = () => {
             ...prev,
             imageUri: imageData,
             imageBase64: imageData,
-            image: imageData
+            thumbnailImage: imageData
         }))
     };
 
@@ -187,7 +187,7 @@ export const usePropertyModals = () => {
             ...prev,
             imageUri: imageData,
             imageBase64: imageData,
-            image: imageData
+            thumbnailImage: imageData
         }))
     };
 
