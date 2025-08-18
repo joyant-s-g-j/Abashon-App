@@ -137,7 +137,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                 />
             </ScrollView>
 
-            {/* footer buttons */}
+            {/* footer button */}
             <FooterButtons
                 handlePrevious={handlePrevious}
                 handleSubmit={handleSubmit}
