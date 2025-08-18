@@ -2,6 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { PropertyFormData, PropertyStep } from '../types/property';
 import RenderStepOne from './steps/RenderStepOne';
+import RenderStepTwo from './steps/RenderStepTwo';
 
 interface PropertyStepsProps {
     currentStep: PropertyStep;
@@ -36,21 +37,25 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
   const renderCurrentStep = () => {
     switch(currentStep) {
         case 1:
-            return (
-                <RenderStepOne 
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    onImagePick={onImagePick}
-                />
-            )
+          return (
+              <RenderStepOne 
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  onImagePick={onImagePick}
+              />
+          )
+        case 2:
+          return (
+            <RenderStepTwo />
+          )
         default:
-            return (
-                <RenderStepOne 
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    onImagePick={onImagePick}
-                />
-            )
+          return (
+              <RenderStepOne 
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  onImagePick={onImagePick}
+              />
+          )
     }
   }
   return (

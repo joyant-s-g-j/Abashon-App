@@ -24,7 +24,7 @@ const FooterButtons: React.FC<FooterButtonsProps> = ({
         onPress={handlePrevious}
         disabled={currentStep === 1}
         className={`px-6 py-3 rounded-lg ${
-            currentStep === 1 ? 'bg-gray-100' : 'bg-black-100'
+            currentStep === 1 ? 'bg-gray-100' : 'bg-gray-300'
         }`}
       >
         <Text className={`font-rubik-medium ${

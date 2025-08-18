@@ -3,6 +3,7 @@ import React from 'react'
 import { Property, PropertyFormData, PropertyStep } from '../types/property';
 import PropertySteps from './PropertySteps';
 import FooterButtons from '@/components/FooterButtons';
+import Stepper from './Stepper';
 
 interface PropertyModalProps {
     visible: boolean;
@@ -99,29 +100,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
             </View>
 
             {/* Progress Bar */}
-            <View className='flex-row items-center justify-center mt-6'>
-                {[1, 2, 3, 4, 5].map((step, index) => (
-                    <View key={index} className='flex-row items-center'>
-                        <View
-                            className={`size-10 rounded-full items-center justify-center 
-                                ${currentStep === step ? "bg-primary-300" : "border-2 border-black-100"}`}
-                        >
-                            <Text className={`text-sm font-rubik-bold
-                                ${currentStep === step ? "text-white" : "text-black-300"}`}
-                            >
-                                {step}
-                            </Text>
-                        </View>
-
-                        {step !== 5 && (
-                            <View 
-                                className={`h-0.5 w-8 mx-1
-                                    ${currentStep > step ? "bg-primary-300" : "bg-black-100"}`}
-                            />
-                        )}
-                    </View>
-                ))}
-            </View>
+            <Stepper currentStep={currentStep} totalSteps={5} />
 
             {/* content */}
             <ScrollView
@@ -137,7 +116,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                 />
             </ScrollView>
 
-            {/* footer button */}
+            {/* footer buttons */}
             <FooterButtons
                 handlePrevious={handlePrevious}
                 handleSubmit={handleSubmit}
