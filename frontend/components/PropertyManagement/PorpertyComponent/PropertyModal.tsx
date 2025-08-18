@@ -2,11 +2,12 @@ import { View, Text, Alert, Modal, TouchableOpacity, ScrollView } from 'react-na
 import React from 'react'
 import { Property, PropertyFormData, PropertyStep } from '../types/property';
 import PropertySteps from './PropertySteps';
+import FooterButtons from '@/components/FooterButtons';
 
 interface PropertyModalProps {
     visible: boolean;
     onClose: () => void;
-    onSubmit?: (data: PropertyFormData) => void;
+    onSubmit: (data: PropertyFormData) => void;
     property: Property | null;
     isEdit: boolean;
     isLoading: boolean;
@@ -30,25 +31,25 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
     setCurrentStep,
     onImagePick
 }) => {
-//   const handleSubmit = () => {
-//     if(!formData?.name.trim()) {
-//         Alert.alert('Error', 'Property name is required')
-//         return
-//     }
-//     if(!formData.type) {
-//         Alert.alert('Error', 'Property type is required')
-//         return
-//     }
-//     if(!formData.location.address.trim()) {
-//         Alert.alert('Error', 'Property address is required')
-//         return
-//     }
-//     if(!formData.price || parseFloat(formData.price) <= 0) {
-//         Alert.alert('Error', 'Valid price is required')
-//         return
-//     }
-//     onSubmit(formData)
-//   }
+  const handleSubmit = () => {
+    if(!formData?.name.trim()) {
+        Alert.alert('Error', 'Property name is required')
+        return
+    }
+    if(!formData.type) {
+        Alert.alert('Error', 'Property type is required')
+        return
+    }
+    if(!formData.location.address.trim()) {
+        Alert.alert('Error', 'Property address is required')
+        return
+    }
+    if(!formData.price || parseFloat(formData.price) <= 0) {
+        Alert.alert('Error', 'Valid price is required')
+        return
+    }
+    onSubmit(formData)
+  }
 
   const handleNext = () => {
     if(currentStep < 5) {
@@ -135,6 +136,16 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                     isEdit={isEdit}
                 />
             </ScrollView>
+
+            {/* footer buttons */}
+            <FooterButtons
+                handlePrevious={handlePrevious}
+                handleSubmit={handleSubmit}
+                handleNext={handleNext}
+                currentStep={currentStep}
+                isLoading={isLoading}
+                isEdit={isEdit}
+            />
         </View>
     </Modal>
   )
