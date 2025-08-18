@@ -1,12 +1,33 @@
 import { useEffect, useState } from "react";
-import { Property, PropertyFormData } from "../types/property";
+import { Property, PropertyFormData, User } from "../types/property";
 import { Alert } from "react-native";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
 export const useProperties = () => {
+    const [owners, setOwners] = useState<User[]>([])
     const [properties, setProperties] = useState<Property[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    const loadOwners = async () => {
+        setIsLoading(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/users`)
+            const result = await response.json();
+
+            if(result.success) {
+                const agents = result.data.filter((user: any) => user.role === 'agent');
+                setOwners(agents)
+            } else {
+                Alert.alert('Error', 'Failed to load owners')
+            }
+        } catch (error) {
+            console.log("Error loading owners", error)
+            Alert.alert('Error', 'Failed to connect to server')
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     const loadProperties = async () => {
         setIsLoading(true);
@@ -149,11 +170,14 @@ export const useProperties = () => {
 
     useEffect(() => {
         loadProperties()
+        loadOwners();
     }, []);
 
     return {
+        owners,
         properties,
         isLoading,
+        loadOwners,
         loadProperties,
         addProperty,
         updatePorperty,

@@ -266,9 +266,6 @@ export const updateProfile = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
     try {
-        if(req.user.role !== 'admin') {
-            return res.status(403).json({ success: false, message: 'Access denied' })
-        }
         const users = await User.find({}).select('-password')
         res.json({success: true, data: users })
     } catch (error) {

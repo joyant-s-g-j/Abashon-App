@@ -11,7 +11,7 @@ router.post("/logout", logout)
 router.get("/check", protectRoute, checkAuth)
 router.get("/profile", protectRoute, getProfile)
 router.put("/update-profile", protectRoute, updateProfile)
-router.get("/users", protectRoute, getAllUsers)
+router.get("/users", getAllUsers)
 
 router.put("/update-phone", protectRoute, updatePhoneNumber);
 router.post("/google", googleAuth)

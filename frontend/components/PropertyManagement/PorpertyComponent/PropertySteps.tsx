@@ -3,6 +3,7 @@ import React from 'react'
 import { PropertyFormData, PropertyStep } from '../types/property';
 import RenderStepOne from './steps/RenderStepOne';
 import RenderStepTwo from './steps/RenderStepTwo';
+import { useProperties } from '../hooks/useProperty';
 
 interface PropertyStepsProps {
     currentStep: PropertyStep;
@@ -19,6 +20,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
     onImagePick,
     isEdit = false
 }) => {
+  const { owners } = useProperties();
   const updateFormData = (field: keyof PropertyFormData, value: any) => {
     setFormData({
         ...formData,
@@ -46,7 +48,11 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
           )
         case 2:
           return (
-            <RenderStepTwo />
+            <RenderStepTwo 
+              formData={formData}
+              updateFormData={updateFormData}
+              owners={owners}
+            />
           )
         default:
           return (
