@@ -68,7 +68,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
     const titles = {
         1: 'Basic Information',
         2: 'Property Details',
-        3: 'Location & Price',
+        3: 'Price & Location ',
         4: 'Facilities & Images',
         5: 'Review & Submit'
     }

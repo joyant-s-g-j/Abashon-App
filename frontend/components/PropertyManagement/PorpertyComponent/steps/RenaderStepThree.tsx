@@ -1,6 +1,6 @@
-import { View, Text, ScrollView } from 'react-native'
+import { ScrollView } from 'react-native'
 import React from 'react'
-import { LabeledInput, LabelText } from '@/components/ReusableComponent'
+import { InputField, LabeledInput, LabelText } from '@/components/ReusableComponent'
 import { locationFields } from '@/constants/data'
 import { PropertyFormData } from '../../types/property'
 
@@ -12,7 +12,15 @@ interface RenaderStepThreeProps {
 const RenaderStepThree: React.FC<RenaderStepThreeProps> = ({formData, updateNestedFormData}) => {
   return (
     <ScrollView>
-      <LabelText text='Location & Price' className='text-xl font-rubik-bold mb-4' />
+      <LabelText text='Price & Location' className='text-xl font-rubik-bold mb-4' />
+      {/* Price */}
+      <InputField 
+        label='Price *'
+        value={formData.price}
+        onChangeText={(text) => updateNestedFormData('price', '', text)}
+        placeholder='Enter property price'
+        keyboardType='numeric'
+      />
       {/* Location */}
       <LabeledInput 
         sectionLabel='Location'
