@@ -7,6 +7,8 @@ type CustomInputProps = {
   placeholder: string;
   secureTextEntry?: boolean;
   keyboardType?: TextInputProps['keyboardType'];
+  multiline?: boolean;
+  numberOfLines?: number;
 };
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -15,6 +17,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
   placeholder,
   secureTextEntry = false,
   keyboardType = 'default',
+  multiline = false,
+  numberOfLines = 1
 }) => {
   return (
     <TextInput
@@ -23,8 +27,11 @@ const CustomInput: React.FC<CustomInputProps> = ({
       placeholder={placeholder}
       secureTextEntry={secureTextEntry}
       keyboardType={keyboardType}
+      multiline={multiline}
+      numberOfLines={numberOfLines}
+      textAlignVertical={multiline ? 'top' : 'center'}
       autoCapitalize="none"
-      className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-black-300 font-rubik"
+      className={`border border-gray-300 rounded-xl px-4 py-3 mb-4 text-black-300 font-rubik ${multiline ? "h-32" : ""}`}
     />
   );
 };
