@@ -50,7 +50,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
           return (
             <RenderStepTwo 
               formData={formData}
-              updateFormData={updateFormData}
+              updateNestedFormData={updateNestedFormData}
               owners={owners}
             />
           )
