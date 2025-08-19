@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TextInput } from 'react-native'
+import { ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { PropertyFormData, User } from '../../types/property'
 import { LabelText } from '@/components/ReusableComponent';
@@ -39,7 +39,7 @@ const RenderStepTwo: React.FC<RenderStepTwoProps> = ({formData, updateNestedForm
           label={field.label}
           value={formData.specifications[field.key]}
           placeholder={field.placeholder}
-          onChnageText={(text) => updateNestedFormData('specifications', field.key, text)}
+          onChangeText={(text) => updateNestedFormData('specifications', field.key, text)}
         />
       ))}
 

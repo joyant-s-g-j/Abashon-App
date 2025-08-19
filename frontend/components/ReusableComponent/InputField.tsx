@@ -1,6 +1,7 @@
 import React from "react";
 import { TextInput, Text, View, TextInputProps } from "react-native";
 import LabelText from "./LabelText";
+import CustomInput from "../CustomInput";
 
 interface InputFieldProps extends TextInputProps {
   label?: string;
@@ -19,16 +20,14 @@ const InputField: React.FC<InputFieldProps> = ({
   ...rest
 }) => {
   return (
-    <View className="mb-4">
+    <View>
       {label && (
         <LabelText text={label} />
       )}
-      <TextInput
+      <CustomInput 
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        className={`border border-gray-200 rounded-lg px-4 py-3 font-rubik text-black-300 ${className}`}
-        placeholderTextColor="#9CA3AF"
         {...rest}
       />
     </View>

@@ -1,31 +1,27 @@
-import { View, Text } from 'react-native'
 import React from 'react'
-import { LabelText } from '@/components/ReusableComponent'
-import CustomInput from '@/components/CustomInput'
+import { InputField } from '@/components/ReusableComponent'
 
 interface SpecificationsProps {
     label: string;
     value: string;
     placeholder: string;
-    onChnageText: (text: string) => void
+    onChangeText: (text: string) => void
 }
 
 const Specifications: React.FC<SpecificationsProps> = ({
     label,
     value,
     placeholder,
-    onChnageText
+    onChangeText
 }) => {
   return (
-    <View>
-        <LabelText text={label} />
-        <CustomInput  
-            value={value}
-            onChangeText={onChnageText}
-            placeholder={placeholder}
-            keyboardType='numeric'
-        />
-    </View>
+    <InputField 
+      label={label}
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+      keyboardType="numeric"
+    />
   )
 }
 

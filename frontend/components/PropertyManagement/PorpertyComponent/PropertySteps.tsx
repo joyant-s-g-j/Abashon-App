@@ -1,67 +1,70 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { PropertyFormData, PropertyStep } from '../types/property';
-import RenderStepOne from './steps/RenderStepOne';
-import RenderStepTwo from './steps/RenderStepTwo';
+import React from 'react';
+import { View } from 'react-native';
 import { useProperties } from '../hooks/useProperty';
+import { PropertyFormData, PropertyStep } from '../types/property';
+import { RenaderStepThree, RenderStepOne, RenderStepTwo } from './steps';
 
 interface PropertyStepsProps {
-    currentStep: PropertyStep;
-    formData: PropertyFormData;
-    setFormData: (data: PropertyFormData) => void;
-    onImagePick: () => void;
-    isEdit?: boolean;
+  currentStep: PropertyStep;
+  formData: PropertyFormData;
+  setFormData: (data: PropertyFormData) => void;
+  onImagePick: () => void;
+  isEdit?: boolean;
 }
 
 const PropertySteps: React.FC<PropertyStepsProps> = ({
-    currentStep,
-    formData,
-    setFormData,
-    onImagePick,
-    isEdit = false
+  currentStep,
+  formData,
+  setFormData,
+  onImagePick,
+  isEdit = false
 }) => {
   const { owners } = useProperties();
   const updateFormData = (field: keyof PropertyFormData, value: any) => {
     setFormData({
-        ...formData,
-        [field]: value
+      ...formData,
+      [field]: value
     })
   };
   const updateNestedFormData = (parent: keyof PropertyFormData, field: string, value: any) => {
     setFormData({
-        ...formData,
-        [parent]: {
-            ...(formData[parent] as any),
-            [field]: value
-        }
+      ...formData,
+      [parent]: {
+          ...(formData[parent] as any),
+          [field]: value
+      }
     })
   }
   const renderCurrentStep = () => {
     switch(currentStep) {
-        case 1:
-          return (
-              <RenderStepOne 
-                  formData={formData}
-                  updateFormData={updateFormData}
-                  onImagePick={onImagePick}
-              />
-          )
-        case 2:
-          return (
-            <RenderStepTwo 
+      case 1:
+        return (
+          <RenderStepOne
+            formData={formData}
+            updateFormData={updateFormData}
+            onImagePick={onImagePick}
+          />
+        )
+      case 2:
+        return (
+          <RenderStepTwo 
+            formData={formData}
+            updateNestedFormData={updateNestedFormData}
+            owners={owners}
+          />
+        )
+      case 3:
+        return (
+          <RenaderStepThree />
+        )
+      default:
+        return (
+            <RenderStepOne 
               formData={formData}
-              updateNestedFormData={updateNestedFormData}
-              owners={owners}
+              updateFormData={updateFormData}
+              onImagePick={onImagePick}
             />
-          )
-        default:
-          return (
-              <RenderStepOne 
-                  formData={formData}
-                  updateFormData={updateFormData}
-                  onImagePick={onImagePick}
-              />
-          )
+        )
     }
   }
   return (
