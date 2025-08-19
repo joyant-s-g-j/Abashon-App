@@ -1,22 +1,22 @@
+import CustomDropdown from '@/components/CustomDropdown';
+import CustomInput from '@/components/ReusableComponent/CustomInput';
+import images from '@/constants/images';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { Link, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Platform,
-  Keyboard,
   Alert,
+  Image,
+  Keyboard,
   KeyboardTypeOptions,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Link, useRouter } from 'expo-router';
-import axios from 'axios';
-import images from '@/constants/images';
-import CustomDropdown from '@/components/CustomDropdown';
-import CustomInput from '@/components/CustomInput';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type FormFieldKey = 'name' | 'email' | 'phone' | 'password';
 

@@ -1,11 +1,9 @@
 import { ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { PropertyFormData, User } from '../../types/property'
-import { LabelText } from '@/components/ReusableComponent';
+import { InputField, LabeledInput, LabelText } from '@/components/ReusableComponent';
 import CustomDropdown from '@/components/CustomDropdown';
 import { specificationsFields } from '@/constants/data';
-import Specifications from '../Specifications';
-import CustomInput from '@/components/CustomInput';
 interface RenderStepTwoProps {
   formData: PropertyFormData;
   updateNestedFormData: (parent: keyof PropertyFormData, field: string, value: any) => void;
@@ -32,25 +30,26 @@ const RenderStepTwo: React.FC<RenderStepTwoProps> = ({formData, updateNestedForm
       />
 
       {/* Specifications */}
-      <LabelText text='Specifications' className='text-xl' />
-      {specificationsFields.map((field) => (
-        <Specifications 
-          key={field.key}
-          label={field.label}
-          value={formData.specifications[field.key]}
-          placeholder={field.placeholder}
-          onChangeText={(text) => updateNestedFormData('specifications', field.key, text)}
-        />
-      ))}
+      <LabeledInput
+        sectionLabel="Specifications"
+        fields={specificationsFields.map((field) => ({
+          key: field.key,
+          label: field.label,
+          value: formData.specifications[field.key],
+          placeholder: field.placeholder,
+          keyboardType: "numeric",
+          onChangeText: (text) => updateNestedFormData('specifications', field.key, text),
+        }))}
+      />
 
       {/* Description */}
-      <LabelText text='Descrption *' />
-      <CustomInput 
+      <InputField 
+        label='Description *'
         value={formData.description}
         onChangeText={(text) => updateNestedFormData('description', '', text)}
         placeholder="Enter property description"
         multiline
-        numberOfLines={5}
+        numberOfLines={10}
       />
     </ScrollView>
   )

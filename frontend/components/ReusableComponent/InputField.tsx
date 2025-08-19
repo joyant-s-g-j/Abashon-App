@@ -1,7 +1,7 @@
 import React from "react";
-import { TextInput, Text, View, TextInputProps } from "react-native";
+import { TextInputProps, View } from "react-native";
 import LabelText from "./LabelText";
-import CustomInput from "../CustomInput";
+import CustomInput from "./CustomInput";
 
 interface InputFieldProps extends TextInputProps {
   label?: string;

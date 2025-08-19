@@ -55,7 +55,10 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
         )
       case 3:
         return (
-          <RenaderStepThree />
+          <RenaderStepThree 
+            formData={formData}
+            updateNestedFormData={updateNestedFormData}
+          />
         )
       default:
         return (

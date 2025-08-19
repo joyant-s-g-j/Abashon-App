@@ -227,3 +227,31 @@ export const specificationsFields: {
     placeholder: 'Enter property area',
   },
 ]
+
+type LocationKey = keyof PropertyFormData["location"];
+
+export const locationFields: {
+  key: LocationKey;
+  label: string;
+  placeholder: string;
+  keyboardType?: 'default' | 'numeric' | 'email-address';
+}[] = [
+  {
+    key: 'address',
+    label: 'Address *',
+    placeholder: 'Enter property address',
+    keyboardType: 'default',
+  },
+  {
+    key: 'latitude',
+    label: 'Latitude *',
+    placeholder: 'Enter latitude (e.g., 23.8103)',
+    keyboardType: 'numeric',
+  },
+  {
+    key: 'longitude',
+    label: 'Longitude *',
+    placeholder: 'Enter longitude (e.g., 90.4125)',
+    keyboardType: 'numeric',
+  },
+]
