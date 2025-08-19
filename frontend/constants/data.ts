@@ -1,3 +1,4 @@
+import { PropertyFormData } from "@/components/PropertyManagement";
 import icons from "./icons";
 import images from "./images";
 
@@ -203,4 +204,26 @@ export const instructionSections = {
     ]
 }
 
+type SpecificationKey = keyof PropertyFormData["specifications"];
 
+export const specificationsFields: {
+  key: SpecificationKey;
+  label: string;
+  placeholder: string;
+}[] = [
+  {
+    key: 'bed',
+    label: 'Bedrooms *',
+    placeholder: 'Number of bedrooms',
+  },
+  {
+    key: 'bath',
+    label: 'Bathrooms *',
+    placeholder: 'Number of bathrooms',
+  },
+  {
+    key: 'area',
+    label: 'Area (sq ft) *',
+    placeholder: 'Enter property area',
+  },
+]

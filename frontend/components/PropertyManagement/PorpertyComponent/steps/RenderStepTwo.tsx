@@ -1,27 +1,49 @@
 import { View, Text, ScrollView } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { PropertyFormData, User } from '../../types/property'
 import { LabelText } from '@/components/ReusableComponent';
 import { useProperties } from '../../hooks/useProperty';
+import CustomDropdown from '@/components/CustomDropdown';
+import CustomInput from '@/components/CustomInput';
+import { specificationsFields } from '@/constants/data';
+import Specifications from '../Specifications';
 interface RenderStepTwoProps {
   formData: PropertyFormData;
-  updateFormData: (field: keyof PropertyFormData, value: any) => void;
+  updateNestedFormData: (parent: keyof PropertyFormData, field: string, value: any) => void;
   owners: User[];
 }
 
-const RenderStepTwo: React.FC<RenderStepTwoProps> = ({formData, updateFormData, owners}) => {
+const RenderStepTwo: React.FC<RenderStepTwoProps> = ({formData, updateNestedFormData, owners}) => {
+  const [owner, setOwner] = useState('')
+  const ownerOptions = owners.map((o) => ({
+    label: o.name,
+    value: o._id
+  }))
   return (
     <ScrollView>
       <LabelText text='Property Details' className='text-xl font-rubik-bold mb-4' />
-      {owners.length === 0 ? (
-        <Text>No owners found</Text>
-      ) : (
-        owners.map((owner: User) => (
-          <View key={owner._id} className="mb-2">
-            <Text className="text-black-300 text-base">{owner.name}</Text>
-          </View>
-        ))
-      )}
+      {/* Owner select */}
+      <LabelText text='Select Owner *' />
+      <CustomDropdown 
+        selectedValue={owner}
+        onValueChange={setOwner}
+        options={ownerOptions}
+        placeholder="Select Owner"
+      />
+
+      {/* Specifications */}
+      <View>
+        <LabelText text='Specifications' className='text-xl' />
+        {specificationsFields.map((field) => (
+          <Specifications 
+            key={field.key}
+            label={field.label}
+            value={formData.specifications[field.key]}
+            placeholder={field.placeholder}
+            onChnageText={(text) => updateNestedFormData('specifications', field.key, text)}
+          />
+        ))}
+      </View>
     </ScrollView>
   )
 }
