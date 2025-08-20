@@ -191,6 +191,20 @@ export const usePropertyModals = () => {
         }))
     };
 
+    const updateNewPropertyGalleryImages = (imageUris: string[]) => {
+        setNewProperty(prev => ({
+            ...prev,
+            galleryImages: [...(prev.galleryImages || []), ...imageUris]
+        }))
+    }
+
+    const updateEditPropertyGalleryImages = (imageUris: string[]) => {
+        setEditProperty(prev => ({
+            ...prev,
+            galleryImages: [...(prev.galleryImages || []), ...imageUris]
+        }))
+    }
+
     return {
         showAddModal,
         showEditModal,
@@ -205,6 +219,8 @@ export const usePropertyModals = () => {
         setNewProperty,
         setEditProperty,
         updateNewPropertyImage,
-        updateEditPropertyImage
+        updateEditPropertyImage,
+        updateNewPropertyGalleryImages,
+        updateEditPropertyGalleryImages
     }
 }

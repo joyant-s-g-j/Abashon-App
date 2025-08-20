@@ -1,4 +1,4 @@
-import { Text, ScrollView } from 'react-native'
+import { Text, ScrollView, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AddButton, Header } from '@/components/ReusableComponent'
@@ -7,6 +7,7 @@ import { filterProperties, Property, PropertyList, PropertyStats, useProperties,
 import { useImagePicker } from '@/components/FacilityMangement'
 import PropertyModal from '@/components/PropertyManagement/PorpertyComponent/PropertyModal'
 import { PropertyFormData, PropertyStep } from '@/components/PropertyManagement/types/property'
+import * as ImagePicker from 'expo-image-picker';
 
 const PropertyMangement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,7 +38,9 @@ const PropertyMangement: React.FC = () => {
     setNewProperty,
     setEditProperty,
     updateNewPropertyImage,
-    updateEditPropertyImage
+    updateEditPropertyImage,
+    updateNewPropertyGalleryImages,
+    updateEditPropertyGalleryImages
   } = usePropertyModals()
 
   const filteredProperties = filterProperties(properties, searchQuery)
@@ -81,6 +84,38 @@ const PropertyMangement: React.FC = () => {
         console.log('Error in handlePickImage:', error);
     }
     console.log('=== handlePickImage end ===');
+  }
+
+  const handlePickMultipleImages = async (isEdit = false) => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if(permissionResult.granted === false) {
+        Alert.alert('Permission Required', 'Please allow access to your photo library to select images.')
+        return
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true,
+        quality: 0.8,
+        aspect: [4, 3],
+        allowsEditing: false
+      })
+
+      if(!result.canceled && result.assets.length > 0) {
+        const imageUris = result.assets.map(asset => asset.uri)
+
+        if(isEdit) {
+          updateEditPropertyGalleryImages(imageUris)
+        } else {
+          updateEditPropertyGalleryImages(imageUris)
+        }
+      }
+    } catch (error) {
+      console.log('Error in handlePickMultipleImages:', error);
+      Alert.alert('Error', 'Something went wrong while picking images.');
+    }
   }
 
   const getCurrentFormData = (): PropertyFormData => {
