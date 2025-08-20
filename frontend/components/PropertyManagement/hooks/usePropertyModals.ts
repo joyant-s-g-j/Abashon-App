@@ -17,7 +17,7 @@ export const usePropertyModals = () => {
         },
         owner: '',
         description: '',
-        facilities: '',
+        facilities: [],
         galleryImages: [],
         location: {
             address: '',
@@ -40,7 +40,7 @@ export const usePropertyModals = () => {
         },
         owner: '',
         description: '',
-        facilities: '',
+        facilities: [],
         galleryImages: [],
         location: {
             address: '',
@@ -68,7 +68,7 @@ export const usePropertyModals = () => {
             },
             owner: '',
             description: '',
-            facilities: '',
+            facilities: [],
             galleryImages: [],
             location: {
                 address: '',
@@ -106,9 +106,9 @@ export const usePropertyModals = () => {
                 ? property.owner
                 : property.owner._id || '',
             description: property.description || '',
-            facilities: typeof property.facilities === 'string'
-                ? property.facilities
-                : property.facilities.name || '',
+            facilities: Array.isArray(property.facilities)
+                ? property.facilities.map(f => typeof f === 'string' ? f : f.name)
+                : [],
             galleryImages: property.galleryImages || [],
             location: {
                 address: place.address || '',
@@ -138,7 +138,7 @@ export const usePropertyModals = () => {
             },
             owner: '',
             description: '',
-            facilities: '',
+            facilities: [],
             galleryImages: [],
             location: {
                 address: '',

@@ -118,7 +118,7 @@ export const useProperties = () => {
                                 longitude: parseFloat(propertyData.location.longitude),
                             } : property.location,
                             price: propertyData.price ? parseFloat(propertyData.price) : property.price,
-                            isFeatued: propertyData.isFeatured !== undefined ? propertyData.isFeatured : property.isFeatured,
+                            isFeatured: propertyData.isFeatured !== undefined ? propertyData.isFeatured : property.isFeatured,
                             updatedAt: new Date()
                         } : property
                     )

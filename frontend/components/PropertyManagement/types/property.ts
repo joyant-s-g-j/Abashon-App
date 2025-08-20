@@ -39,7 +39,7 @@ export type Property = {
     averageRating: number;
     owner: string | User;
     description: string;
-    facilities: string | Facility;
+    facilities: string[] | Facility[];
     galleryImages: string[];
     location: Location;
     price: number;
@@ -59,7 +59,7 @@ export interface PropertyFormData {
     };
     owner: string;
     description: string;
-    facilities: string;
+    facilities: string[];
     galleryImages: string[];
     location: {
         address: string;
@@ -83,7 +83,7 @@ export interface PropertyCreateData {
         area: string;
     };
     description: string;
-    facilities: string;
+    facilities: string[];
     galleryImages: string[];
     location: {
         address: string;

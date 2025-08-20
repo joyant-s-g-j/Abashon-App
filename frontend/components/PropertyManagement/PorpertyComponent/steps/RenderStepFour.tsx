@@ -21,11 +21,13 @@ const RenderStepFour: React.FC<RenderStepFourProps> = ({formData, updateFormData
       <TowColumnCheckbox 
         label='Facilities *'
         items={facilities}
-        selectedId={formData.facilities}
-        onSelect={(id) => updateFormData('facilities', id)}
+        multi={true}
+        selectedIds={formData.facilities}
+        onSelect={(ids) => updateFormData('facilities', ids)}
         getId={(item) => item._id}
         getLabel={(item) => item.name}
       />
+      {/* galleryImages */}
     </ScrollView>
   )
 }

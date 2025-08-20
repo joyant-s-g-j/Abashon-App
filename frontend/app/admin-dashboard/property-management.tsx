@@ -46,9 +46,18 @@ const PropertyMangement: React.FC = () => {
     deleteProperty(property)
   }
 
-
-  const handleOpenAddModal = () => {
-    openAddModal();
+  const handleSubmit = async () => {
+    const formData = getCurrentFormData()
+    try {
+      if(showEditModal && selectedProperty) {
+        await updatePorperty(selectedProperty._id, formData)
+      } else {
+        await addProperty(formData)
+      }
+      handleModalClose()
+    } catch (error) {
+      console.log("Error in handle submit", error)
+    }
   }
 
   const handleModalClose = () => {
@@ -125,6 +134,7 @@ const PropertyMangement: React.FC = () => {
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
         onImagePick={() => handlePickImage(false)}
+        onSubmit={handleSubmit}
       />
     </SafeAreaView>
   )

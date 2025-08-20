@@ -5,19 +5,23 @@ import LabelText from './LabelText'
 interface TowColumnCheckboxProps<T> {
     label: string
     items: T[]
-    selectedId: string | number | null
-    onSelect: (id: string | number | null) => void
+    selectedId?: string | number | null
+    selectedIds?: (string | number)[]
+    onSelect: (id: string | number | null | (string | number)[]) => void
     getId: (item: T) => string | number
     getLabel: (item: T) => string
+    multi?: boolean
 }
 
 export function TowColumnCheckbox<T>({
     label,
     items,
     selectedId,
+    selectedIds = [],
     onSelect,
     getId,
-    getLabel
+    getLabel,
+    multi = false
 }: TowColumnCheckboxProps<T>) {
   const leftColumn: T[] = []
   const rightColumn: T[] = []
@@ -29,10 +33,18 @@ export function TowColumnCheckbox<T>({
 
   const renderItem = (item: T) => {
     const id = getId(item)
-    const isSelected = selectedId === id
+    const isSelected = multi ? selectedIds.includes(id) : selectedId === id
     const handlePress = () => {
-        if(isSelected) onSelect(null)
-        else onSelect(id)
+        if(multi) {
+            if(isSelected) {
+                onSelect(selectedIds.filter(sid => sid !== id))
+            } else {
+                onSelect([...selectedIds, id])
+            }
+        } else {
+            if(isSelected) onSelect(null)
+            else onSelect(id)
+        }
     }
     return (
     <TouchableOpacity
