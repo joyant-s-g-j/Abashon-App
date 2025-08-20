@@ -2,7 +2,8 @@ import React from 'react';
 import { View } from 'react-native';
 import { useProperties } from '../hooks/useProperty';
 import { PropertyFormData, PropertyStep } from '../types/property';
-import { RenderStepFour, RenderStepOne, RenderStepThree, RenderStepTwo } from './steps';
+import { RenderStepFive, RenderStepFour, RenderStepOne, RenderStepThree, RenderStepTwo } from './steps';
+import { useCategories } from '@/components/CategoryManagement';
 
 interface PropertyStepsProps {
   currentStep: PropertyStep;
@@ -22,6 +23,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
   isEdit = false
 }) => {
   const { owners } = useProperties();
+  const { categories } = useCategories()
   const updateFormData = (field: keyof PropertyFormData, value: any) => {
     setFormData({
       ...formData,
@@ -51,6 +53,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
         return (
           <RenderStepTwo 
             formData={formData}
+            updateFormData={updateFormData}
             updateNestedFormData={updateNestedFormData}
             owners={owners}
           />
@@ -68,6 +71,14 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
             formData={formData}
             updateFormData={updateFormData}
             onMultipleImagePick={onMultipleImagePick}
+          />
+        )
+      case 5:
+        return (
+          <RenderStepFive 
+            formData={formData}
+            owners={owners}
+            categories={categories}
           />
         )
       default:

@@ -51,13 +51,13 @@ export type Property = {
 export interface PropertyFormData {
     name: string;
     thumbnailImage: string;
-    type: string;
+    type: string | Category;
     specifications: {
         bed: string;
         bath: string;
         area: string;
     };
-    owner: string;
+    owner: User | string | null;
     description: string;
     facilities: string[];
     galleryImages: string[];
@@ -76,7 +76,7 @@ export interface PropertyFormData {
 export interface PropertyCreateData {
     name: string;
     thumbnailImage: string;
-    type: string;
+    type: string | Category;
     specifications: {
         bed: string;
         bath: string;

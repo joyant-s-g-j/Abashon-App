@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons'
 interface TowColumnCheckboxProps<T> {
     label: string
     items: T[]
-    selectedId?: string | number | null
+    selectedId?: string | number | T | null
     selectedIds?: (string | number)[]
     onSelect: (id: string | number | null | (string | number)[]) => void
     getId: (item: T) => string | number

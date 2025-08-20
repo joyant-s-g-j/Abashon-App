@@ -6,16 +6,26 @@ import CustomDropdown from '@/components/CustomDropdown';
 import { specificationsFields } from '@/constants/data';
 interface RenderStepTwoProps {
   formData: PropertyFormData;
+  updateFormData: (field: keyof PropertyFormData, value: any) => void;
   updateNestedFormData: (parent: keyof PropertyFormData, field: string, value: any) => void;
   owners: User[];
 }
 
-const RenderStepTwo: React.FC<RenderStepTwoProps> = ({formData, updateNestedFormData, owners}) => {
-  const [owner, setOwner] = useState('')
+const RenderStepTwo: React.FC<RenderStepTwoProps> = ({
+  formData,
+  updateFormData, 
+  updateNestedFormData, 
+  owners
+  }) => {
   const ownerOptions = owners.map((o) => ({
     label: o.name,
     value: o._id
   }))
+
+  const handleOwnerChange = (value: string) => {
+    const selectedOwner = owners.find(owner => owner._id === value)
+    updateFormData('owner', selectedOwner)
+  }
 
   return (
     <ScrollView>
@@ -23,8 +33,12 @@ const RenderStepTwo: React.FC<RenderStepTwoProps> = ({formData, updateNestedForm
       {/* Owner select */}
       <LabelText text='Select Owner *' />
       <CustomDropdown 
-        selectedValue={owner}
-        onValueChange={setOwner}
+        selectedValue={
+          typeof formData.owner === 'string' 
+            ? formData.owner 
+            : formData.owner?._id || null
+        }
+        onValueChange={handleOwnerChange}
         options={ownerOptions}
         placeholder="Select Owner"
       />

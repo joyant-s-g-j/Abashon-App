@@ -7,7 +7,7 @@ type Option = {
 };
 
 type Props = {
-  selectedValue: string;
+  selectedValue: string | null;
   onValueChange: (value: string) => void;
   options: Option[];
   placeholder: string;

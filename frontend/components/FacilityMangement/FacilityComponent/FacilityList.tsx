@@ -24,7 +24,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
 
     <EmptyState
       isEmpty={facilities.length === 0}
-      emoji="🏊"
+      icon="water-outline"
       title="No Facilities found"
       message={
         searchQuery
