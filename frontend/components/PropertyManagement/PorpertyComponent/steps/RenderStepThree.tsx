@@ -6,10 +6,11 @@ import { PropertyFormData } from '../../types/property'
 
 interface RenderStepThreeProps {
   formData: PropertyFormData;
+  updateFormData: (field: keyof PropertyFormData, value: any) => void;
   updateNestedFormData: (parent: keyof PropertyFormData, field: string, value: any) => void;
 }
 
-const RenderStepThree: React.FC<RenderStepThreeProps> = ({formData, updateNestedFormData}) => {
+const RenderStepThree: React.FC<RenderStepThreeProps> = ({formData, updateFormData, updateNestedFormData}) => {
   return (
     <ScrollView>
       <LabelText text='Price & Location' className='text-xl font-rubik-bold mb-4' />
@@ -17,7 +18,7 @@ const RenderStepThree: React.FC<RenderStepThreeProps> = ({formData, updateNested
       <InputField 
         label='Price *'
         value={formData.price}
-        onChangeText={(text) => updateNestedFormData('price', '', text)}
+        onChangeText={(text) => updateFormData('price', text)}
         placeholder='Enter property price'
         keyboardType='numeric'
       />

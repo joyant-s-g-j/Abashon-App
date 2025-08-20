@@ -8,7 +8,7 @@ interface LabelTextProps {
 
 const LabelText: React.FC<LabelTextProps> = ({ text, className }) => {
   return (
-    <Text className={`text-lg font-rubik-medium text-black-300 mb-2 ${className}`}>
+    <Text className={`text-lg font-rubik-medium text-black-300 mb-1 ${className}`}>
       {text}
     </Text>
   )

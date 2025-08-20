@@ -7,7 +7,7 @@ interface ReviewTextProps {
 
 const ReviewText: React.FC<ReviewTextProps> = ({text}) => {
   return (
-      <Text className="text-sm font-rubik text-black-200">{text}</Text>
+      <Text className="text-base font-rubik text-black-200">{text}</Text>
   )
 }
 

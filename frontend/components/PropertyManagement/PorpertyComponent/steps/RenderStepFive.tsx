@@ -1,7 +1,7 @@
 import React from 'react'
 import { PropertyFormData, User } from '../../types/property'
 import { LabelText, ReviewText } from '@/components/ReusableComponent'
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { Category } from '@/components/CategoryManagement'
 
 interface RenderStepFiveProps {
@@ -32,18 +32,26 @@ const RenderStepFive: React.FC<RenderStepFiveProps> = ({formData, categories, ow
                 : (formData.owner as any).name || 'No Category Selected'
                 }`} 
             />
+        </View>
+        <View>
+            <LabelText text='Property Details' />
             <ReviewText 
                 text={`Owner: ${typeof formData.owner === 'string'
                     ? getOwnerName(formData.owner)
                     : (formData.owner as any).name || 'No Owner Selected'
                 }`}
             />
-        </View>
-        <View>
-            <LabelText text='Specifications' />
             <ReviewText text={`Bed: ${formData.specifications.bed}`} />
             <ReviewText text={`Bed: ${formData.specifications.bath}`} />
             <ReviewText text={`Bed: ${formData.specifications.area}`} />
+            <ReviewText text={`Description: ${formData.description}`} />
+        </View>
+        <View>
+            <LabelText text='Price & Location' />
+            <ReviewText text={`Price: ${formData.price} $`} />
+            <ReviewText text={`Location: ${formData.location.address}`} />
+            <ReviewText text={`Location: ${formData.location.latitude}`} />
+            <ReviewText text={`Location: ${formData.location.longitude}`} />
         </View>
       </View>
     </ScrollView>

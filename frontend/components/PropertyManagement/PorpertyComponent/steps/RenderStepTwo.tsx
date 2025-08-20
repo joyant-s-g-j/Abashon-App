@@ -60,7 +60,7 @@ const RenderStepTwo: React.FC<RenderStepTwoProps> = ({
       <InputField 
         label='Description *'
         value={formData.description}
-        onChangeText={(text) => updateNestedFormData('description', '', text)}
+        onChangeText={(text) => updateFormData('description', text)}
         placeholder="Enter property description"
         multiline
         numberOfLines={10}

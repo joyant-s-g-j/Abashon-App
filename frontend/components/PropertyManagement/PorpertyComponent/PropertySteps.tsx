@@ -62,6 +62,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
         return (
           <RenderStepThree 
             formData={formData}
+            updateFormData={updateFormData}
             updateNestedFormData={updateNestedFormData}
           />
         )
