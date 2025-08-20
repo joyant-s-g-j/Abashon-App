@@ -62,7 +62,11 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
         )
       case 4:
         return (
-          <RenderStepFour />
+          <RenderStepFour 
+            formData={formData}
+            updateFormData={updateFormData}
+            onImagePick={onImagePick}
+          />
         )
       default:
         return (
