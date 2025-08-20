@@ -17,6 +17,7 @@ interface PropertyModalProps {
     currentStep: PropertyStep;
     setCurrentStep: (step: PropertyStep) => void;
     onImagePick: () => void;
+    onMultipleImagePick: () => void;
 }
 
 const PropertyModal: React.FC<PropertyModalProps> = ({
@@ -30,7 +31,8 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
     setFormData,
     currentStep,
     setCurrentStep,
-    onImagePick
+    onImagePick,
+    onMultipleImagePick
 }) => {
   const handleSubmit = () => {
     if(!formData?.name.trim()) {
@@ -112,6 +114,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                     formData={formData}
                     setFormData={setFormData}
                     onImagePick={onImagePick}
+                    onMultipleImagePick={onMultipleImagePick}
                     isEdit={isEdit}
                 />
             </ScrollView>

@@ -9,6 +9,7 @@ interface PropertyStepsProps {
   formData: PropertyFormData;
   setFormData: (data: PropertyFormData) => void;
   onImagePick: () => void;
+  onMultipleImagePick: () => void;
   isEdit?: boolean;
 }
 
@@ -17,6 +18,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
   formData,
   setFormData,
   onImagePick,
+  onMultipleImagePick,
   isEdit = false
 }) => {
   const { owners } = useProperties();
@@ -65,7 +67,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
           <RenderStepFour 
             formData={formData}
             updateFormData={updateFormData}
-            onImagePick={onImagePick}
+            onMultipleImagePick={onMultipleImagePick}
           />
         )
       default:

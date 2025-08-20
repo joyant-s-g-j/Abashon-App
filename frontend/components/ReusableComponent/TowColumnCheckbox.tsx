@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import LabelText from './LabelText'
+import { Ionicons } from '@expo/vector-icons'
 
 interface TowColumnCheckboxProps<T> {
     label: string
@@ -49,12 +50,14 @@ export function TowColumnCheckbox<T>({
     return (
     <TouchableOpacity
         key={id}
-        className={`flex-row items-center`}
+        className="flex-row items-center gap-2"
         onPress={handlePress}
     >
-        <Text className='text-2xl mr-2'>
-            {isSelected ? '✅' : '⬜'}
-        </Text>
+        <Ionicons
+            name={isSelected ? "checkmark-circle" : "ellipse-outline"}
+            size={24}
+            color={isSelected ? "green" : "gray"}
+        />
         <Text className={`text-xl font-rubik ${
             isSelected ? 'text-primary-300 font-rubik-semibold' : "text-black-300"}`}
         >

@@ -4,6 +4,7 @@ import { InputField, LabelText } from '@/components/ReusableComponent'
 import { PropertyFormData } from '../../types/property'
 import { useCategories } from '@/components/CategoryManagement';
 import { TowColumnCheckbox } from '@/components/ReusableComponent/TowColumnCheckbox';
+import { Ionicons } from '@expo/vector-icons';
 
 interface RenderStepOneProps {
     formData: PropertyFormData;
@@ -55,7 +56,7 @@ const RenderStepOne: React.FC<RenderStepOneProps> = ({formData, updateFormData, 
           </View>
         ) : (
           <View className="items-center p-6">
-            <Text className="text-4xl mb-2">📷</Text>
+            <Ionicons name='camera-outline' size={40} color="#9CA3AF" />
             <Text className="text-base font-rubik-medium text-black-300">Add Thumbnail</Text>
             <Text className="text-sm font-rubik text-black-200">Tap to select image</Text>
           </View>

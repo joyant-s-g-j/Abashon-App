@@ -24,7 +24,7 @@ const CategoryList: React.FC<CategoryListProps> = ({
 
     <EmptyState
       isEmpty={categories.length === 0}
-      emoji="📂"
+      icon="folder-open-outline"
       title="No categories found"
       message={
         searchQuery 

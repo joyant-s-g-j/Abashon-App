@@ -25,7 +25,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
 
         <EmptyState 
             isEmpty={properties.length === 0}
-            emoji='🏡'
+            icon='business-outline'
             title='No Properties found'
             message={
                 searchQuery

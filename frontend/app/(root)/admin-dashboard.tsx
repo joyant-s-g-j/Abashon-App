@@ -1,6 +1,7 @@
 import Header from '@/components/ReusableComponent/Header'
 import { adminDashboard, instructionSections } from '@/constants/data'
 import icons from '@/constants/icons'
+import { Ionicons } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
@@ -125,7 +126,7 @@ const AdminDashboard = () => {
                 <View className='flex-row items-center justify-between'>
                   <View className='flex-row items-center flex-1'>
                     <View className='size-12 bg-primary-200 rounded-xl items-center justify-center mr-4'>
-                      <Text className='text-4xl'>{option.icon}</Text>
+                       <Ionicons name={option.icon as keyof typeof Ionicons.glyphMap} size={24} color="#3B82F6" />
                     </View>
                     <View className='flex-1'>
                       <Text className='text-xl font-rubik-semibold text-black-300 mb-1'>

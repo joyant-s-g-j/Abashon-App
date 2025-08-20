@@ -109,7 +109,7 @@ const PropertyMangement: React.FC = () => {
         if(isEdit) {
           updateEditPropertyGalleryImages(imageUris)
         } else {
-          updateEditPropertyGalleryImages(imageUris)
+          updateNewPropertyGalleryImages(imageUris)
         }
       }
     } catch (error) {
@@ -129,6 +129,15 @@ const PropertyMangement: React.FC = () => {
       setNewProperty(data)
     }
   }
+
+  const updateFormData = (field: keyof PropertyFormData, value: any) => {
+    if(showEditModal) {
+      setEditProperty(prev => ({...prev, [field]: value}))
+    } else {
+      setNewProperty(prev => ({...prev, [field]: value}))
+    }
+  }
+
   return (
     <SafeAreaView>
       <Header 
@@ -169,6 +178,7 @@ const PropertyMangement: React.FC = () => {
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
         onImagePick={() => handlePickImage(false)}
+        onMultipleImagePick={() => handlePickMultipleImages(false)}
         onSubmit={handleSubmit}
       />
     </SafeAreaView>

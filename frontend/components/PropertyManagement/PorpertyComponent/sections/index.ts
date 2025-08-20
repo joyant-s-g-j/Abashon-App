@@ -1,0 +1,1 @@
+export { default as GalleryImagesSection } from './GalleryImagesSection'
