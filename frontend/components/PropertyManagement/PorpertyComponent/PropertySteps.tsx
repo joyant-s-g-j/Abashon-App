@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { useProperties } from '../hooks/useProperty';
 import { PropertyFormData, PropertyStep } from '../types/property';
-import { RenaderStepThree, RenderStepOne, RenderStepTwo } from './steps';
+import { RenderStepFour, RenderStepOne, RenderStepThree, RenderStepTwo } from './steps';
 
 interface PropertyStepsProps {
   currentStep: PropertyStep;
@@ -55,10 +55,14 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
         )
       case 3:
         return (
-          <RenaderStepThree 
+          <RenderStepThree 
             formData={formData}
             updateNestedFormData={updateNestedFormData}
           />
+        )
+      case 4:
+        return (
+          <RenderStepFour />
         )
       default:
         return (

@@ -4,12 +4,12 @@ import { InputField, LabeledInput, LabelText } from '@/components/ReusableCompon
 import { locationFields } from '@/constants/data'
 import { PropertyFormData } from '../../types/property'
 
-interface RenaderStepThreeProps {
+interface RenderStepThreeProps {
   formData: PropertyFormData;
   updateNestedFormData: (parent: keyof PropertyFormData, field: string, value: any) => void;
 }
 
-const RenaderStepThree: React.FC<RenaderStepThreeProps> = ({formData, updateNestedFormData}) => {
+const RenderStepThree: React.FC<RenderStepThreeProps> = ({formData, updateNestedFormData}) => {
   return (
     <ScrollView>
       <LabelText text='Price & Location' className='text-xl font-rubik-bold mb-4' />
@@ -37,4 +37,4 @@ const RenaderStepThree: React.FC<RenaderStepThreeProps> = ({formData, updateNest
   )
 }
 
-export default RenaderStepThree
+export default RenderStepThree
