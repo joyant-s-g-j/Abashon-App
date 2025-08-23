@@ -1,3 +1,4 @@
+import { LabelText } from '@/components/ReusableComponent'
 import Header from '@/components/ReusableComponent/Header'
 import { adminDashboard, instructionSections } from '@/constants/data'
 import icons from '@/constants/icons'
@@ -37,13 +38,16 @@ const AdminDashboard = () => {
       const categoriesResponse = await fetch(`${API_BASE_URL}/api/categories`, { headers })
       const usersResponse = await fetch(`${API_BASE_URL}/api/auth/users`, { headers })
       const facilitiesResponse = await fetch(`${API_BASE_URL}/api/facilities`, { headers })
+      const propertiesResponse = await fetch(`${API_BASE_URL}/api/properties`, { headers })
 
       const categoriesResult = await categoriesResponse.json()
       const usersResult = await usersResponse.json()
       const facilitiesResult = await facilitiesResponse.json()
+      const propertiesResult = await propertiesResponse.json()
 
       const categoriesCount = categoriesResult.success ? categoriesResult.data.length : 0
       const facilitiesCount = facilitiesResult.success ? facilitiesResult.data.length : 0
+      const propertiesCount = propertiesResult.success ? propertiesResult.data.length : 0
       
       let customersCount = 0
       let agentCount = 0
@@ -55,7 +59,7 @@ const AdminDashboard = () => {
       }
 
       setStats([
-        { label: 'Total Properties', value: '247' },
+        { label: 'Total Properties', value: propertiesCount.toString() },
         { label: 'Categories', value: categoriesCount.toString() },
         { label: 'Facilities', value: facilitiesCount.toString() },
         { label: 'Agents', value: agentCount.toString() },
@@ -91,9 +95,7 @@ const AdminDashboard = () => {
 
           {/* stats cards */}
           <View>
-            <Text className='text-xl font-rubik-semibold text-black-300 mb-4'>
-              Quick Stats
-            </Text>
+            <LabelText text='Quick Stats' className='text-xl mb-3' />
             <View className='flex-row flex-wrap justify-between'>
               {stats.map((stat, index ) => (
                 <View key={index} className='w-[48%] flex-row items-center gap-2 bg-white rounded-xl p-4 mb-4 shadow-sm'>
@@ -111,10 +113,8 @@ const AdminDashboard = () => {
           </View>
 
           {/* Navigation Cards */}
-          <View className='py-6'>
-            <Text className='text-xl font-rubik-semibold mb-4 text-black-300'>
-              Management Options
-            </Text>
+          <View className='py-3'>
+            <LabelText text='Management Options' className='text-xl mb-3' />
 
             {adminDashboard.map((option, index) => (
               <TouchableOpacity

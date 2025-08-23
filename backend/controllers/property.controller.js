@@ -26,11 +26,6 @@ const deleteFromCloudinary = async (imageUrl) => {
         const pathAfterVersion = urlParts.slice(uploadIndex + 2).join('/')
         const publicId = pathAfterVersion.replace(/\.[^/.]+$/, '');
         const result = await cloudinary.uploader.destroy(publicId)
-        if (result.result === 'ok') {
-            console.log('Successfully deleted from Cloudinary:', publicId);
-        } else {
-            console.log('Cloudinary deletion result:', result);
-        }
         return result;
     } catch (error) {
         console.error('Error deleting image from Cloudinary:', error.message);
@@ -166,7 +161,6 @@ export const createProperty = async (req, res) => {
         if(facilities && Array.isArray(facilities)) {
             for(let i = 0; i < facilities.length; i++) {
                 const facilityId = facilities[i];
-                console.log(`Checking facility ${i}: ${facilityId}`);
                 
                 if(!mongoose.Types.ObjectId.isValid(facilityId)) {
                     console.log(`Invalid facility ID at index ${i}: ${facilityId}`);
@@ -203,7 +197,6 @@ export const createProperty = async (req, res) => {
                         return uploadToCloudinary(image, 'properties/gallery')
                     })
                     uploadedGalleryImages = await Promise.all(uploadPromises);
-                    console.log('Successfully uploaded gallery images:', uploadedGalleryImages.length);
                 } else {
                     console.log('No valid gallery images to upload');
                 }
@@ -255,7 +248,6 @@ export const updateProperty = async (req, res) => {
         const updateData = { ...req.body };
 
         if(req.body.facilities && Array.isArray(req.body.facilities)) {
-            console.log('Validating facilities for update:', req.body.facilities);
             
             for(let i = 0; i < req.body.facilities.length; i++) {
                 const facilityId = req.body.facilities[i];
