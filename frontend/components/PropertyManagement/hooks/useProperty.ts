@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { Property, PropertyFormData, User } from "../types/property";
 import { Alert } from "react-native";
+import { transformPropertyDataForApi } from "../utils/propertyUtils";
+import { Facility } from "@/components/FacilityMangement";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
 export const useProperties = () => {
     const [owners, setOwners] = useState<User[]>([])
+    const [facilities, setFacilities] = useState<Facility[]>([])
     const [properties, setProperties] = useState<Property[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -23,6 +26,25 @@ export const useProperties = () => {
             }
         } catch (error) {
             console.log("Error loading owners", error)
+            Alert.alert('Error', 'Failed to connect to server')
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const loadFacilities = async () => {
+        setIsLoading(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/facilities`)
+            const result = await response.json();
+
+            if(result.success) {
+                setFacilities(result.data)
+            } else {
+                Alert.alert('Error', 'Failed to load facilities')
+            }
+        } catch (error) {
+            console.log("Error loading facilities", error)
             Alert.alert('Error', 'Failed to connect to server')
         } finally {
             setIsLoading(false);
@@ -55,12 +77,14 @@ export const useProperties = () => {
         }
         setIsLoading(true);
         try {
+            const transformedData = transformPropertyDataForApi(propertyData)
+
             const response = await fetch(`${API_BASE_URL}/api/properties`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(propertyData)
+                body: JSON.stringify(transformedData)
             });
 
             const result = await response.json();
@@ -82,7 +106,7 @@ export const useProperties = () => {
         }
     };
 
-    const updatePorperty = async(id: string, propertyData: PropertyFormData) => {
+    const updateProperty = async(id: string, propertyData: PropertyFormData) => {
         if(!propertyData) {
             Alert.alert('Error', 'Property data are required')
             return false;
@@ -90,12 +114,14 @@ export const useProperties = () => {
 
         setIsLoading(true);
         try {
+            const transformedData = transformPropertyDataForApi(propertyData);
+
             const response = await fetch(`${API_BASE_URL}/api/properties/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(propertyData)
+                body: JSON.stringify(transformedData)
             });
 
             const result = await response.json();
@@ -103,24 +129,7 @@ export const useProperties = () => {
             if(response.ok && result.success) {
                 setProperties(prev =>
                     prev.map(property => 
-                        property._id === id
-                        ? {...property,
-                            name: propertyData.name || property.name,
-                            thumbnailImage: propertyData.thumbnailImage || property.thumbnailImage,
-                            type: propertyData.type || property.type,
-                            specifications: propertyData.specifications || property.specifications,
-                            description: propertyData.description || property.description,
-                            facilities: propertyData.facilities || property.facilities,
-                            galleryImages: propertyData.galleryImages || property.galleryImages,
-                            location: propertyData.location ? {
-                                address: propertyData.location.address,
-                                latitude: parseFloat(propertyData.location.latitude),
-                                longitude: parseFloat(propertyData.location.longitude),
-                            } : property.location,
-                            price: propertyData.price ? parseFloat(propertyData.price) : property.price,
-                            isFeatured: propertyData.isFeatured !== undefined ? propertyData.isFeatured : property.isFeatured,
-                            updatedAt: new Date()
-                        } : property
+                        property._id === id ? result.data : property
                     )
                 );
                 Alert.alert('Success', 'Facility updated successfully')
@@ -141,7 +150,7 @@ export const useProperties = () => {
     const deleteProperty = async (property: Property) => {
         setIsLoading(true)
         try {
-            const response = await fetch(`${API_BASE_URL}/api/facilities/${property._id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/properties/${property._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,16 +180,19 @@ export const useProperties = () => {
     useEffect(() => {
         loadProperties()
         loadOwners();
+        loadFacilities();
     }, []);
 
     return {
         owners,
+        facilities,
         properties,
         isLoading,
         loadOwners,
+        loadFacilities,
         loadProperties,
         addProperty,
-        updatePorperty,
+        updateProperty,
         deleteProperty
     }
 }

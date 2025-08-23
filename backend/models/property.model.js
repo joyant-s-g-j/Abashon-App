@@ -61,10 +61,10 @@ const propertySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    facilities: {
+    facilities: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Facility"
-    },
+    }],
     galleryImages: {
         type: [String],
         default: []

@@ -15,11 +15,22 @@ const GalleryImagesSection: React.FC<GalleryImagesSectionProps> = ({
     updateFormData,
     onMultipleImagePick
 }) => {
+  const isValidImageUri = (uri: string): boolean => {
+    return Boolean(uri && 
+        typeof uri === 'string' && 
+        uri.trim() !== '' &&
+        (uri.startsWith('data:image/') || 
+        uri.startsWith('file://') || 
+        uri.startsWith('http://') || 
+        uri.startsWith('https://')));
+  };
+
+  const validGalleryImages = galleryImages?.filter(isValidImageUri) || []
   return (
     <View className='mt-4'>
       <LabelText text='Gallery Images *' />
       {/* Add Images Button */}
-      {(!galleryImages || galleryImages.length === 0) && (
+      {validGalleryImages.length === 0 && (
         <TouchableOpacity
             onPress={onMultipleImagePick}
             className='border border-dashed border-black-100 rounded-md p-4 items-center justify-center mb-4 h-40'
@@ -35,19 +46,23 @@ const GalleryImagesSection: React.FC<GalleryImagesSectionProps> = ({
       )}
       
       {/* Gallery Images Preview */}
-      {galleryImages && galleryImages.length > 0 && (
+      {validGalleryImages.length > 0 && (
         <View>
             <Text className='text-sm font-rubik-medium text-black-300 mb-3'>
-                {galleryImages.length} images selected
+                {validGalleryImages.length} image{validGalleryImages.length === 1 ? '' : 's'} selected
             </Text>
 
             <View className='flex-row flex-wrap gap-2'>
-                {galleryImages.map((imageUri, index) => (
+                {validGalleryImages.map((imageUri, index) => (
                     <View key={index} className='relative'>
                         <Image 
                             source={{ uri: imageUri }}
                             className='size-20 rounded-md'
                             resizeMode='cover'
+                            onError={() => {
+                              const updatedImages = validGalleryImages.filter((_, i) => i !== index);
+                              updateFormData('galleryImages', updatedImages)
+                            }}
                         />
 
                         {/* Remove button */}

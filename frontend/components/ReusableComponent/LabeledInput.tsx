@@ -1,6 +1,7 @@
 import React from 'react'
-import { InputField, LabelText } from '@/components/ReusableComponent'
 import { View } from 'react-native';
+import LabelText from './LabelText';
+import InputField from './InputField';
 
 interface Field {
   key: string;

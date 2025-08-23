@@ -22,7 +22,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
   onMultipleImagePick,
   isEdit = false
 }) => {
-  const { owners } = useProperties();
+  const { owners, facilities } = useProperties();
   const { categories } = useCategories()
   const updateFormData = (field: keyof PropertyFormData, value: any) => {
     setFormData({
@@ -72,6 +72,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
             formData={formData}
             updateFormData={updateFormData}
             onMultipleImagePick={onMultipleImagePick}
+            facilities={facilities}
           />
         )
       case 5:
@@ -80,6 +81,7 @@ const PropertySteps: React.FC<PropertyStepsProps> = ({
             formData={formData}
             owners={owners}
             categories={categories}
+            facilities={facilities}
           />
         )
       default:

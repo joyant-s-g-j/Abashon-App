@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Property, PropertyFormData } from "../types/property"
 import { Alert } from "react-native"
+import { extractFacilityIds } from "../utils/propertyUtils"
 
 export const usePropertyModals = () => {
     const [showAddModal, setShowAddModal] = useState(false)
@@ -54,7 +55,9 @@ export const usePropertyModals = () => {
         originalImage: ''
     })
 
-    const openAddModal = () => setShowAddModal(true);
+    const openAddModal = () => {
+        setShowAddModal(true);
+    }
 
     const closeAddModal = () => {
         setNewProperty({ 
@@ -89,6 +92,10 @@ export const usePropertyModals = () => {
             ? property.specifications
             : { bed: '', bath: '', area: '' }
         const place = property.location || { address: '', latitude: 0, longitude: 0 }
+        
+        // Extract facility IDs properly
+        const facilityIds = extractFacilityIds(property.facilities || []);
+        
         setEditProperty({
             name: property.name,
             thumbnailImage: typeof property.thumbnailImage === 'string'
@@ -96,7 +103,7 @@ export const usePropertyModals = () => {
                 : String(property.thumbnailImage),
             type: typeof property.type === 'string'
                 ? property.type
-                : property.type.name || '',
+                : property.type?.name || '',
             specifications: {
                 bed: specs.bed || '',
                 bath: specs.bath || '',
@@ -104,11 +111,9 @@ export const usePropertyModals = () => {
             },
             owner: typeof property.owner === 'string'
                 ? property.owner
-                : property.owner._id || '',
+                : property.owner?._id || '',
             description: property.description || '',
-            facilities: Array.isArray(property.facilities)
-                ? property.facilities.map(f => typeof f === 'string' ? f : f.name)
-                : [],
+            facilities: facilityIds, // Use extracted facility IDs
             galleryImages: property.galleryImages || [],
             location: {
                 address: place.address || '',
@@ -158,7 +163,7 @@ export const usePropertyModals = () => {
     const handleDeleteProperty = (property: Property, onConfirmDelete: (property: Property) => void) => {
         Alert.alert(
             'Delete Property',
-            `Are you sure you want to delete "${property.name}"? This active cannot be undone.`,
+            `Are you sure you want to delete "${property.name}"? This action cannot be undone.`,
             [
                 {
                     text: 'Cancel',

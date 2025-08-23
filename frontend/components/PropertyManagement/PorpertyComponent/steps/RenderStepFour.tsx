@@ -1,34 +1,66 @@
-import { Alert, ScrollView, Text } from 'react-native'
+import { ScrollView } from 'react-native'
 import React from 'react'
 import { PropertyFormData } from '../../types/property'
-import { useFacilities } from '@/components/FacilityMangement';
-import { LabelText } from '@/components/ReusableComponent';
-import { TowColumnCheckbox } from '@/components/ReusableComponent/TowColumnCheckbox';
-import { GalleryImagesSection } from '../sections';
+import { Facility } from '@/components/FacilityMangement'
+import { LabelText } from '@/components/ReusableComponent'
+import { TowColumnCheckbox } from '@/components/ReusableComponent/TowColumnCheckbox'
+import { GalleryImagesSection } from '../sections'
 
 interface RenderStepFourProps {
-    formData: PropertyFormData;
-    updateFormData: (field: keyof PropertyFormData, value: any) => void;
+    formData: PropertyFormData
+    updateFormData: (field: keyof PropertyFormData, value: any) => void
     onMultipleImagePick: () => void
+    facilities: Facility[]
 }
 
-const RenderStepFour: React.FC<RenderStepFourProps> = ({formData, updateFormData, onMultipleImagePick}) => {
-  const {facilities} = useFacilities();
+const RenderStepFour: React.FC<RenderStepFourProps> = ({
+  formData,
+  updateFormData,
+  onMultipleImagePick,
+  facilities
+}) => {
+  const normalizeToIds = (facilities: string[] | Facility[]): string[] => {
+    if (!Array.isArray(facilities)) return [];
+    
+    return facilities.map(facility => {
+      if (typeof facility === 'string') {
+        return facility;
+      }
+      return facility._id;
+    });
+  };
+
+  // Get the selected facility IDs
+  const selectedFacilityIds = normalizeToIds(formData.facilities);
+
+  const handleFacilitySelect = (ids: string | number | null | (string | number)[]) => {
+    // Convert the component's output back to the format expected by formData
+    if (Array.isArray(ids)) {
+      const stringIds = ids.map(id => String(id));
+      updateFormData('facilities', stringIds);
+    } else if (ids === null) {
+      updateFormData('facilities', []);
+    } else {
+      updateFormData('facilities', [String(ids)]);
+    }
+  };
 
   return (
     <ScrollView>
       <LabelText text='Facilities & Images' className='text-xl font-rubik-bold mb-4' />
-      {/* facilities */}
+
+      {/* Facilities */}
       <TowColumnCheckbox 
         label='Facilities *'
         items={facilities}
         multi={true}
-        selectedIds={formData.facilities}
-        onSelect={(ids) => updateFormData('facilities', ids)}
+        selectedIds={selectedFacilityIds}
+        onSelect={handleFacilitySelect}
         getId={(item) => item._id}
         getLabel={(item) => item.name}
       />
-      {/* galleryImages */}
+
+      {/* Gallery Images */}
       <GalleryImagesSection 
         galleryImages={formData.galleryImages}
         updateFormData={updateFormData}

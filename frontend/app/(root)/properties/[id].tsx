@@ -1,6 +1,5 @@
 import { View, ScrollView } from 'react-native'
 import React from 'react'
-import { useLocalSearchParams } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ImageSlider from '@/components/SinglePropertyPage/ImageSlider'
 import PropertInfo from '@/components/SinglePropertyPage/PropertInfo'

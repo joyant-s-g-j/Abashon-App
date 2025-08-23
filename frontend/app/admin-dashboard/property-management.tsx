@@ -18,7 +18,7 @@ const PropertyMangement: React.FC = () => {
     isLoading,
     loadProperties,
     addProperty,
-    updatePorperty,
+    updateProperty,
     deleteProperty
   } = useProperties();
 
@@ -53,7 +53,7 @@ const PropertyMangement: React.FC = () => {
     const formData = getCurrentFormData()
     try {
       if(showEditModal && selectedProperty) {
-        await updatePorperty(selectedProperty._id, formData)
+        await updateProperty(selectedProperty._id, formData)
       } else {
         await addProperty(formData)
       }
@@ -100,18 +100,36 @@ const PropertyMangement: React.FC = () => {
         allowsMultipleSelection: true,
         quality: 0.8,
         aspect: [4, 3],
-        allowsEditing: false
+        allowsEditing: false,
+        base64: true,
+        exif: false
       })
 
       if(!result.canceled && result.assets.length > 0) {
-        const imageUris = result.assets.map(asset => asset.uri)
+        const imageDataUrls = result.assets.map(asset => {
+          if(asset.base64) {
+            return `data:image/jpeg;base64,${asset.base64}`;
+          } else {
+            return asset.uri
+          }
+        })
+        const validImages = imageDataUrls.filter(imageData => 
+          imageData &&
+          typeof imageData === 'string' &&
+          imageData.trim() !== ''
+        )
 
-        if(isEdit) {
-          updateEditPropertyGalleryImages(imageUris)
+        if(validImages.length > 0) {
+          if(isEdit) {
+            updateEditPropertyGalleryImages(validImages)
+          } else {
+            updateNewPropertyGalleryImages(validImages)
+          }
         } else {
-          updateNewPropertyGalleryImages(imageUris)
+          Alert.alert('Error', 'No valid images were selected')
         }
-      }
+    }
+
     } catch (error) {
       console.log('Error in handlePickMultipleImages:', error);
       Alert.alert('Error', 'Something went wrong while picking images.');
@@ -177,8 +195,8 @@ const PropertyMangement: React.FC = () => {
         setFormData={setCurrentFormData}
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
-        onImagePick={() => handlePickImage(false)}
-        onMultipleImagePick={() => handlePickMultipleImages(false)}
+        onImagePick={() => handlePickImage(showEditModal)}
+        onMultipleImagePick={() => handlePickMultipleImages(showEditModal)}
         onSubmit={handleSubmit}
       />
     </SafeAreaView>

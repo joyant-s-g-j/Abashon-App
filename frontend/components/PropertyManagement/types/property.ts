@@ -59,7 +59,7 @@ export interface PropertyFormData {
     };
     owner: User | string | null;
     description: string;
-    facilities: string[];
+    facilities: string[] | Facility[];
     galleryImages: string[];
     location: {
         address: string;
@@ -76,12 +76,13 @@ export interface PropertyFormData {
 export interface PropertyCreateData {
     name: string;
     thumbnailImage: string;
-    type: string | Category;
+    type: string;
     specifications: {
         bed: string;
         bath: string;
         area: string;
     };
+    owner: string;
     description: string;
     facilities: string[];
     galleryImages: string[];

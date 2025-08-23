@@ -19,12 +19,33 @@ const uploadToCloudinary = async(imageData, folder = 'properties') => {
 
 const deleteFromCloudinary = async (imageUrl) => {
     try {
-        const publicId = imageUrl.split('/').pop().split('.')[0];
-        const folderPath = imageUrl.includes('/properties') ? 'properties/' + publicId : publicId;
-        await cloudinary.uploader.destroy(folderPath);
+        if(!imageUrl || typeof imageUrl !== 'string') return
+        const urlParts = imageUrl.split('/')
+        const uploadIndex = urlParts.indexOf('upload')
+        if(uploadIndex === -1) return
+        const pathAfterVersion = urlParts.slice(uploadIndex + 2).join('/')
+        const publicId = pathAfterVersion.replace(/\.[^/.]+$/, '');
+        const result = await cloudinary.uploader.destroy(publicId)
+        if (result.result === 'ok') {
+            console.log('Successfully deleted from Cloudinary:', publicId);
+        } else {
+            console.log('Cloudinary deletion result:', result);
+        }
+        return result;
     } catch (error) {
         console.error('Error deleting image from Cloudinary:', error.message);
+        console.error('Image URL:', imageUrl);
     }
+}
+
+const isCloudinaryUrl = (url) => {
+    return url && typeof url === 'string' && url.includes('cloudinary.com')
+}
+
+const needsUpload = (imageData) => {
+    return imageData &&
+        typeof imageData === 'string' &&
+        (imageData.startsWith('data:image/') || image.startsWith('file://'))
 }
 
 export const getAllProperties = async (req, res) => {
@@ -142,8 +163,24 @@ export const createProperty = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid owner Id"})
         }
 
-        if(facilities && !mongoose.Types.ObjectId.isValid(facilities)) {
-            return res.status(400).json({ success: false, message: "Invalid facility Id"})
+        if(facilities && Array.isArray(facilities)) {
+            for(let i = 0; i < facilities.length; i++) {
+                const facilityId = facilities[i];
+                console.log(`Checking facility ${i}: ${facilityId}`);
+                
+                if(!mongoose.Types.ObjectId.isValid(facilityId)) {
+                    console.log(`Invalid facility ID at index ${i}: ${facilityId}`);
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: `Invalid facility Id at index ${i}: ${facilityId}` 
+                    });
+                }
+            }
+        } else if(facilities && !Array.isArray(facilities)){
+            return res.status(400).json({ 
+                success: false, 
+                message: "Facilities must be an array of facility IDs" 
+            });
         }
 
         let uploadedThumbnail;
@@ -154,10 +191,22 @@ export const createProperty = async (req, res) => {
         }
 
         let uploadedGalleryImages = [];
-        if(galleryImages && galleryImages.length > 0) {
+        if(galleryImages && Array.isArray(galleryImages) && galleryImages.length > 0) {
             try {
-                const uploadPromises = galleryImages.map(image => uploadToCloudinary(image, 'properties/gallery'));
-                uploadedGalleryImages = await Promise.all(uploadPromises);
+                const validImages = galleryImages.filter(image => 
+                    image && typeof image === 'string' &&
+                    image.trim() !== '' &&
+                    (image.startsWith('data:image/') || image.startsWith('file://') || image.startsWith('http'))
+                )
+                if(validImages.length > 0) {
+                    const uploadPromises = validImages.map((image, index) => {
+                        return uploadToCloudinary(image, 'properties/gallery')
+                    })
+                    uploadedGalleryImages = await Promise.all(uploadPromises);
+                    console.log('Successfully uploaded gallery images:', uploadedGalleryImages.length);
+                } else {
+                    console.log('No valid gallery images to upload');
+                }
             } catch (error) {
                 await deleteFromCloudinary(uploadedThumbnail)
                 return res.status(400).json({ success: false, message: `Gallery upload failed: ${error.message}` })
@@ -171,7 +220,7 @@ export const createProperty = async (req, res) => {
             specifications,
             owner,
             description,
-            facilities,
+            facilities: facilities || [],
             galleryImages: uploadedGalleryImages,
             location,
             price,
@@ -205,36 +254,82 @@ export const updateProperty = async (req, res) => {
 
         const updateData = { ...req.body };
 
-        if(req.body.thumbnailImage && req.body.thumbnailImage !== property.thumbnailImage) {
-            try {
-                const newThumnail = await uploadToCloudinary(req.body.thumbnailImage, 'properties/thumbnails')
-
-                if(property.thumbnailImage) {
-                    await deleteFromCloudinary(property.thumbnailImage)
+        if(req.body.facilities && Array.isArray(req.body.facilities)) {
+            console.log('Validating facilities for update:', req.body.facilities);
+            
+            for(let i = 0; i < req.body.facilities.length; i++) {
+                const facilityId = req.body.facilities[i];
+                if(!mongoose.Types.ObjectId.isValid(facilityId)) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: `Invalid facility Id at index ${i}: ${facilityId}` 
+                    });
                 }
-                updateData.thumbnailImage = newThumnail
-            } catch (error) {
-                return res.status(400).json({ success: false, message: `Thumbnail update failed: ${error.message}` });
+            }
+        }
+
+        if(req.body.thumbnailImage) {
+            if(req.body.thumbnailImage === property.thumbnailImage) {
+                delete updateData.thumbnailImage
+            } else if(needsUpload(req.body.thumbnailImage)) {
+                try {
+                    const newThumnail = await uploadToCloudinary(req.body.thumbnailImage, 'properties/thumbnails')
+
+                    if(property.thumbnailImage && isCloudinaryUrl(property.thumbnailImage)) {
+                        await deleteFromCloudinary(property.thumbnailImage)
+                    }
+                    updateData.thumbnailImage = newThumnail
+                } catch (error) {
+                    return res.status(400).json({ success: false, message: `Thumbnail update failed: ${error.message}` });
+                }
+            } else if(isCloudinaryUrl(req.body.thumbnailImage)) {
+                updateData.thumbnailImage = req.body.thumbnailImage
             }
         }
 
         if(req.body.galleryImages && Array.isArray(req.body.galleryImages)) {
             try {
-                const uploadPromises = req.body.galleryImages.map(image => uploadToCloudinary(image, 'properties/gallery'))
-                const newGalleryImages = await Promise.all(uploadPromises)
+                const existingCloudinaryImages = [];
+                const imagesToUpload = [];
 
+                req.body.galleryImages.forEach(image => {
+                    if(image && typeof image === 'string') {
+                        if(isCloudinaryUrl(image)) {
+                            existingCloudinaryImages.push(image)
+                        } else if(needsUpload(image)) {
+                            imagesToUpload.push(image)
+                        }
+                    }
+                })
+
+                let newUploadedImages = [];
+                if(imagesToUpload.length > 0) {
+                    const uploadPromises = imagesToUpload.map(image => uploadToCloudinary(image, 'properties/gallery'));
+                    newUploadedImages = await Promise.all(uploadPromises);
+                    console.log('Successfully uploaded new gallery images:', newUploadedImages.length);
+                }
+                const finalGalleryImages = [...existingCloudinaryImages, ...newUploadedImages];
+                
                 if(property.galleryImages && property.galleryImages.length > 0) {
-                    const deletePromises = property.galleryImages.map(imageUrl => deleteFromCloudinary(imageUrl));
-                    await Promise.all(deletePromises)
+                    const imagesToDelete = property.galleryImages.filter(oldImage => 
+                        !finalGalleryImages.includes(oldImage)
+                    );
+                    
+                    if(imagesToDelete.length > 0) {
+                        console.log('Deleting removed gallery images:', imagesToDelete.length);
+                        const deletePromises = imagesToDelete.map(imageUrl => deleteFromCloudinary(imageUrl));
+                        await Promise.all(deletePromises);
+                    }
                 }
 
-                updateData.galleryImages = newGalleryImages
+                updateData.galleryImages = finalGalleryImages;
+                console.log('Final gallery images count:', finalGalleryImages.length);
             } catch (error) {
                 return res.status(400).json({ success: false, message: `Gallery update failed: ${error.message}` });
             }
         }
 
-        const updatedProperty = await Property.findByIdAndUpdate( id, req.body, { new: true, runValidators: true })
+        const updatedProperty = await Property.findByIdAndUpdate( id, updateData, { new: true, runValidators: true })
             .populate('type', 'name')
             .populate('owner', 'name email')
             .populate('facilities', 'name');
@@ -259,13 +354,18 @@ export const deleteProperty = async (req, res) => {
             return res.status(404).json({ success: false, message: "Property not found" })
         }
 
-        if(property.thumbnailImage) {
+        if(property.thumbnailImage && isCloudinaryUrl(property.thumbnailImage)) {
             await deleteFromCloudinary(property.thumbnailImage)
         }
 
-        if(property.galleryImages && property.galleryImages.length > 0) {
-            const deletePromises = property.galleryImages.map(imageUrl => deleteFromCloudinary(imageUrl))
-            await Promise.all(deletePromises)
+        if(property.galleryImages && Array.isArray(property.galleryImages) && property.galleryImages.length > 0) {
+            const deletePromises = property.galleryImages
+                .filter(imageUrl => isCloudinaryUrl(imageUrl))
+                .map(imageUrl => deleteFromCloudinary(imageUrl))
+            
+            if(deletePromises.length > 0) {
+                await Promise.all(deletePromises)
+            }
         }
         
         await Property.findByIdAndDelete(id)

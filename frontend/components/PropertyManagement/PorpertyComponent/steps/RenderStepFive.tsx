@@ -3,14 +3,16 @@ import { PropertyFormData, User } from '../../types/property'
 import { LabelText, ReviewText } from '@/components/ReusableComponent'
 import { ScrollView, View } from 'react-native'
 import { Category } from '@/components/CategoryManagement'
+import { Facility } from '@/components/FacilityMangement'
 
 interface RenderStepFiveProps {
     formData: PropertyFormData
     categories: Category[]
     owners: User[]
+    facilities: Facility[]
 }
 
-const RenderStepFive: React.FC<RenderStepFiveProps> = ({formData, categories, owners}) => {
+const RenderStepFive: React.FC<RenderStepFiveProps> = ({formData, categories, owners, facilities}) => {
   const getCategoryName = (categoryId: string) => {
     const type = categories.find(cat => cat._id === categoryId);
     return type ? type.name : "Unknown Type"
@@ -18,6 +20,12 @@ const RenderStepFive: React.FC<RenderStepFiveProps> = ({formData, categories, ow
   const getOwnerName = (ownerId: string) => {
     const owner = owners.find(o => o._id === ownerId);
     return owner ? owner.name : "Unknown Owner"
+  }
+  const getFacilitiesName = (facilityIds: string[]) => {
+    return facilityIds.map(id => {
+        const facility = facilities.find(f => f._id === id);
+        return facility ? facility.name : null
+    }).filter(Boolean).join(", ")
   }
   return (
     <ScrollView>
@@ -52,6 +60,15 @@ const RenderStepFive: React.FC<RenderStepFiveProps> = ({formData, categories, ow
             <ReviewText text={`Location: ${formData.location.address}`} />
             <ReviewText text={`Location: ${formData.location.latitude}`} />
             <ReviewText text={`Location: ${formData.location.longitude}`} />
+        </View>
+        <View>
+            <LabelText text='Facilities' />
+            <ReviewText 
+                text={`Selected Facilitites: ${
+                    formData.facilities && formData.facilities.length > 0
+                        ? getFacilitiesName(formData.facilities as any) : "No facilities Selected"
+                }`}
+            />
         </View>
       </View>
     </ScrollView>

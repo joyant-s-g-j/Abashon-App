@@ -23,8 +23,7 @@ const RenderStepTwo: React.FC<RenderStepTwoProps> = ({
   }))
 
   const handleOwnerChange = (value: string) => {
-    const selectedOwner = owners.find(owner => owner._id === value)
-    updateFormData('owner', selectedOwner)
+    updateFormData('owner', value)
   }
 
   return (
