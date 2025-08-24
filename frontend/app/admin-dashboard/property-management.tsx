@@ -8,6 +8,7 @@ import { useImagePicker } from '@/components/FacilityMangement'
 import PropertyModal from '@/components/PropertyManagement/PorpertyComponent/PropertyModal'
 import { PropertyFormData, PropertyStep } from '@/components/PropertyManagement/types/property'
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator'
 
 const PropertyMangement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,21 +70,42 @@ const PropertyMangement: React.FC = () => {
     closeEditModal()
   }
 
+  const compressImage = async (uri: string, quality = 0.7, maxWidth = 800, maxHeight = 600) => {
+    try {
+      const result = await ImageManipulator.manipulateAsync(
+        uri,
+        [
+          { resize: { width: maxWidth, height: maxHeight } }
+        ],
+        {
+          compress: quality,
+          format: ImageManipulator.SaveFormat.JPEG,
+          base64: true
+        }
+      );
+
+      return `data:image/jpeg;base64,${result.base64}`
+    } catch (error) {
+      console.log('Error compressing image:', error)
+      return uri
+    }
+  }
+
   const handlePickImage = async (isEdit = false) => {
     try {
         const imageData = await pickImage()
         
         if(imageData) {
+          const compressedImage = await compressImage(imageData)
           if(isEdit) {
-            updateEditPropertyImage(imageData)
+            updateEditPropertyImage(compressedImage)
           } else {
-            updateNewPropertyImage(imageData)
+            updateNewPropertyImage(compressedImage)
           }            
         }
     } catch (error) {
         console.log('Error in handlePickImage:', error);
     }
-    console.log('=== handlePickImage end ===');
   }
 
   const handlePickMultipleImages = async (isEdit = false) => {
@@ -101,19 +123,23 @@ const PropertyMangement: React.FC = () => {
         quality: 0.8,
         aspect: [4, 3],
         allowsEditing: false,
-        base64: true,
+        base64: false,
         exif: false
       })
 
       if(!result.canceled && result.assets.length > 0) {
-        const imageDataUrls = result.assets.map(asset => {
-          if(asset.base64) {
-            return `data:image/jpeg;base64,${asset.base64}`;
-          } else {
-            return asset.uri
-          }
-        })
-        const validImages = imageDataUrls.filter(imageData => 
+        const compressedImage = await Promise.all(
+          result.assets.map(async (asset) => {
+            try {
+              return await compressImage(asset.uri, 0.6)
+            } catch (error) {
+              console.error('Failed to compress image:', error);
+              return asset.uri;
+            }
+          })
+        )
+        
+        const validImages = compressedImage.filter(imageData => 
           imageData &&
           typeof imageData === 'string' &&
           imageData.trim() !== ''
