@@ -9,17 +9,27 @@ import Carousel from 'react-native-reanimated-carousel';
 const { width } = Dimensions.get('window');
 
 interface Props {
-  images: (number | { uri: string })[];
+  images: string[];
 }
 
 const ImageSlider: React.FC<Props> = ({ images }) => {
   const [active, setActive] = useState(0);
   const router = useRouter()
+
+  const safeImages = images && images.length > 0 ? images : [];
+
+  const renderImage = (imageUrl: string) => {
+    if (typeof imageUrl === 'string' && (imageUrl.startsWith('http') || imageUrl.startsWith('https'))) {
+      return { uri: imageUrl };
+    } else {
+      return { uri: imageUrl };
+    }
+  }
   return (
     <View className="relative h-[250px]">
       <Carousel
-        loop
-        autoPlay
+        loop={safeImages.length > 1}
+        autoPlay={safeImages.length > 1}
         autoPlayInterval={3000}
         width={width}
         height={250}
@@ -28,7 +38,7 @@ const ImageSlider: React.FC<Props> = ({ images }) => {
         onSnapToItem={(index) => setActive(index)}
         renderItem={({ item }) => (
           <Image
-            source={item}
+            source={renderImage(item)}
             className="w-full h-full"
             resizeMode="cover"
           />

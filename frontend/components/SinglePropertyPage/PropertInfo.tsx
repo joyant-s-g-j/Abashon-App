@@ -4,26 +4,93 @@ import icons from '@/constants/icons'
 import IconText from './IconText'
 import images from '@/constants/images'
 import Heading from './Heading'
+import { Property } from '../PropertyManagement'
+
+interface PropertInfoProps {
+  property?: Property | null;
+}
 
 
-const PropertInfo = () => {
+const PropertInfo: React.FC<PropertInfoProps> = ({ property }) => {
+  if(!property) {
+    return (
+      <View className='p-4'>
+        <Text className='text-base font-rubik text-gray-500'>Loading property information...</Text>
+      </View>
+    )
+  }
+  const getSpecifications = () => {
+    if(!property.specifications) {
+      return { bed: '0', bath: '0', area: '0' }
+    }
+
+    if (typeof property.specifications === 'object') {
+      return {
+        bed: property.specifications.bed || '0',
+        bath: property.specifications.bath || '0',
+        area: property.specifications.area || '0'
+      }
+    }
+
+    return { bed: '0', bath: '0', area: '0' }
+  }
+
+  const specs = getSpecifications()
+  const bed = specs.bed
+  const bath = specs.bath
+  const area = specs.area
+
+  const getPropertyType = () => {
+    if (!property.type) return 'Property'
+    
+    // If type is an object with name property
+    if (typeof property.type === 'object' && 'name' in property.type) {
+      return property.type.name || 'Property'
+    }
+    
+    // If type is a string
+    if (typeof property.type === 'string') {
+      return property.type
+    }
+    
+    return 'Property'
+  }
+
+  const propertyType = getPropertyType()
+
+  const getOwnerInfo = () => {
+    if(!property.owner) {
+      return { name: 'Property Owner', email: '', phone: '' }
+    }
+
+    if(typeof property.owner === 'object') {
+      return {
+        name: property.owner.name || 'Property Owner',
+        email: property.owner.email || '',
+        phone: property.owner.phone || ''
+      }
+    }
+
+    return { name: 'Property Owner', email: '', phone: '' }
+  }
+  const ownerInfo = getOwnerInfo()
   return (
     <View>
       <View className='flex-col gap-3'>
-        <Heading title='Modern Appartment' size='text-3xl' />
+        <Heading title={property.name} size='text-3xl' />
         {/* category and rating */}
         <View className='flex-row gap-3 items-center'>
-            <Text className='px-4 py-2 rounded-full text-base font-rubik-semibold bg-primary-100 border border-primary-200 text-primary-300'>Apartment</Text>
+            <Text className='px-4 py-2 rounded-full text-base font-rubik-semibold bg-primary-100 border border-primary-200 text-primary-300'>{propertyType}</Text>
             <View className='flex-row gap-1'>
                 <Image source={icons.star} className='size-5' />
-                <Text className='font-rubik-semibold text-black-200 text-base'>4.8 (12 Reviews)</Text>
+                <Text className='font-rubik-semibold text-black-200 text-base'>{property.averageRating.toFixed(1)}</Text>
             </View>
         </View>
         {/* room count */}
         <View className='flex-row justify-between border-b pb-4 border-primary-200'>
-            <IconText icon={icons.bed} text='8 Beds' />
-            <IconText icon={icons.bath} text='3 Bath' />
-            <IconText icon={icons.area} text='2000 sqft' />
+            <IconText icon={icons.bed} text={`${bed} Beds`} />
+            <IconText icon={icons.bath} text={`${bath} Beds`} />
+            <IconText icon={icons.area} text={`${area} sqft`}/>
         </View>
       </View>
       {/* agent info */}
@@ -33,15 +100,15 @@ const PropertInfo = () => {
             <View className='flex-row gap-3 items-center'>
                 <Image source={images.avatar} className='size-14 rounded-full' />
                 <View className='flex-col'>
-                  <Text className='text-lg font-rubik-semibold text-black-300'>Joyant Sheikhar</Text>
+                  <Text className='text-lg font-rubik-semibold text-black-300'>{ownerInfo.name}</Text>
                   <Text className='text-base font-rubik text-black-200'>Owner</Text>
                 </View>
             </View>
             <View className='flex-row gap-3 items-center'>
-              <TouchableOpacity onPress={() => Linking.openURL('mailto:agent@example.com')}>
+              <TouchableOpacity disabled={!ownerInfo.email} onPress={() => Linking.openURL(`mailto:${ownerInfo.email}`)}>
                 <Image source={icons.email} className='size-8' />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => Linking.openURL('tel:+123456789')}>
+              <TouchableOpacity disabled={!ownerInfo.phone} onPress={() => Linking.openURL(`tel:${ownerInfo.phone}`)}>
                 <Image source={icons.phone} className='size-8' />
               </TouchableOpacity>
             </View>
@@ -49,8 +116,8 @@ const PropertInfo = () => {
       </View>
       {/* overview */}
       <View className='mt-4 flex-col gap-2'>
-        <Heading title='Overview' />
-        <Text className='text-base font-rubik text-black-200'>Sleek, modern 2-bedroom apartment with open living space, high-end finishes, and city views. Minutes from downtown, dining, and transit.</Text>
+        <Heading title='Description' />
+        <Text className='text-base font-rubik text-black-200'>{property.description}</Text>
       </View>
     </View>
   )
