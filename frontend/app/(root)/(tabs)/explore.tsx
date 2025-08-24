@@ -1,20 +1,32 @@
 import { ExploreCard } from '@/components/Cards'
 import Filters from '@/components/Filters'
+import { filterProperties, Property, useProperties } from '@/components/PropertyManagement'
 import Header from '@/components/ReusableComponent/Header'
 import Search from '@/components/Search'
 import icons from '@/constants/icons'
-import React from 'react'
+import React, { useState } from 'react'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 const explore = () => {
+  const [searchQuery, setSearchQuery] = useState('')
+  const {
+    properties,
+    isLoading,
+  } = useProperties()
+  const filteredProperties = filterProperties(properties, searchQuery)
   return (
     <SafeAreaView className="bg-white h-full">
       <Header title='Search for Your Ideal Home' backRoute='/' rightIcon={icons.bell} />
       <FlatList
-        data={[1, 2, 3, 4]}
-        renderItem={({item}) => <ExploreCard id={item.toString()} />}
-        keyExtractor={(item) => item.toString()}
+        data={filteredProperties}
+        renderItem={({item}) => (
+          <ExploreCard 
+            id={item._id.toString()}
+            property={item}
+          />
+        )}
+        keyExtractor={(item) => item._id.toString()}
         contentContainerClassName="pb-32 px-4"
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={

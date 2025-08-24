@@ -3,6 +3,7 @@ import React from 'react'
 import images from '@/constants/images'
 import icons from '@/constants/icons'
 import { useRouter } from 'expo-router'
+import { Property } from './PropertyManagement'
 
 interface Props {
     id: string
@@ -87,20 +88,25 @@ export const Card = ({id, onPress}: Props) => {
   )
 }
 
-export const ExploreCard = ({ id, onPress }: Props) => {
+interface ExploreCardProps {
+    id: string;
+    property: Property;
+}
+
+export const ExploreCard: React.FC<ExploreCardProps> = ({ id, property }) => {
     const { navigateToProperty } = useNavigateToProperty();
     return (
         <TouchableOpacity
-            onPress={() => navigateToProperty(id, onPress)}
+            onPress={() => navigateToProperty(id)}
             className='flex-row items-center w-full mt-4 px-4 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70'
         >
             {/* Image with rating */}
             <View className='relative'>
-                <Image source={images.newYork} className='w-28 h-28 rounded-lg' />
+                <Image source={{ uri: property.thumbnailImage as string }} className='w-28 h-28 rounded-lg' />
                 
                 <View className='flex-row items-center absolute top-1 left-1 bg-white/90 px-1 py-0.5 rounded-full'>
                     <Image source={icons.star} className='size-3' />
-                    <Text className='text-xs font-rubik-bold text-primary-300 ml-0.5'>4.8</Text>
+                    <Text className='text-xs font-rubik-bold text-primary-300 ml-0.5'>{property.averageRating.toFixed(1)}</Text>
                 </View>
             </View>
 
@@ -108,17 +114,15 @@ export const ExploreCard = ({ id, onPress }: Props) => {
             <View className='flex-1 flex flex-row justify-between items-center ml-4 h-full'>
                 <View>
                     <Text className='text-base font-rubik-bold text-black-300'>
-                        Lucky Lake {"\n"}Apartments
+                        {property.name}
                     </Text>
-                    <Text className='text-sm font-rubik text-black-200 mt-0.5'>
-                        Beijing, China
-                    </Text>
+                    <Text className='text-base font-rubik-bold text-primary-300'>${property.price}</Text>
+                    
                 </View>
                 
 
                 <View className='items-end'>
                     <Image source={icons.heart} className='size-5' tintColor="#cfcfcf" />
-                    <Text className='text-base font-rubik-bold text-primary-300'>$1234</Text>
                 </View>
             </View>
         </TouchableOpacity>
