@@ -23,7 +23,7 @@ app.use(cookieParser());
 // CORS setup for React Native (Expo)
 app.use(
   cors({
-    origin: ['http://localhost:19006', 'http://192.168.0.105:5000'],
+    origin: ['http://localhost:19006', 'http://192.168.0.108:5000'],
     credentials: true,
   })
 );

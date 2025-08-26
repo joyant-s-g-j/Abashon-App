@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ImageSlider from '@/components/SinglePropertyPage/ImageSlider'
 import PropertInfo from '@/components/SinglePropertyPage/PropertInfo'
-import { gallery } from '@/constants/data'
 import PorpertyDetails from '@/components/SinglePropertyPage/PorpertyDetails'
 import BookingTab from '@/components/SinglePropertyPage/BookingTab'
 import { useLocalSearchParams } from 'expo-router'
@@ -82,8 +81,8 @@ const PropertyPage = () => {
         <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
           <ImageSlider images={galleryImages as any} />
           <View className='p-4'>
-            <PropertInfo property={property as any} />
-            <PorpertyDetails />
+            <PropertInfo property={property} />
+            <PorpertyDetails property={property}  />
           </View>
         </ScrollView>
         <BookingTab />

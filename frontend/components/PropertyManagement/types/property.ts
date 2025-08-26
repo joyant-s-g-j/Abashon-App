@@ -84,7 +84,7 @@ export interface PropertyCreateData {
     };
     owner: string;
     description: string;
-    facilities: string[];
+    facilities: string[] | Facility[];
     galleryImages: string[];
     location: {
         address: string;

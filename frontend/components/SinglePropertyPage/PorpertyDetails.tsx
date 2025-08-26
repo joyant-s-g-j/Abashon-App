@@ -3,12 +3,55 @@ import React from 'react'
 import Heading from './Heading'
 import IconText from './IconText'
 import Gallery from './Gallery'
-import { facilities, gallery } from '@/constants/data'
 import Location from './Location'
 import icons from '@/constants/icons'
+import { Property } from '../PropertyManagement'
 
-const PorpertyDetails = () => {
-  const galleryImages = gallery.map(item => item.image)
+interface PropertDetailsProps {
+  property?: Property | null;
+}
+
+const PorpertyDetails: React.FC<PropertDetailsProps> = ({ property }) => {
+  if (!property) {
+    return (
+      <View className='p-4'>
+        <Text className='text-base font-rubik text-gray-500'>Loading property details...</Text>
+      </View>
+    )
+  }
+  const galleryImages = [
+    property?.thumbnailImage,
+    ...(property?.galleryImages || [])
+  ].filter(Boolean)
+
+  const getFacilities = () => {
+    if(!property.facilities || !Array.isArray(property.facilities)) {
+      return []
+    }
+
+    return property.facilities.map((facility, index) => {
+      if (typeof facility === 'object') {
+        return {
+          id: facility._id || index.toString(),
+          name: facility.name || 'Facility',
+          icon: facility.icon
+        }
+      }
+
+      if (typeof facility === 'string') {
+        return {
+          id: index.toString(),
+          name: facility
+        }
+      }
+
+      return {
+        id: index.toString(),
+        name: 'Facility'
+      }
+    })
+  }
+  const facilities = getFacilities()
   const handleImagePress = (index: number) => {
     // Handle individual image press
     console.log('Image pressed:', index);
@@ -27,12 +70,12 @@ const PorpertyDetails = () => {
       <View className='flex-col gap-3'>
         <Heading title='Facilities' />
         <View className="flex-row flex-wrap gap-4">
-            {facilities.map((item, index) => (
-                <View key={index} className="w-[22%] mb-3">
+            {facilities.map((facility) => (
+                <View key={facility.id} className="w-[22%] mb-3">
                     <IconText 
-                        icon={item.icon} 
-                        text={item.title} 
-                        direction='col'
+                      icon={{ uri: facility.icon as any }} 
+                      text={facility.name}
+                      direction='col'
                     />
                 </View>
             ))}
@@ -42,9 +85,9 @@ const PorpertyDetails = () => {
       <View>
         <Heading title='Gallery' />
         <Gallery 
-            images={galleryImages}
-            onImagePress={handleImagePress}
-            onViewAllPress={handleViewAllPress}
+          images={galleryImages as any}
+          onImagePress={handleImagePress}
+          onViewAllPress={handleViewAllPress}
         />
       </View>
       {/* location */}

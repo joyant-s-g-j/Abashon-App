@@ -34,7 +34,7 @@ const Gallery: React.FC<GalleryProps> = ({
             style={{ width: imageSize, height: imageSize }}
           >
             <Image
-              source={image}
+              source={typeof image === 'string' ? { uri: image }: image}
               style={{ width: '100%', height: '100%' }}
               resizeMode="cover"
             />

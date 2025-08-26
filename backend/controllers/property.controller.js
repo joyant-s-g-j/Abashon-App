@@ -85,7 +85,7 @@ export const getAllProperties = async (req, res) => {
         const properties = await Property.find(query)
             .populate('type', 'name')
             .populate('owner', 'name email')
-            .populate('facilities', 'name')
+            .populate('facilities', 'name icon')
             .sort(sort)
             .skip(skip)
             .limit(Number(limit));
@@ -121,7 +121,7 @@ export const getPropertyById = async (req, res) => {
         const property = await Property.findById(id)
             .populate('type', 'name description')
             .populate('owner', 'name email phone')
-            .populate('facilities', 'name description')
+            .populate('facilities', 'name icon')
             .populate('ratings.user', 'name');
         
         if(!property) {
@@ -223,7 +223,7 @@ export const createProperty = async (req, res) => {
         const populatedProperty = await Property.findById(property._id)
             .populate('type', 'name')
             .populate('owner', 'name email')
-            .populate('facilities', 'name');
+            .populate('facilities', 'name icon');
         
         res.status(201).json({ success: true, data: populatedProperty, message: "Property created successfully"})
     } catch (error) {
@@ -315,7 +315,6 @@ export const updateProperty = async (req, res) => {
                 }
 
                 updateData.galleryImages = finalGalleryImages;
-                console.log('Final gallery images count:', finalGalleryImages.length);
             } catch (error) {
                 return res.status(400).json({ success: false, message: `Gallery update failed: ${error.message}` });
             }
