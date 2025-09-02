@@ -12,46 +12,27 @@ interface PropertDetailsProps {
 }
 
 const PorpertyDetails: React.FC<PropertDetailsProps> = ({ property }) => {
-  if (!property) {
-    return (
-      <View className='p-4'>
-        <Text className='text-base font-rubik text-gray-500'>Loading property details...</Text>
-      </View>
-    )
-  }
   const galleryImages = [
     property?.thumbnailImage,
     ...(property?.galleryImages || [])
-  ].filter(Boolean)
+  ].filter(Boolean);
 
-  const getFacilities = () => {
-    if(!property.facilities || !Array.isArray(property.facilities)) {
-      return []
-    }
+  const getFacilities = () =>
+    Array.isArray(property?.facilities)
+      ? property.facilities.map((facility, index) => {
+          if (typeof facility === 'string') {
+            return { id: index.toString(), name: facility };
+          }
+          return {
+            id: facility?._id || index.toString(),
+            name: facility?.name || 'Facility',
+            icon: facility?.icon,
+          };
+        })
+      : [];
 
-    return property.facilities.map((facility, index) => {
-      if (typeof facility === 'object') {
-        return {
-          id: facility._id || index.toString(),
-          name: facility.name || 'Facility',
-          icon: facility.icon
-        }
-      }
+  const facilities = getFacilities();
 
-      if (typeof facility === 'string') {
-        return {
-          id: index.toString(),
-          name: facility
-        }
-      }
-
-      return {
-        id: index.toString(),
-        name: 'Facility'
-      }
-    })
-  }
-  const facilities = getFacilities()
   const handleImagePress = (index: number) => {
     // Handle individual image press
     console.log('Image pressed:', index);
@@ -70,28 +51,32 @@ const PorpertyDetails: React.FC<PropertDetailsProps> = ({ property }) => {
       <View className='flex-col gap-3'>
         <Heading title='Facilities' />
         <View className="flex-row flex-wrap gap-4">
-            {facilities.map((facility) => (
-                <View key={facility.id} className="w-[22%] mb-3">
-                    <IconText 
-                      icon={{ uri: facility.icon as any }} 
-                      text={facility.name}
-                      direction='col'
-                    />
-                </View>
-            ))}
+          {facilities.map((facility) => (
+            <View key={facility.id} className="w-[22%] mb-3">
+              <IconText
+                icon={{ uri: facility.icon as any }}
+                text={facility.name}
+                direction='col'
+              />
+            </View>
+          ))}
         </View>
       </View>
-      {/* gallary */}
+      {/* gallery */}
       <View>
         <Heading title='Gallery' />
-        <Gallery 
+        <Gallery
           images={galleryImages as any}
           onImagePress={handleImagePress}
           onViewAllPress={handleViewAllPress}
         />
       </View>
       {/* location */}
-      <Location />
+      <Location
+        address={property?.location?.address || 'No address available'}
+        latitude={property?.location?.latitude || 0}
+        longitude={property?.location?.longitude || 0}
+      />
       {/* Ratings */}
       <View className='flex-row justify-between mt-3'>
         <TouchableOpacity className='flex-row gap-2'>

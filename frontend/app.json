@@ -15,7 +15,9 @@
         "CFBundleURLTypes": [
           {
             "CFBundleURLName": "abashon",
-            "CFBundleURLSchemes": ["abashon"]
+            "CFBundleURLSchemes": [
+              "abashon"
+            ]
           }
         ]
       }
@@ -41,7 +43,10 @@
               "scheme": "abashon"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
