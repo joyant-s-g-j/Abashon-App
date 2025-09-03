@@ -7,6 +7,7 @@ import { Property } from './PropertyManagement'
 
 interface Props {
     id: string
+    property?: Property;
     onPress?: () => void
 }
 
@@ -55,39 +56,36 @@ export const FeaturedCard = ({id, onPress }: Props) => {
   )
 }
 
-export const Card = ({id, onPress}: Props) => {
+export const Card = ({id, property }: Props) => {
   const { navigateToProperty } = useNavigateToProperty();
   return (
     <TouchableOpacity 
-        onPress={() => navigateToProperty(id, onPress)}
+        onPress={() => navigateToProperty(id)}
         className='flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative'
     >
       <View className='flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50'>
             <Image source={icons.star} className='size-2.5' />
-            <Text className='text-xs font-rubik-bold text-primary-300 ml-0.5'>4.4</Text>
+            <Text className='text-xs font-rubik-bold text-primary-300 ml-0.5'>{property?.averageRating?.toFixed(1)}</Text>
         </View>
 
-        <Image source={images.newYork} className='w-full h-40 rounded-lg' />
+        <Image source={{ uri: property?.thumbnailImage as string }} className='w-full h-40 rounded-lg' />
 
         <View className='flex flex-col mt-2'>
-            <Text 
-                className='text-base font-rubik-bold text-black-300'
-            >
-                Cozy Studio
+            <Text className='text-base font-rubik-bold text-black-300 line-clamp-1'>
+                {property?.name}
             </Text>
-            <Text className='text-base font-rubik text-black-200'>
-                22 W 15th St, New York
+            <Text className='text-base font-rubik text-black-200 line-clamp-2'>
+                {property?.location.address}
             </Text>
 
             <View className='flex flex-row items-center justify-between mt-2'>
-                <Text className='text-base font-rubik-bold text-primary-300'>$2,500</Text>
+                <Text className='text-base font-rubik-bold text-primary-300'>${property?.price}</Text>
                 <Image source={icons.heart} className='size-5 mr-2' tintColor="#191d31" />
             </View>
         </View>
     </TouchableOpacity>
   )
 }
-
 interface ExploreCardProps {
     id: string;
     property: Property;

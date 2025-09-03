@@ -1,5 +1,6 @@
 import { Card, FeaturedCard } from "@/components/Cards";
 import Filters from "@/components/Filters";
+import { filterProperties, useProperties } from "@/components/PropertyManagement";
 import Search from "@/components/Search";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
@@ -10,28 +11,35 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [user, setUser] = useState<{ name: string; profilePic: string } | null>(null);
-
-useEffect(() => {
-  const loadUser = async () => {
-    try {
-      const userData = await AsyncStorage.getItem('user');
-      if (userData) {
-        const parsed = JSON.parse(userData);
-        setUser(parsed);
+  const [searchQuery, setSearchQuery] = useState('')
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('user');
+        if (userData) {
+          const parsed = JSON.parse(userData);
+          setUser(parsed);
+        }
+      } catch (error) {
+        console.error("Failed to load user:", error);
       }
-    } catch (error) {
-      console.error("Failed to load user:", error);
-    }
-  };
+    };
 
-  loadUser();
-}, []);
-
+    loadUser();
+  }, []);
+  const { properties } = useProperties()
+  const filteredProperties = filterProperties(properties, searchQuery)
+  
   return (
     <SafeAreaView className="bg-white h-full">
       <FlatList
-        data={[1, 2, 3, 4]}
-        renderItem={({item}) => <Card id={item.toString()} />}
+        data={filteredProperties}
+        renderItem={({item}) => (
+          <Card 
+            id={item._id.toString()}
+            property={item}
+          />
+        )}
         keyExtractor={(item) => item.toString()}
         numColumns={2}
         contentContainerClassName="pb-32"

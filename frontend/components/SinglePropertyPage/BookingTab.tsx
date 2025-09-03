@@ -1,7 +1,11 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 
-const BookingTab = () => {
+interface BookingTabProps {
+    price: number | undefined;
+}
+
+const BookingTab: React.FC<BookingTabProps> = ({ price }) => {
   return (
     <View 
         pointerEvents='box-none' 
@@ -10,7 +14,7 @@ const BookingTab = () => {
         <View className='flex-col'>
             <Text className='text-sm tracking-widest font-rubik-medium text-black-200 uppercase'>Price</Text>
             <Text className='text-lg font-rubik-bold text-primary-300'>
-                $17821
+                ${price}
             </Text>
         </View>
         <TouchableOpacity 
