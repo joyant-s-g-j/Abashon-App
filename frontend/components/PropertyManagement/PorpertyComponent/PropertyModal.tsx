@@ -77,6 +77,41 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
     return titles[currentStep]
   }
 
+  const validateStep = (step: PropertyStep): boolean => {
+    switch(step) {
+        case 1:
+            return !!(
+                formData?.name?.trim() &&
+                formData?.type &&
+                (formData?.imageUri || formData?.thumbnailImage)
+            );
+        case 2:
+            return !!(
+                formData?.owner &&
+                formData?.description?.trim()
+            );
+        case 3:
+            return !!(
+                formData?.price &&
+                parseFloat(formData.price) > 0 &&
+                formData?.location?.address &&
+                formData?.location?.latitude &&
+                formData?.location?.longitude
+            );
+        case 4:
+            return !!(
+                formData?.facilities &&
+                formData.facilities.length > 0 &&
+                formData.galleryImages &&
+                formData.galleryImages.length > 0
+            );
+        case 5:
+            return true;
+        default:
+            return false
+    }
+  }
+
   return (
     <Modal
         visible={visible}
@@ -127,6 +162,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({
                 currentStep={currentStep}
                 isLoading={isLoading}
                 isEdit={isEdit}
+                canProceed={validateStep(currentStep)}
             />
         </View>
     </Modal>

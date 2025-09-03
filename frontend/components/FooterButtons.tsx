@@ -8,6 +8,7 @@ interface FooterButtonsProps {
     currentStep: number;
     isLoading: boolean;
     isEdit: boolean;
+    canProceed: boolean;
 }
 
 const FooterButtons: React.FC<FooterButtonsProps> = ({
@@ -16,7 +17,8 @@ const FooterButtons: React.FC<FooterButtonsProps> = ({
     handleNext,
     currentStep,
     isLoading,
-    isEdit
+    isEdit,
+    canProceed
 }) => {
   return (
     <View className='flex-row items-center justify-between p-4 border-t border-gray-200'>
@@ -37,9 +39,9 @@ const FooterButtons: React.FC<FooterButtonsProps> = ({
       {currentStep === 5 ? (
         <TouchableOpacity
             onPress={handleSubmit}
-            disabled={isLoading}
+            disabled={isLoading || !canProceed}
             className={`px-8 py-3 rounded-lg ${
-                isLoading ? 'bg-gray-300' : 'bg-primary-300'
+                isLoading || !canProceed ? 'bg-gray-300' : 'bg-primary-300'
             }`}
         >
             <Text className='text-white font-rubik-semibold'>
@@ -48,10 +50,13 @@ const FooterButtons: React.FC<FooterButtonsProps> = ({
         </TouchableOpacity>
       ): (
         <TouchableOpacity
-            onPress={handleNext}
-            className='bg-primary-300 px-8 py-3 rounded-lg'
+          onPress={handleNext}
+          disabled={!canProceed}
+          className={`px-8 py-3 rounded-lg ${
+            !canProceed ? 'bg-gray-300' : 'bg-primary-300'
+          }`}
         >
-            <Text className='text-white font-rubik-semibold'>Next</Text>
+          <Text className='text-white font-rubik-semibold'>Next</Text>
         </TouchableOpacity>
       )}
     </View>
