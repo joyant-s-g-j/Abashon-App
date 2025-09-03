@@ -29,18 +29,37 @@ export default function Index() {
   }, []);
   const { properties } = useProperties()
   const filteredProperties = filterProperties(properties, searchQuery)
+  const featuredProperties = properties.filter((item) => item.isFeatured)
+
+  const formatDataForColumns = (data: any[], numColumns: number) => {
+    const numberOfFullRows = Math.floor(data.length / numColumns)
+    let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns)
+
+    while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
+      data.push({key: `blank-${numberOfElementsLastRow}`, empty: true})
+      numberOfElementsLastRow++;
+    }
+    return data;
+  }
+
+  const formattedProperties = formatDataForColumns([...filteredProperties], 2)
   
   return (
     <SafeAreaView className="bg-white h-full">
       <FlatList
-        data={filteredProperties}
-        renderItem={({item}) => (
-          <Card 
-            id={item._id.toString()}
-            property={item}
-          />
-        )}
-        keyExtractor={(item) => item.toString()}
+        data={formattedProperties}
+        renderItem={({ item }) => {
+          if (item.empty === true) {
+            return <View style={{ flex: 1, margin: 10 }} />;
+          }
+          return (
+            <Card 
+              id={item._id.toString()}
+              property={item}
+            />
+          );
+        }}
+        keyExtractor={(item) => item._id?.toString() || item.key}
         numColumns={2}
         contentContainerClassName="pb-32"
         columnWrapperClassName="flex gap-5 px-5"
@@ -76,9 +95,14 @@ export default function Index() {
               </View>
 
               <FlatList
-                data={[1, 2, 3]}
-                renderItem={({item}) => <FeaturedCard id={item.toString()} />}
-                keyExtractor={(item) => item.toString()}
+                data={featuredProperties}
+                renderItem={({item}) => (
+                  <FeaturedCard 
+                    id={item._id.toString()}
+                    property={item}
+                  />
+                )}
+                keyExtractor={(item) => item._id.toString()}
                 horizontal
                 bounces={false}
                 showsHorizontalScrollIndicator={false}
