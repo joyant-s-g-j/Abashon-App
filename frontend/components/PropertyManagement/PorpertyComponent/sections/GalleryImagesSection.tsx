@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
+import { View, Text, TouchableOpacity, Image, ActivityIndicator } from 'react-native'
+import React, { useState } from 'react'
 import { LabelText } from '@/components/ReusableComponent'
 import { PropertyFormData } from '../../types/property';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,9 @@ const GalleryImagesSection: React.FC<GalleryImagesSectionProps> = ({
     updateFormData,
     onMultipleImagePick
 }) => {
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [processingCount, setProcessingCount] = useState(0)
+
   const isValidImageUri = (uri: string): boolean => {
     return Boolean(uri && 
         typeof uri === 'string' && 
@@ -26,13 +29,47 @@ const GalleryImagesSection: React.FC<GalleryImagesSectionProps> = ({
   };
 
   const validGalleryImages = galleryImages?.filter(isValidImageUri) || []
+
+  const handleImagePick = async () => {
+    setIsProcessing(true)
+    setProcessingCount(0)
+    try {
+      await onMultipleImagePick()
+    } finally {
+      setIsProcessing(false)
+      setProcessingCount(0)
+    }
+  }
+
+  const updateProgress = (count: number) => {
+    setProcessingCount(count)
+  }
   return (
     <View className='mt-4'>
       <LabelText text='Gallery Images *' />
+      {/* Processing Indicator */}
+      {isProcessing && (
+        <View className='border border-primary-200 rounded-md p-4 items-center justify-center mb-4 bg-primary-100'>
+          <ActivityIndicator size="large" color="#3B82F6" />
+          <Text className='text-primary-600 mt-2 font-rubik-medium'>
+            Processing Images...
+          </Text>
+          {processingCount > 0 && (
+            <Text className='text-primary-500 text-sm font-rubik mt-1'>
+              {processingCount} image{processingCount === 1 ? '' : 's'} processed
+            </Text>
+          )}
+          <View className='w-32 h-1 bg-primary-200 rounded-full mt-3 overflow-hidden'>
+            <View className='h-full bg-primary-500 rounded-full animate-pulse' style={{width: '60%'}} />
+          </View>
+        </View>
+      )}
+
       {/* Add Images Button */}
-      {validGalleryImages.length === 0 && (
+      {validGalleryImages.length === 0 && !isProcessing && (
         <TouchableOpacity
-            onPress={onMultipleImagePick}
+            onPress={handleImagePick}
+            disabled={isProcessing}
             className='border border-dashed border-black-100 rounded-md p-4 items-center justify-center mb-4 h-40'
         >
             <Ionicons name='camera-outline' size={40} color="#9CA3AF" />
@@ -46,7 +83,7 @@ const GalleryImagesSection: React.FC<GalleryImagesSectionProps> = ({
       )}
       
       {/* Gallery Images Preview */}
-      {validGalleryImages.length > 0 && (
+      {validGalleryImages.length > 0 && !isProcessing && (
         <View>
             <Text className='text-sm font-rubik-medium text-black-300 mb-3'>
                 {validGalleryImages.length} image{validGalleryImages.length === 1 ? '' : 's'} selected
@@ -81,12 +118,23 @@ const GalleryImagesSection: React.FC<GalleryImagesSectionProps> = ({
 
             {/* Add more images button */}
             <TouchableOpacity 
-              onPress={onMultipleImagePick}
-              className='mt-3 border border-primary-300 rounded-lg p-3 items-center justify-center flex-row'
+              onPress={handleImagePick}
+              disabled={isProcessing}
+              className={`mt-3 border rounded-lg p-3 items-center justify-center flex-row ${
+                isProcessing 
+                  ? 'border-gray-300 bg-gray-100' 
+                  : 'border-primary-300 bg-white'
+              }`}
             >
-              <Ionicons name="add" size={20} color="#3B82F6" />
-              <Text className='text-primary-300 ml-2 font-rubik-medium'>
-                Add More Images
+              {isProcessing ? (
+                <ActivityIndicator size="small" color="#9CA3AF" />
+              ) : (
+                <Ionicons name="add" size={20} color="#3B82F6" />
+              )}
+              <Text className={`ml-2 font-rubik-medium ${
+                isProcessing ? 'text-gray-400' : 'text-primary-300'
+              }`}>
+                {isProcessing ? 'Processing...' : 'Add More Images'}
               </Text>
             </TouchableOpacity>
         </View>

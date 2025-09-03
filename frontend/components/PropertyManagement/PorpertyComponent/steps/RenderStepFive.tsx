@@ -62,13 +62,14 @@ const RenderStepFive: React.FC<RenderStepFiveProps> = ({formData, categories, ow
             <ReviewText text={`Location: ${formData.location.longitude}`} />
         </View>
         <View>
-            <LabelText text='Facilities' />
+            <LabelText text='Facilities & Featured' />
             <ReviewText 
                 text={`Selected Facilitites: ${
                     formData.facilities && formData.facilities.length > 0
                         ? getFacilitiesName(formData.facilities as any) : "No facilities Selected"
                 }`}
             />
+            <ReviewText text={`Is Featured: ${formData.isFeatured}`} />
         </View>
       </View>
     </ScrollView>

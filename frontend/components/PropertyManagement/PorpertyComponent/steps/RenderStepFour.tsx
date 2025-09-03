@@ -1,10 +1,11 @@
-import { ScrollView } from 'react-native'
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { PropertyFormData } from '../../types/property'
 import { Facility } from '@/components/FacilityMangement'
 import { LabelText } from '@/components/ReusableComponent'
 import { TowColumnCheckbox } from '@/components/ReusableComponent/TowColumnCheckbox'
 import { GalleryImagesSection } from '../sections'
+import { Ionicons } from '@expo/vector-icons'
 
 interface RenderStepFourProps {
     formData: PropertyFormData
@@ -60,6 +61,24 @@ const RenderStepFour: React.FC<RenderStepFourProps> = ({
         getLabel={(item) => item.name}
       />
 
+      {/* Featured checkbox */}
+      <View className='mt-4'>
+        <LabelText text='Featured Property' />
+        <TouchableOpacity
+          className='flex-row items-center gap-2 mt-2'
+          onPress={() => updateFormData('isFeatured', !formData.isFeatured)}
+        >
+          <Ionicons
+            name={formData.isFeatured ? 'checkmark-circle' : 'ellipse-outline'}
+            size={24}
+            color={formData.isFeatured ? 'green' : 'gray'}
+          />
+          <Text className='text-lg font-rubik'>
+            {formData.isFeatured ? 'Yes' : 'No'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      
       {/* Gallery Images */}
       <GalleryImagesSection 
         galleryImages={formData.galleryImages}

@@ -39,16 +39,18 @@ const RenderStepOne: React.FC<RenderStepOneProps> = ({formData, updateFormData, 
       <LabelText text='Thumbnail Image *' className='mt-4' />
       <TouchableOpacity
         onPress={onImagePick}
-        className='border border-dashed border-black-100 rounded-md items-center justify-center h-40'
+        className={`rounded-md h-40 ${
+          selectedImage ? '' : 'border border-dashed border-black-100'
+        }`}
       >
         {selectedImage ? (
-          <View className='items-center w-full h-full relative'>
+          <View className='size-40 relative overflow-hidden'>
             <Image 
               source={{ uri: selectedImage }}
-              className='w-full h-full rounded-md'
+              className='size-40 rounded-md'
               resizeMode='cover'
             />
-            <View className='absolute bottom-2 left-0 right-0 items-center'>
+            <View className='absolute bottom-2 w-full items-center left-0 right-0'>
               <View className='bg-black/50 px-3 py-1 rounded-full'>
                 <Text className='text-sm font-rubik text-white'>Tap to change</Text>
               </View>
