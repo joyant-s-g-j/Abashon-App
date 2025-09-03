@@ -40,7 +40,7 @@ const isCloudinaryUrl = (url) => {
 const needsUpload = (imageData) => {
     return imageData &&
         typeof imageData === 'string' &&
-        (imageData.startsWith('data:image/') || image.startsWith('file://'))
+        (imageData.startsWith('data:image/') || imageData.startsWith('file://'))
 }
 
 export const getAllProperties = async (req, res) => {

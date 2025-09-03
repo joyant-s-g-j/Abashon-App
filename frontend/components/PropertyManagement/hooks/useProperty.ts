@@ -132,10 +132,10 @@ export const useProperties = () => {
                         property._id === id ? result.data : property
                     )
                 );
-                Alert.alert('Success', 'Facility updated successfully')
+                Alert.alert('Success', 'Property updated successfully')
                 return true;
             } else {
-                Alert.alert('Error', result.message || 'Failed to update facility');
+                Alert.alert('Error', result.message || 'Failed to update property');
                 return false
             }
         } catch (error) {

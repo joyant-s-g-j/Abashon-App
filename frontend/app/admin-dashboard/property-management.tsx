@@ -51,18 +51,67 @@ const PropertyMangement: React.FC = () => {
   }
 
   const handleSubmit = async () => {
-    const formData = getCurrentFormData()
-    try {
-      if(showEditModal && selectedProperty) {
-        await updateProperty(selectedProperty._id, formData)
-      } else {
-        await addProperty(formData)
-      }
-      handleModalClose()
-    } catch (error) {
-      console.log("Error in handle submit", error)
-    }
+  const formData = getCurrentFormData()
+
+  console.log('=== DEBUGGING FORM DATA ===')
+  console.log('Raw form data:', formData)
+  console.log('Selected property:', selectedProperty)
+  console.log('Is edit mode:', showEditModal)
+  console.log('Property ID:', selectedProperty?._id)
+  
+  // Validation add করুন
+  if(!formData?.name?.trim()) {
+    Alert.alert('Error', 'Property name is required')
+    return
   }
+  if(!formData.type) {
+    Alert.alert('Error', 'Property type is required')
+    return
+  }
+  if(!formData.owner) {
+    Alert.alert('Error', 'Property owner is required')
+    return
+  }
+  if(!formData.description?.trim()) {
+    Alert.alert('Error', 'Property description is required')
+    return
+  }
+  if(!formData.location.address?.trim()) {
+    Alert.alert('Error', 'Property address is required')
+    return
+  }
+  if(!formData.location.latitude || !formData.location.longitude) {
+    Alert.alert('Error', 'Property coordinates are required')
+    return
+  }
+  if(!formData.price || parseFloat(formData.price) <= 0) {
+    Alert.alert('Error', 'Valid price is required')
+    return
+  }
+  if(!formData.specifications?.bed || !formData.specifications?.bath || !formData.specifications?.area) {
+    Alert.alert('Error', 'All specifications are required')
+    return
+  }
+
+  console.log('Submitting form data:', JSON.stringify(formData, null, 2))
+  
+  try {
+    if(showEditModal && selectedProperty) {
+      const success = await updateProperty(selectedProperty._id, formData)
+      if(success) {
+        handleModalClose()
+      }
+    } else {
+      const success = await addProperty(formData)
+      if(success) {
+        handleModalClose()
+      }
+    }
+  } catch (error) {
+    console.log("Error in handle submit", error)
+    Alert.alert('Error', 'Failed to save property. Please try again.')
+  }
+}
 
   const handleModalClose = () => {
     setCurrentStep(1)

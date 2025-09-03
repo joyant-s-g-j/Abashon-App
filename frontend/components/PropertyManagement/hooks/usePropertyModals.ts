@@ -103,7 +103,7 @@ export const usePropertyModals = () => {
                 : String(property.thumbnailImage),
             type: typeof property.type === 'string'
                 ? property.type
-                : property.type?.name || '',
+                : property.type?._id || '',
             specifications: {
                 bed: specs.bed || '',
                 bath: specs.bath || '',
