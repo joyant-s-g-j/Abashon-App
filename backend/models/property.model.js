@@ -90,6 +90,10 @@ const propertySchema = new mongoose.Schema({
     isFeatured: {
         type: Boolean,
         default: false
+    },
+    isBooked: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true})
 

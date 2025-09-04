@@ -9,19 +9,7 @@ export const usePayment = () => {
 
     const checkAuthentication = useCallback(async () => {
         try {
-            const token = await AsyncStorage.getItem('authToken');
-            if (!token) {
-                // Try alternative token keys
-                const alternativeKeys = ['token', 'accessToken', 'userToken', 'jwt'];
-                for (const key of alternativeKeys) {
-                    const altToken = await AsyncStorage.getItem(key);
-                    if (altToken) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            return true;
+            return await PaymentService.checkAuthStatus();
         } catch (error) {
             console.error('Error checking authentication:', error);
             return false;

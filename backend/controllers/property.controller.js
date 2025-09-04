@@ -136,7 +136,7 @@ export const getPropertyById = async (req, res) => {
 
 export const createProperty = async (req, res) => {
     try {
-        const { name, thumbnailImage, type, specifications, owner, description, facilities, galleryImages, location, price, isFeatured } = req.body;
+        const { name, thumbnailImage, type, specifications, owner, description, facilities, galleryImages, location, price, isFeatured, isBooked } = req.body;
 
         if( !name || !thumbnailImage || !specifications || !description || !location || !price) {
             return res.status(400).json({ success: false, message: "Please provide all required fields" });
@@ -217,7 +217,8 @@ export const createProperty = async (req, res) => {
             galleryImages: uploadedGalleryImages,
             location,
             price,
-            isFeatured: isFeatured || false
+            isFeatured: isFeatured || false,
+            isBooked: isBooked || false
         })
 
         const populatedProperty = await Property.findById(property._id)

@@ -1,5 +1,6 @@
 import { stripe } from "../lib/stripe.js"
 import Booking from "../models/booking.model.js"
+import Property from "../models/property.model.js"
 
 export const createCheckoutSession = async(req, res) => {
     try {
@@ -92,6 +93,8 @@ export const checkoutSuccess = async(req, res) => {
             })
 
             await newBooking.save()
+
+            await Property.findByIdAndUpdate(session.metadata.propertyId, { isBooked: true })
             res.status(200).json({ 
                 success: true, 
                 message: "Payment successful, booking created", 

@@ -10,10 +10,11 @@ interface BookingTabProps {
 }
 
 const BookingTab: React.FC<BookingTabProps> = ({ price, property }) => {
-  const { loading, initiatePayment } = usePayment();
+  const { loading, initiatePayment, confirmPayment } = usePayment();
   const [webViewVisible, setWebViewVisible] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false)
 
   const handleBookingPress = async () => {
       if(!property) return;
@@ -21,8 +22,8 @@ const BookingTab: React.FC<BookingTabProps> = ({ price, property }) => {
       try {
           const sessionData = await initiatePayment(property);
           if(sessionData.url) {
-              setPaymentUrl(sessionData.url); // save URL
-              setWebViewVisible(true);        // show modal
+              setPaymentUrl(sessionData.url);
+              setWebViewVisible(true);
           } else {
               Alert.alert('Payment Error', 'No payment URL received.');
           }
@@ -31,19 +32,44 @@ const BookingTab: React.FC<BookingTabProps> = ({ price, property }) => {
       }
   };
 
-  const handleNavigationStateChange = (navState: any) => {
+  const handleNavigationStateChange = async (navState: any) => {
     const { url } = navState
 
     if(url.includes('/purchase-success')) {
       setWebViewVisible(false)
       setShowSuccessModal(true)
+
+      try {
+        const urlParams = new URLSearchParams(url.split('?')[1])
+        const sessionId = urlParams.get('session_id')
+
+        if(sessionId) {
+          await confirmPayment(sessionId)
+
+          property.isBooked = true
+
+          setShowSuccessModal(true)
+        } else {
+          throw new Error('No session ID found in success URL');
+        }
+      } catch (error) {
+        console.error('Payment confirmation error:', error);
+        Alert.alert(
+          'Payment Processing Error',
+          'Payment was successful but booking confirmation failed. Please contact support.',
+          [{ text: 'OK' }]
+        );
+      } finally {
+        setProcessingPayment(false);
+      }
     }
 
     if(url.includes('/purchase-cancel')) {
       setWebViewVisible(false)
       Alert.alert(
         'Payment Cancelled',
-        'Your payment was cancelled.'
+        'Your payment was cancelled.',
+        [{ text: 'OK' }]
       )
     }
   }
@@ -58,14 +84,22 @@ const BookingTab: React.FC<BookingTabProps> = ({ price, property }) => {
         <Text className="text-lg font-rubik-bold text-primary-300">${price}</Text>
       </View>
 
-      <TouchableOpacity
-        onPress={handleBookingPress}
-        disabled={loading}
-        className={`px-5 py-4 rounded-full flex-row items-center ${loading ? 'bg-gray-400' : 'bg-primary-300'}`}
-      >
-        {loading && <ActivityIndicator size="small" color="white" style={{ marginRight: 8 }} />}
-        <Text className="font-rubik-semibold text-white">{loading ? 'Processing...' : 'Booking Now'}</Text>
-      </TouchableOpacity>
+      {property?.isBooked ? (
+        <View className="px-5 py-4 rounded-full bg-gray-400">
+          <Text className="font-rubik-semibold text-white">Booked</Text>
+        </View>
+      ) : (
+        <TouchableOpacity
+          onPress={handleBookingPress}
+          disabled={loading || processingPayment}
+          className={`px-5 py-4 rounded-full flex-row items-center ${(loading || processingPayment) ? 'bg-gray-400' : 'bg-primary-300'}`}
+        >
+          {(loading || processingPayment) && <ActivityIndicator size="small" color="white" style={{ marginRight: 8 }} />}
+          <Text className="font-rubik-semibold text-white">
+            {processingPayment ? 'Confirming...' : loading ? 'Processing...' : 'Booking Now'}
+          </Text>
+        </TouchableOpacity>
+      )}
 
       {/* WebView Modal */}
       <Modal visible={webViewVisible} animationType="slide" presentationStyle='pageSheet'>

@@ -4,29 +4,36 @@ import { Linking } from "react-native"
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
 export const PaymentService = {
+    getAuthToken: async () => {
+        try {
+            const tokenKeys = ['authToken', 'token', 'accessToken', 'userToken', 'jwt']
+
+            for(const key of tokenKeys) {
+                const token = await AsyncStorage.getItem(key)
+                if(token) {
+                    return token
+                }
+            }
+
+            const allKeys = await AsyncStorage.getAllKeys()
+
+            for(const key of allKeys) {
+                if(key.toLowerCase().includes('token') || key.toLowerCase().includes('auth')) {
+                    const value = await AsyncStorage.getItem(key)
+                    if(value) return value
+                }
+            }
+            throw new Error('No authentication token found')
+        } catch (error) {
+            console.error('Error getting auth token:', error);
+            throw error;
+        }
+    },
+
     createCheckoutSession: async (property: any) => {
         try {
             // Get token with better error handling
-            let token = await AsyncStorage.getItem('authToken')
-
-            if (!token) {
-                // Try alternative token keys that might be used
-                const alternativeKeys = ['token', 'accessToken', 'userToken', 'jwt'];
-                
-                for (const key of alternativeKeys) {
-                    const altToken = await AsyncStorage.getItem(key);
-                    if (altToken) {
-                        token = altToken;
-                        break;
-                    }
-                }
-                
-                if (!token) {
-                    // Log all AsyncStorage keys to debug
-                    const allKeys = await AsyncStorage.getAllKeys();
-                    throw new Error('No authentication token found. Please login again.');
-                }
-            }
+            const token = await PaymentService.getAuthToken()
 
             // Validate property data
             if (!property) {
@@ -86,10 +93,10 @@ export const PaymentService = {
 
     handlePaymentSuccess: async (sessionId: string) => {
         try {
-            const token = await AsyncStorage.getItem('authToken')
+            const token = await PaymentService.getAuthToken()
 
-            if (!token) {
-                throw new Error('No authentication token found');
+            if (!sessionId) {
+                throw new Error('Session ID is required');
             }
 
             const response = await fetch(`${API_BASE_URL}/api/payment/checkout-success`, {
@@ -131,7 +138,7 @@ export const PaymentService = {
     // Helper function to check authentication status
     checkAuthStatus: async () => {
         try {
-            const token = await AsyncStorage.getItem('authToken');
+            const token = await PaymentService.getAuthToken();
             return !!token;
         } catch (error) {
             console.error('Error checking auth status:', error);
