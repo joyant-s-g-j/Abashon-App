@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Modal, Alert, SafeAreaView } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { usePayment } from './hooks/usePayment';
+import PaymentSuccessModal from './PaymentSuccessModal';
 
 interface BookingTabProps {
   price: number | undefined;
@@ -12,22 +13,40 @@ const BookingTab: React.FC<BookingTabProps> = ({ price, property }) => {
   const { loading, initiatePayment } = usePayment();
   const [webViewVisible, setWebViewVisible] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleBookingPress = async () => {
-        if(!property) return;
+      if(!property) return;
 
-        try {
-            const sessionData = await initiatePayment(property);
-            if(sessionData.url) {
-                setPaymentUrl(sessionData.url); // save URL
-                setWebViewVisible(true);        // show modal
-            } else {
-                Alert.alert('Payment Error', 'No payment URL received.');
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
+      try {
+          const sessionData = await initiatePayment(property);
+          if(sessionData.url) {
+              setPaymentUrl(sessionData.url); // save URL
+              setWebViewVisible(true);        // show modal
+          } else {
+              Alert.alert('Payment Error', 'No payment URL received.');
+          }
+      } catch (error) {
+          console.error(error);
+      }
+  };
+
+  const handleNavigationStateChange = (navState: any) => {
+    const { url } = navState
+
+    if(url.includes('/purchase-success')) {
+      setWebViewVisible(false)
+      setShowSuccessModal(true)
+    }
+
+    if(url.includes('/purchase-cancel')) {
+      setWebViewVisible(false)
+      Alert.alert(
+        'Payment Cancelled',
+        'Your payment was cancelled.'
+      )
+    }
+  }
 
   return (
     <View
@@ -51,23 +70,21 @@ const BookingTab: React.FC<BookingTabProps> = ({ price, property }) => {
       {/* WebView Modal */}
       <Modal visible={webViewVisible} animationType="slide" presentationStyle='pageSheet'>
         <SafeAreaView style={{ flex: 1 }}>
-          <View className='flex flex-row justify-between items-center p-4 border-b-1 border-black-100 bg-slate-50'>
+          <View className='flex flex-row justify-between items-center p-4 border-b-2 border-black-100 bg-slate-50'>
             <Text className='text-xl font-rubik-bold text-black-300'>
-                Complete your payment
+              Complete your payment
             </Text>
             <TouchableOpacity
-                onPress={() => {
-                    setWebViewVisible(false);
-                }}
-                style={{ 
+              onPress={() => setWebViewVisible(false)}
+              style={{ 
                 padding: 8,
                 backgroundColor: '#dc3545',
                 borderRadius: 6
-                }}
+              }}
             >
-                <Text style={{ fontSize: 14, color: '#fff', fontWeight: '600' }}>
-                Cancel
-                </Text>
+              <Text className='text-lg text-white font-rubik-semibold'>
+                  Cancel
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -75,6 +92,7 @@ const BookingTab: React.FC<BookingTabProps> = ({ price, property }) => {
             <WebView
               source={{ uri: paymentUrl }}
               startInLoadingState
+              onNavigationStateChange={handleNavigationStateChange}
               renderLoading={() => <ActivityIndicator size="large" color="blue" style={{ flex: 1 }} />}
             />
           ) : (
@@ -82,6 +100,12 @@ const BookingTab: React.FC<BookingTabProps> = ({ price, property }) => {
           )}
         </SafeAreaView>
       </Modal>
+
+      <PaymentSuccessModal 
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        property={property}
+      />
     </View>
   );
 };

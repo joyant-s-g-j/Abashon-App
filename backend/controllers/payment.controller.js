@@ -33,13 +33,13 @@ export const createCheckoutSession = async(req, res) => {
             },
             quantity: 1
         }]
-
+        const FRONTEND_URL= process.env.FRONTEND_URLS.split(',')[1];
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
-            success_url: `${process.env.BASE_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.BASE_URL}/purchase-cancel`,
+            success_url: `${FRONTEND_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${FRONTEND_URL}/purchase-cancel`,
             metadata: {
                 userId: req.user._id.toString(),
                 propertyId: property.id.toString(),
