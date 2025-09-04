@@ -67,8 +67,6 @@ const PorpertyDetails: React.FC<PropertDetailsProps> = ({ property }) => {
         <Heading title='Gallery' />
         <Gallery
           images={galleryImages as any}
-          // onImagePress={handleImagePress}
-          // onViewAllPress={handleViewAllPress}
         />
       </View>
       {/* location */}

@@ -21,9 +21,11 @@ app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 
 // CORS setup for React Native (Expo)
+const allowedOrigins = process.env.FRONTEND_URLS.split(',');
+
 app.use(
   cors({
-    origin: ['http://localhost:19006', 'http://192.168.0.106:5000'],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
