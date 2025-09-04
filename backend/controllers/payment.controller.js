@@ -5,18 +5,29 @@ export const createCheckoutSession = async(req, res) => {
     try {
         const { property } = req.body
 
+        // Validate single property
         if(!property || !property.id || !property.price || !property.name) {
-            return res.status(400).json({ error: "Invalid property data"})
+            return res.status(400).json({ 
+                error: "Invalid property data", 
+                received: property,
+                required: ['id', 'name', 'price']
+            })
         }
 
-        const amount = Math.round(property.price * 100)
+        const amount = Math.round(property.price * 100) // Convert to cents
+        
+        // Handle thumbnailImage properly
+        const images = [];
+        if (property.thumbnailImage) {
+            images.push(property.thumbnailImage);
+        }
         
         const lineItems = [{
             price_data: {
                 currency: "usd",
                 product_data: {
                     name: property.name,
-                    images: property.thumbnailImage
+                    images: images
                 },
                 unit_amount: amount
             },
@@ -31,13 +42,8 @@ export const createCheckoutSession = async(req, res) => {
             cancel_url: `${process.env.BASE_URL}/purchase-cancel`,
             metadata: {
                 userId: req.user._id.toString(),
-                properties: JSON.stringify(
-                    properties.map((p) => ({
-                        id: p._id,
-                        quantity: p.quantity,
-                        price: p.price
-                    }))
-                )
+                propertyId: property.id.toString(),
+                propertyPrice: property.price.toString()
             }
         })
 
@@ -46,9 +52,14 @@ export const createCheckoutSession = async(req, res) => {
             sessionId: session.id,
             url: session.url
         })
+
     } catch (error) {
-        console.log("Error processing checkout:", error)
-        res.status(500).json({message: "Error processing checkout:", error: error.message})
+        console.error("Error processing checkout:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error processing checkout", 
+            error: error.message
+        })
     }
 }
 
@@ -58,6 +69,7 @@ export const checkoutSuccess = async(req, res) => {
         const session = await stripe.checkout.sessions.retrieve(sessionId)
 
         if(session.payment_status === "paid") {
+            // Check if booking already exists
             const existingBooking = await Booking.findOne({ stripSessionId: sessionId })
 
             if(existingBooking) {
@@ -80,12 +92,22 @@ export const checkoutSuccess = async(req, res) => {
             })
 
             await newBooking.save()
-            res.status(200).json({ success: true, message: "Payment Successfull, booking created", bookingId: newBooking._id })
+            res.status(200).json({ 
+                success: true, 
+                message: "Payment successful, booking created", 
+                bookingId: newBooking._id 
+            })
         } else {
-            res.status(400).json({ success: false, message: "Payment not completed" })
+            res.status(400).json({ 
+                success: false, 
+                message: "Payment not completed" 
+            })
         }
     } catch (error) {
-        console.log("Error processing successful checkout:", error)
-        res.status(500).json({message: "Error processing successful checkout:", error: error.message})
+        res.status(500).json({
+            success: false,
+            message: "Error processing successful checkout", 
+            error: error.message
+        })
     }
 }

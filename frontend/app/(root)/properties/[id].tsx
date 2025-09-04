@@ -85,7 +85,7 @@ const PropertyPage = () => {
             <PorpertyDetails property={property}  />
           </View>
         </ScrollView>
-        <BookingTab price={property?.price} />
+        <BookingTab property={property} price={property?.price} />
       </SafeAreaView>
     </>
   )

@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, ScrollView, Alert, Modal } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import images from '@/constants/images';
 import icons from '@/constants/icons';
 
@@ -100,7 +100,6 @@ const SignIn = () => {
         Alert.alert('Error', data.message || 'Authentication failed');
       }
     } catch (error) {
-      console.error('❌ Code exchange error:', error);
       Alert.alert('Error', 'Authentication failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -184,7 +183,7 @@ const SignIn = () => {
             borderBottomColor: '#e0e0e0',
             backgroundColor: '#f8f9fa'
           }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#333' }}>
+            <Text className='text-xl font-rubik-bold text-black-300'>
               Sign in with Google
             </Text>
             <TouchableOpacity
