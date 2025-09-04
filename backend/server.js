@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.route.js";
 import propertyRoutes from "./routes/property.route.js"
 import categoryRoutes from "./routes/category.route.js"
 import facilityRoutes from "./routes/facility.route.js"
+import paymentRoutes from "./routes/payment.route.js"
 import { connectDB } from "./lib/db.js";
 
 dotenv.config();
@@ -35,6 +36,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes)
 app.use("/api/categories", categoryRoutes)
 app.use("/api/facilities", facilityRoutes);
+app.use("/api/payment", paymentRoutes)
 
 // Health check
 app.get("/", (req, res) => {
