@@ -1,7 +1,7 @@
 import { Card, FeaturedCard } from "@/components/Cards";
 import Filters from "@/components/Filters";
 import { filterProperties, useProperties } from "@/components/PropertyManagement";
-import Search from "@/components/Search";
+import SearchInput from "@/components/SearchInput";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -99,12 +99,18 @@ export default function Index() {
               <Image source={icons.bell} className="size-6" />
             </View>
 
-            <Search />
+            <SearchInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search Properties..."
+            />
 
             <View className="my-5">
               <View className="flex flex-row items-center justify-between">
                 <Text className="text-xl font-rubik-bold text-black-300">Featured</Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => router.push("/explore")}
+                >
                   <Text className="text-base font-rubik-bold text-primary-300">See All</Text>
                 </TouchableOpacity>
               </View>
@@ -127,7 +133,9 @@ export default function Index() {
 
             <View className="flex mt-5 flex-row items-center justify-between">
               <Text className="text-xl font-rubik-bold text-black-300">Our Recommendation</Text>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push("/explore")}
+              >
                 <Text className="text-base font-rubik-bold text-primary-300">See All</Text>
               </TouchableOpacity>
             </View>
@@ -135,8 +143,7 @@ export default function Index() {
             <Filters /> 
           </View> 
           }
-        />
-        
+        /> 
     </SafeAreaView>
   );
 }

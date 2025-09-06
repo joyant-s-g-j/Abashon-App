@@ -1,8 +1,8 @@
 import { ExploreCard } from '@/components/Cards'
 import Filters from '@/components/Filters'
-import { filterProperties, Property, useProperties } from '@/components/PropertyManagement'
+import { filterProperties, useProperties } from '@/components/PropertyManagement'
 import Header from '@/components/ReusableComponent/Header'
-import Search from '@/components/Search'
+import SearchInput from '@/components/SearchInput'
 import icons from '@/constants/icons'
 import React, { useState } from 'react'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
@@ -31,9 +31,11 @@ const explore = () => {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View>
-
-            <Search />
-
+            <SearchInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search Properties..."
+            />
             <View className="flex mt-5 flex-row items-center justify-between">
               <Text className="text-xl font-rubik-bold text-black-300">Our Recommendation</Text>
               <TouchableOpacity>
