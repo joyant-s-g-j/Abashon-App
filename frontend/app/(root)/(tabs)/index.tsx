@@ -5,6 +5,7 @@ import Search from "@/components/Search";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -43,6 +44,16 @@ export default function Index() {
   }
 
   const formattedProperties = formatDataForColumns([...filteredProperties], 2)
+
+  const getGreeting = () => {
+    const currentHour = new Date().getHours()
+
+    if(currentHour >= 5 && currentHour < 12) return "Good Moring";
+    if(currentHour >= 12 && currentHour < 15) return "Good Noon";
+    if(currentHour >= 15 && currentHour < 17) return "Good Afternoon";
+    if(currentHour >= 17 && currentHour < 21) return "Good Evening";
+    return "Good Night"
+  }
   
   return (
     <SafeAreaView className="bg-white h-full">
@@ -67,20 +78,24 @@ export default function Index() {
         ListHeaderComponent={
           <View className="px-5">
             <View className="flex flex-row items-center justify-between mt-5">
-              <View className="flex flex-row items-center">
-                <Image
-                  source={
-                    user?.profilePic === "local" || !user?.profilePic
-                      ? images.avatar
-                      : { uri: user.profilePic }
-                  }
-                  className="size-12 rounded-full"
-                />
-                <View className="flex flex-col items-start ml-2 justify-center">
-                  <Text className="text-xs font-rubik text-black-100">Good Morning</Text>
-                  <Text className="text-base font-rubik-medium text-black-300">{user?.name}</Text>
+              <TouchableOpacity
+                onPress={() => router.push("/(root)/(tabs)/profile")}
+              >
+                <View className="flex flex-row items-center">
+                  <Image
+                    source={
+                      user?.profilePic === "local" || !user?.profilePic
+                        ? images.avatar
+                        : { uri: user.profilePic }
+                    }
+                    className="size-12 rounded-full"
+                  />
+                  <View className="flex flex-col items-start ml-2 justify-center">
+                    <Text className="text-xs font-rubik text-black-100">{getGreeting()}</Text>
+                    <Text className="text-base font-rubik-medium text-black-300">{user?.name}</Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
               <Image source={icons.bell} className="size-6" />
             </View>
 

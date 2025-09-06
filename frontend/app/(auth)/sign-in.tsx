@@ -197,7 +197,7 @@ const SignIn = () => {
                 borderRadius: 6
               }}
             >
-              <Text style={{ fontSize: 14, color: '#fff', fontWeight: '600' }}>
+              <Text className='font-rubik-semibold text-white'>
                 Cancel
               </Text>
             </TouchableOpacity>
