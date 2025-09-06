@@ -79,6 +79,5 @@ export const transformPropertyDataForApi = (propertyData: PropertyFormData) => {
         isFeatured: propertyData.isFeatured,
     };
 
-    console.log('Final transformed data:', transformed);
     return transformed;
 }

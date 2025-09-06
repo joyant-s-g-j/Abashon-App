@@ -1,6 +1,7 @@
 import { Card, FeaturedCard } from "@/components/Cards";
 import Filters from "@/components/Filters";
 import { filterProperties, useProperties } from "@/components/PropertyManagement";
+import { EmptyState } from "@/components/ReusableComponent";
 import SearchInput from "@/components/SearchInput";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
@@ -90,6 +91,18 @@ export default function Index() {
         contentContainerClassName="pb-32"
         columnWrapperClassName="flex gap-5 px-5"
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <EmptyState 
+            isEmpty={filteredProperties.length === 0}
+            icon='business-outline'
+            title='No Properties found'
+            message={
+                searchQuery || selectedFilter !== "All" 
+                  ? "Try adjusting you search"
+                  : "Add your first properties to get started"
+            }
+        />
+        }
         ListHeaderComponent={
           <View className="px-5">
             <View className="flex flex-row items-center justify-between mt-5">

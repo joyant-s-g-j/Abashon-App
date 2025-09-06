@@ -1,6 +1,7 @@
 import { ExploreCard } from '@/components/Cards'
 import Filters from '@/components/Filters'
 import { filterProperties, useProperties } from '@/components/PropertyManagement'
+import { EmptyState } from '@/components/ReusableComponent'
 import Header from '@/components/ReusableComponent/Header'
 import SearchInput from '@/components/SearchInput'
 import icons from '@/constants/icons'
@@ -44,6 +45,18 @@ const explore = () => {
         keyExtractor={(item) => item._id.toString()}
         contentContainerClassName="pb-32 px-4"
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <EmptyState 
+            isEmpty={filteredProperties.length === 0}
+            icon='business-outline'
+            title='No Properties found'
+            message={
+                searchQuery || selectedFilter !== "All" 
+                  ? "Try adjusting you search"
+                  : "Add your first properties to get started"
+            }
+        />
+        }
         ListHeaderComponent={
           <View>
             <SearchInput

@@ -17,7 +17,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   if (!isEmpty) return null; 
   return (
-    <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
+    <View className='bg-white rounded-xl p-8 items-center justify-center'>
         <Ionicons name={icon as keyof typeof Ionicons.glyphMap} size={40} color="#9CA3AF" />
         <Text className='text-black-300 font-rubik-medium mb-1'>{title}</Text>
         <Text className='text-black-200 font-rubik text-center'>{message}</Text>
