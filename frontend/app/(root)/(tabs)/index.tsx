@@ -5,14 +5,32 @@ import SearchInput from "@/components/SearchInput";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [user, setUser] = useState<{ name: string; profilePic: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState('')
+  const params = useLocalSearchParams<{filter?: string}>()
+  const selectedFilter = params.filter || "All"
+  const { properties } = useProperties()
+  const featuredProperties = properties.filter((item) => item.isFeatured)
+  const filteredProperties = useMemo(() => {
+    let filtered = filterProperties(properties, searchQuery)
+
+    if(selectedFilter !== "All") {
+      filtered = filtered.filter(property => {
+        if(typeof property.type === "object" && property.type.name) {
+          return property.type.name === selectedFilter
+        }
+        return false
+      })
+    }
+    return filtered
+  }, [properties, searchQuery, selectedFilter])
+
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -28,9 +46,6 @@ export default function Index() {
 
     loadUser();
   }, []);
-  const { properties } = useProperties()
-  const filteredProperties = filterProperties(properties, searchQuery)
-  const featuredProperties = properties.filter((item) => item.isFeatured)
 
   const formatDataForColumns = (data: any[], numColumns: number) => {
     const numberOfFullRows = Math.floor(data.length / numColumns)

@@ -17,6 +17,10 @@ const Filters = () => {
   const [error, setError] = useState<string | null>(null)
   
   useEffect(() => {
+    setSelectedCategory(params.filter || "All")
+  }, [params.filter])
+
+  useEffect(() => {
     fetchCategories()
   }, [])
 
