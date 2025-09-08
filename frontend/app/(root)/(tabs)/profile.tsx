@@ -46,7 +46,7 @@ const profile = () => {
     email: string;
     phone: string;
     role: string;
-    profilePic: string;
+    avatar: string;
   }>(null);
 
   useEffect(() => {
@@ -82,9 +82,9 @@ const profile = () => {
           <View className='flex flex-col items-center relative mt-5'>
             <Image
               source={
-                user?.profilePic === "local" || !user?.profilePic
+                user?.avatar === "local" || !user?.avatar
                   ? images.avatar
-                  : { uri: user.profilePic }
+                  : { uri: user.avatar }
               }
               className='size-44 relative rounded-full'
             />

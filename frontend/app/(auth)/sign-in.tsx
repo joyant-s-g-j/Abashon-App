@@ -77,7 +77,7 @@ const SignIn = () => {
           email: data.email,
           phone: data.phone || '', // Ensure phone field is included
           role: data.role || 'customer',
-          profilePic: data.profilePic || '',
+          avatar: data.avatar || '',
           authMethod: data.authMethod || 'google',
           googleId: data.googleId,
           isEmailVerified: data.isEmailVerified || true

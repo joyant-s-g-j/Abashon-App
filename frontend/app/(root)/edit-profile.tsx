@@ -15,7 +15,7 @@ interface User {
   email: string;
   phone: string;
   role: string;
-  profilePic: string;
+  avatar: string;
   authMethod: string;
 }
 
@@ -28,7 +28,7 @@ const EditProfile = () => {
     email: '',
     phone: '',
     role: '',
-    profilePic: ''
+    avatar: ''
   })
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const EditProfile = () => {
             email: parsedUser.email || '',
             phone: parsedUser.phone || '',
             role: parsedUser.role || '',
-            profilePic: parsedUser.profilePic || ''
+            avatar: parsedUser.avatar || ''
           })
         }
       } catch (error) {
@@ -97,7 +97,7 @@ const EditProfile = () => {
         const base64Image = `data:${asset.type === 'image' ? 'image/jpeg': asset.type};base64,${asset.base64}`
         setFormData(prev => ({
           ...prev,
-          profilePic: base64Image
+          avatar: base64Image
         }))
       }
     } catch (error) {
@@ -107,11 +107,11 @@ const EditProfile = () => {
   }
 
   const getCurrentProfileImage = () => {
-    if(formData.profilePic && formData.profilePic.startsWith('data:')) {
-      return { uri: formData.profilePic }
+    if(formData.avatar && formData.avatar.startsWith('data:')) {
+      return { uri: formData.avatar }
     }
-    if(formData.profilePic && formData.profilePic !== "local") {
-      return { uri: formData.profilePic }
+    if(formData.avatar && formData.avatar !== "local") {
+      return { uri: formData.avatar }
     }
     return images.avatar
   }
@@ -134,13 +134,13 @@ const EditProfile = () => {
         name: string;
         email: string;
         phone: string;
-        profilePic: string;
+        avatar: string;
         role?: string
       } = {
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
         phone: formData.phone.trim(),
-        profilePic: formData.profilePic
+        avatar: formData.avatar
       }
 
       if(currentUser?.role === 'admin') {
@@ -167,7 +167,7 @@ const EditProfile = () => {
           email: data.user.email || '',
           phone: data.user.phone || '',
           role: data.user.role || '',
-          profilePic: data.user.profilePic || ''
+          avatar: data.user.avatar || ''
         })
         Alert.alert(
           'Success',

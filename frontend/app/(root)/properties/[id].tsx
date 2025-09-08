@@ -1,4 +1,4 @@
-import { View, ScrollView, Alert } from 'react-native'
+import { View, ScrollView, Alert, ActivityIndicator, Text } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ImageSlider from '@/components/SinglePropertyPage/ImageSlider'
@@ -73,10 +73,17 @@ const PropertyPage = () => {
     property?.thumbnailImage,
     ...(property?.galleryImages || [])
   ].filter(Boolean)
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#3B82F6" />
+        <Text className="mt-3 text-base text-gray-600">Loading Property...</Text>
+      </SafeAreaView>
+    )
+  }
   
   return (
-    <>
-      <LoadingBox isLoading={loading} message="Loading Property..." />
       <SafeAreaView className='flex-1'>
         <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
           <ImageSlider images={galleryImages as any} />
@@ -87,7 +94,6 @@ const PropertyPage = () => {
         </ScrollView>
         <BookingTab property={property} price={property?.price} />
       </SafeAreaView>
-    </>
   )
 }
 

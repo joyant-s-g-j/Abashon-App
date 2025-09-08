@@ -13,7 +13,7 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
-  const [user, setUser] = useState<{ name: string; profilePic: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; avatar: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState('')
   const params = useLocalSearchParams<{filter?: string}>()
   const selectedFilter = params.filter || "All"
@@ -113,9 +113,9 @@ export default function Index() {
                 <View className="flex flex-row items-center">
                   <Image
                     source={
-                      user?.profilePic === "local" || !user?.profilePic
+                      user?.avatar === "local" || !user?.avatar
                         ? images.avatar
-                        : { uri: user.profilePic }
+                        : { uri: user.avatar }
                     }
                     className="size-12 rounded-full"
                   />

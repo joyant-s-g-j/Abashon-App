@@ -22,7 +22,7 @@ export const signup = async (req, res) => {
             password,
             authMethod: 'local',
             role: role || 'customer',
-            profilePic: ''
+            avatar: ''
         })
 
         if(newUser) {
@@ -39,7 +39,7 @@ export const signup = async (req, res) => {
                     email: newUser.email,
                     phone: newUser.phone,
                     role: newUser.role,
-                    profilePic: newUser.profilePic,
+                    avatar: newUser.avatar,
                     authMethod: newUser.authMethod
                 }
             })
@@ -91,7 +91,7 @@ export const login = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 role: user.role,
-                profilePic: user.profilePic,
+                avatar: user.avatar,
                 authMethod: user.authMethod
             }
         });
@@ -118,7 +118,7 @@ export const checkAuth = (req, res) => {
             name: req.user.name,
             email: req.user.email,
             phone: req.user.phone,
-            profilePic: req.user.profilePic,
+            avatar: req.user.avatar,
             authMethod: req.user.authMethod,
             googleId: req.user.googleId,
             isEmailVerified: req.user.isEmailVerified
@@ -145,7 +145,7 @@ export const getProfile = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 role: user.role,
-                profilePic: user.profilePic,
+                avatar: user.avatar,
                 authMethod: user.authMethod
             }
         });
@@ -184,7 +184,7 @@ const deleteImageFromCloudinary = async (imageUrl) => {
 export const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { name, email, phone, role, profilePic } = req.body;
+        const { name, email, phone, role, avatar } = req.body;
 
         if(!name || !email || !phone) {
             return res.status(400).json({ success: false, message: "Name, email and phone are required" })
@@ -223,24 +223,24 @@ export const updateProfile = async (req, res) => {
             user.role = role
         }
 
-        if(profilePic) {
-            if(profilePic.startsWith('data:')) {
+        if(avatar) {
+            if(avatar.startsWith('data:')) {
                 try {
-                    const newImageUrl = await uploadImageToCloudinary(profilePic)
+                    const newImageUrl = await uploadImageToCloudinary(avatar)
 
-                    if(user.profilePic && !user.profilePic.includes('googleusercontent.com')) {
-                        await deleteImageFromCloudinary(user.profilePic)
+                    if(user.avatar && !user.avatar.includes('googleusercontent.com')) {
+                        await deleteImageFromCloudinary(user.avatar)
                     }
-                    user.profilePic = newImageUrl;
+                    user.avatar = newImageUrl;
                 } catch (uploadError) {
                     console.log("Image upload error", uploadError);
                     return res.status(500).json({ success: false, message: "Failed to upload profile picture" })
                 }
-            } else if (profilePic !== user.profilePic) {
-                if(user.profilePic && !user.profilePic.includes('googleusercontent.com')) {
-                    await deleteImageFromCloudinary(user.profilePic)
+            } else if (avatar !== user.avatar) {
+                if(user.avatar && !user.avatar.includes('googleusercontent.com')) {
+                    await deleteImageFromCloudinary(user.avatar)
                 }
-                user.profilePic = profilePic;
+                user.avatar = avatar;
             }
         }
         await user.save();
@@ -254,7 +254,7 @@ export const updateProfile = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 role: user.role,
-                profilePic: user.profilePic,
+                avatar: user.avatar,
                 authMethod: user.authMethod,
             }
         })

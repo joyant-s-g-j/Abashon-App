@@ -54,19 +54,20 @@ const PropertInfo: React.FC<PropertInfoProps> = ({ property }) => {
 
   const getOwnerInfo = () => {
     if (!property?.owner) {
-      return { name: 'Property Owner', email: '', phone: '', _id: '' };
+      return { name: 'Property Owner', avatar: '', email: '', phone: '', _id: '' };
     }
 
     if (typeof property.owner === 'object') {
       return {
         name: property.owner.name || 'Property Owner',
+        avatar: property.owner.avatar || '',
         email: property.owner.email || '',
         phone: property.owner.phone || '',
         _id: property.owner._id || ''
       };
     }
 
-    return { name: 'Property Owner', email: '', phone: '', _id: '' };
+    return { name: 'Property Owner', avatar: '', email: '', phone: '', _id: '' };
   };
   const ownerInfo = getOwnerInfo();
 
@@ -114,7 +115,10 @@ const PropertInfo: React.FC<PropertInfoProps> = ({ property }) => {
         <Heading title='Agent' />
         <View className='flex-row justify-between items-center'>
           <View className='flex-row gap-3 items-center'>
-            <Image source={images.avatar} className='size-14 rounded-full' />
+            <Image 
+              source={{ uri: ownerInfo.avatar }} 
+              className='size-14 rounded-full'
+            />
             <View className='flex-col'>
               <Text className='text-lg font-rubik-semibold text-black-300'>
                 {ownerInfo.name}

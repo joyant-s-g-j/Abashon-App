@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         sparse: true
     },
-    profilePic: {
+    avatar: {
         type: String,
         // enum: ['local', 'google'],
         default: ''

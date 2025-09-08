@@ -46,7 +46,7 @@ export const googleAuth = async (req, res) => {
             }
 
             user.name = name;
-            user.profilePic = picture || user.profilePic;
+            user.avatar = picture || user.avatar;
             user.isEmailVerified = true;
             await user.save();
         } else {
@@ -54,7 +54,7 @@ export const googleAuth = async (req, res) => {
                 googleId,
                 email,
                 name,
-                profilePic: picture || "",
+                avatar: picture || "",
                 authMethod: 'google',
                 isEmailVerified: true
             });
@@ -67,7 +67,7 @@ export const googleAuth = async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
-            profilePic: user.profilePic,
+            avatar: user.avatar,
             authMethod: user.authMethod,
             googleId: user.googleId,
             isEmailVerified: user.isEmailVerified,
@@ -121,7 +121,7 @@ export const googleAuthWithAccessToken = async (req, res) => {
             }
             user.name = name; 
             if (picture && !picture.includes('googleusercontent.com')) {
-                user.profilePic = picture;
+                user.avatar = picture;
             }
             user.isEmailVerified = verified_email || true;
             await user.save();
@@ -131,7 +131,7 @@ export const googleAuthWithAccessToken = async (req, res) => {
                 email,
                 name,
                 phone: null,
-                profilePic: (picture && !picture.includes('googleusercontent.com')) ? picture : "",
+                avatar: (picture && !picture.includes('googleusercontent.com')) ? picture : "",
                 authMethod: 'google',
                 isEmailVerified: verified_email || true
             });
@@ -145,7 +145,7 @@ export const googleAuthWithAccessToken = async (req, res) => {
             name: user.name,
             email: user.email,
             phone: user.phone || '',
-            profilePic: picture || user.profilePic,
+            avatar: picture || user.avatar,
             authMethod: user.authMethod,
             googleId: user.googleId,
             isEmailVerified: user.isEmailVerified,
@@ -191,7 +191,7 @@ export const googleAuthWithUserData = async (req, res) => {
             
             // Update user info from Google
             user.name = name;
-            user.profilePic = picture || user.profilePic;
+            user.avatar = picture || user.avatar;
             user.isEmailVerified = isEmailVerified || true;
             await user.save();
         } else {
@@ -200,7 +200,7 @@ export const googleAuthWithUserData = async (req, res) => {
                 googleId,
                 email,
                 name,
-                profilePic: picture || "",
+                avatar: picture || "",
                 authMethod: 'google',
                 isEmailVerified: isEmailVerified || true
             });
@@ -215,7 +215,7 @@ export const googleAuthWithUserData = async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
-            profilePic: user.profilePic,
+            avatar: user.avatar,
             authMethod: user.authMethod,
             googleId: user.googleId,
             isEmailVerified: user.isEmailVerified,
@@ -291,7 +291,7 @@ export const googleAuthWithCode = async (req, res) => {
             }
             user.name = name;
             if (picture && !picture.includes('googleusercontent.com')) {
-                user.profilePic = picture;
+                user.avatar = picture;
             }
             user.isEmailVerified = verified_email || true;
             await user.save();
@@ -301,7 +301,7 @@ export const googleAuthWithCode = async (req, res) => {
                 email,
                 name,
                 phone: '', // Explicitly set empty string
-                profilePic: (picture && !picture.includes('googleusercontent.com')) ? picture : "",
+                avatar: (picture && !picture.includes('googleusercontent.com')) ? picture : "",
                 authMethod: 'google',
                 isEmailVerified: verified_email || true
             });
@@ -319,7 +319,7 @@ export const googleAuthWithCode = async (req, res) => {
             name: user.name,
             email: user.email,
             phone: user.phone || '',
-            profilePic: picture || user.profilePic,
+            avatar: picture || user.avatar,
             authMethod: user.authMethod,
             googleId: user.googleId,
             isEmailVerified: user.isEmailVerified,
@@ -367,8 +367,7 @@ export const updatePhoneNumber = async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                phone: user.phone,
-                profilePic: user.profilePic,
+                avatar: user.avatar,
                 authMethod: user.authMethod,
                 role: user.role
             }

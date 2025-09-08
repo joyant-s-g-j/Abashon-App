@@ -84,7 +84,7 @@ export const getAllProperties = async (req, res) => {
 
         const properties = await Property.find(query)
             .populate('type', 'name')
-            .populate('owner', 'name email')
+            .populate('owner', 'name email phone avatar')
             .populate('facilities', 'name icon')
             .sort(sort)
             .skip(skip)
@@ -120,7 +120,7 @@ export const getPropertyById = async (req, res) => {
 
         const property = await Property.findById(id)
             .populate('type', 'name description')
-            .populate('owner', 'name email phone')
+            .populate('owner', 'name email phone avatar')
             .populate('facilities', 'name icon')
             .populate('ratings.user', 'name');
         
@@ -223,7 +223,7 @@ export const createProperty = async (req, res) => {
 
         const populatedProperty = await Property.findById(property._id)
             .populate('type', 'name')
-            .populate('owner', 'name email')
+            .populate('owner', 'name email phone avatar')
             .populate('facilities', 'name icon');
         
         res.status(201).json({ success: true, data: populatedProperty, message: "Property created successfully"})
@@ -323,8 +323,8 @@ export const updateProperty = async (req, res) => {
 
         const updatedProperty = await Property.findByIdAndUpdate( id, updateData, { new: true, runValidators: true })
             .populate('type', 'name')
-            .populate('owner', 'name email')
-            .populate('facilities', 'name');
+            .populate('owner', 'name email phone avatar')
+            .populate('facilities', 'name icon');
         
         res.status(200).json({ success: true, data: updatedProperty, message: "Property updated successfully"})
     } catch (error) {
