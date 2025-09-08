@@ -79,7 +79,6 @@ const login = () => {
       }
       router.replace("/(root)/(tabs)");
     } catch (error) {
-      console.error('Login error:', error);
       
       if (axios.isAxiosError(error)) {
         if (error.code === 'ECONNABORTED') {
