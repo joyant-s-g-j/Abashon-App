@@ -5,6 +5,8 @@ import IconText from './IconText';
 import images from '@/constants/images';
 import Heading from './Heading';
 import { Property } from '../PropertyManagement';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 interface PropertInfoProps {
   property?: Property | null;
@@ -52,7 +54,7 @@ const PropertInfo: React.FC<PropertInfoProps> = ({ property }) => {
 
   const getOwnerInfo = () => {
     if (!property?.owner) {
-      return { name: 'Property Owner', email: '', phone: '' };
+      return { name: 'Property Owner', email: '', phone: '', _id: '' };
     }
 
     if (typeof property.owner === 'object') {
@@ -60,12 +62,29 @@ const PropertInfo: React.FC<PropertInfoProps> = ({ property }) => {
         name: property.owner.name || 'Property Owner',
         email: property.owner.email || '',
         phone: property.owner.phone || '',
+        _id: property.owner._id || ''
       };
     }
 
-    return { name: 'Property Owner', email: '', phone: '' };
+    return { name: 'Property Owner', email: '', phone: '', _id: '' };
   };
   const ownerInfo = getOwnerInfo();
+
+  const handleChatWithOwner = () => {
+    if(property?.owner && typeof property.owner === 'object') {
+      const ownerUser = {
+        _id: property.owner._id,
+        name: property.owner.name,
+        email: property.owner.email,
+        avatar: property.owner.avatar
+      };
+
+      router.push({
+        pathname: '/(root)/messages/chat',
+        params: { user: JSON.stringify(ownerUser)}
+      })
+    }
+  }
 
   return (
     <View>
@@ -105,16 +124,16 @@ const PropertInfo: React.FC<PropertInfoProps> = ({ property }) => {
           </View>
           <View className='flex-row gap-3 items-center'>
             <TouchableOpacity
-              disabled={!ownerInfo.email}
-              onPress={() => Linking.openURL(`mailto:${ownerInfo.email}`)}
+              disabled={!ownerInfo._id}
+              onPress={handleChatWithOwner}
             >
-              <Image source={icons.email} className='size-8' />
+              <Ionicons name="chatbubble-outline" size={24} color="#3B82F6" />
             </TouchableOpacity>
             <TouchableOpacity
               disabled={!ownerInfo.phone}
               onPress={() => Linking.openURL(`tel:${ownerInfo.phone}`)}
             >
-              <Image source={icons.phone} className='size-8' />
+              <Ionicons name="call-outline" size={24} color="#3B82F6" />
             </TouchableOpacity>
           </View>
         </View>
