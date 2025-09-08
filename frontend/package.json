@@ -20,6 +20,7 @@
     "@stripe/stripe-react-native": "^0.51.0",
     "axios": "^1.10.0",
     "expo": "53.0.22",
+    "expo-av": "^15.1.7",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
     "expo-file-system": "~18.1.11",
@@ -40,8 +41,10 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.5",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-gifted-chat": "^2.8.1",
     "react-native-image-viewing": "^0.2.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
+    "react-native-keyboard-controller": "^1.18.6",
     "react-native-maps": "1.20.1",
     "react-native-reanimated": "~3.17.4",
     "react-native-reanimated-carousel": "^4.0.2",
@@ -49,6 +52,7 @@
     "react-native-screens": "~4.11.1",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
+    "socket.io-client": "^4.8.1",
     "use-debounce": "^10.0.5"
   },
   "devDependencies": {

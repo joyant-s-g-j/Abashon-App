@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/ReusableComponent";
 import SearchInput from "@/components/SearchInput";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -124,7 +125,14 @@ export default function Index() {
                   </View>
                 </View>
               </TouchableOpacity>
-              <Image source={icons.bell} className="size-6" />
+              <View className="flex-row gap-2">
+                <TouchableOpacity
+                  onPress={() => router.push("/(root)/messages/users-list")}
+                >
+                <Ionicons  name="chatbubble-outline" size={24} />
+              </TouchableOpacity>
+              <Ionicons  name="notifications-outline" size={24}/>
+              </View>
             </View>
 
             <SearchInput

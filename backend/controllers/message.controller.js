@@ -1,5 +1,5 @@
 import cloudinary from "../lib/cloudinary.js"
-import { getReceiverSocketId } from "../lib/socket.js"
+import { getReceiverSocketId, io } from "../lib/socket.js"
 import Message from "../models/message.model.js"
 import User from "../models/user.model.js"
 
@@ -11,7 +11,6 @@ const uploadToCloudinary = async(imageData, folder = 'messages', type = "image")
             transformation: 
                 type === "image" ? [{width: 800, height: 600, crop: 'fill', quality: 'auto'}]
                 : undefined
-
         })
         return result.secure_url;
     } catch (error) {
@@ -76,11 +75,14 @@ export const sendMessage = async (req, res) => {
             senderId,
             receiverId,
             text,
-            image: imageUrl,
-            video: videoUrl
+            image: imageUrl ? [imageUrl] : [],
+            video: videoUrl ? [videoUrl] : []
         })
 
         await newMessage.save()
+
+        await newMessage.populate("senderId", "name profilePicture")
+        await newMessage.populate("receiverId", "name profilePicture")
 
         const receiverSocketId = getReceiverSocketId(receiverId)
         if(receiverSocketId) {
