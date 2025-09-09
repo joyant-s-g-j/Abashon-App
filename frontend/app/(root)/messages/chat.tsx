@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, FlatList, Alert, Image, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, TextInput, Modal } from 'react-native'
+import { View, Text, Dimensions, FlatList, Alert, Image, TouchableOpacity, ActivityIndicator, TextInput, Modal, Keyboard } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router, useLocalSearchParams } from 'expo-router';
@@ -8,7 +8,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { Video } from 'expo-av';
 import { pickFromCamera, pickFromGallery } from '@/utils/chatUtils';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const { width, height } = Dimensions.get('window')
 
@@ -36,7 +35,7 @@ const ChatScreen: React.FC = () => {
   const [imageModalVisible, setImageModalVisible] = useState<boolean>(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const flatListRef = useRef<FlatList>(null)
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
   const { socket, onlineUsers } = useSocket()
 
   useEffect(() => {
@@ -44,10 +43,18 @@ const ChatScreen: React.FC = () => {
         initializeChat();
         setupSocketListeners()
     }
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
+      setKeyboardHeight(e.endCoordinates.height)
+    })
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0)
+    })
     return () => {
         if(socket) {
             socket.off('newMessage')
         }
+        keyboardDidShowListener?.remove();
+        keyboardDidHideListener?.remove();
     }
   }, [socket, selectedUser])
 
@@ -269,7 +276,8 @@ const ChatScreen: React.FC = () => {
   }
 
   return (
-    <SafeAreaView className=' bg-gray-50 h-full'>
+    <SafeAreaView className='bg-gray-50 flex-1'>
+      {/* header section */}
       <View className='flex-row items-center justify-between p-4 bg-white border-b border-gray-200'>
         <View className='flex-row items-center flex-1'>
           <TouchableOpacity 
@@ -304,61 +312,55 @@ const ChatScreen: React.FC = () => {
         </View>
       </View>
 
-      <FlatList 
-        ref={flatListRef}
-        data={messages}
-        renderItem={renderMessage as any}
-        keyExtractor={(item) => item._id}
-        inverted
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: 10, flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-      />
-
-      <KeyboardAwareScrollView
-        contentContainerStyle={{ flex: 1 }}
-        keyboardShouldPersistTaps="handled"
-        enableOnAndroid
-        enableAutomaticScroll
-        extraScrollHeight={90}
-        scrollEnabled={false}
-        className='bg-green-800'
-      >
-        {/* Input bar */}
-        <View className='flex-row items-center p-4 bg-white border-t border-gray-200'>
+      <View className='flex-1' style={{ marginBottom: keyboardHeight }}>
+        <FlatList 
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage as any}
+          keyExtractor={(item) => item._id}
+          inverted
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingTop: 10, flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          className='flex-1 bg-gray-50'
+        />
+        <View className="flex-row items-center p-4 border-t border-gray-200">
           <TouchableOpacity
             onPress={pickFromGallery}
-            className='bg-blue-500 rounded-full p-2 mr-2'
+            className="bg-blue-500 rounded-full p-2 mr-2"
             disabled={sending}
           >
-            <Ionicons name='image' size={22} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={pickFromCamera}
-            className='bg-blue-500 rounded-full p-2 mr-2'
-            disabled={sending}
-          >
-            <Ionicons name='camera' size={22} color="white" />
+            <Ionicons name="image" size={22} color="white" />
           </TouchableOpacity>
 
-          <TextInput 
+          <TouchableOpacity
+            onPress={pickFromCamera}
+            className="bg-blue-500 rounded-full p-2 mr-2"
+            disabled={sending}
+          >
+            <Ionicons name="camera" size={22} color="white" />
+          </TouchableOpacity>
+
+          <TextInput
             value={inputText}
             onChangeText={setInputText}
-            placeholder='Type a message...'
-            className='flex-1 bg-gray-100 rounded-full px-4 py-3 mr-3'
+            placeholder="Type a message..."
+            className="flex-1 bg-gray-100 rounded-full px-4 py-3 mr-3"
             multiline
             maxLength={1000}
             editable={!sending}
           />
+
           <TouchableOpacity
             onPress={sendMessage}
-            className='bg-blue-500 rounded-full p-3'
+            className="bg-blue-500 rounded-full p-3"
             disabled={!inputText.trim()}
           >
-            <Ionicons name='send' size={16} color="white" className='-rotate-45' />
+            <Ionicons name="send" size={16} color="white" />
           </TouchableOpacity>
         </View>
-      </KeyboardAwareScrollView>
+      </View>
+
 
       {/* Image Preview Modal */}
       <Modal
