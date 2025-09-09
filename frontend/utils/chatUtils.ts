@@ -101,35 +101,77 @@ const compressVideo = async (
     }
 }
 
-const openCamera = async(resolve: (value: MediaAsset | null) => void): Promise<void> => {
+const openCamera = async (resolve: (value: MediaAsset | null) => void): Promise<void> => {
     try {
         const { status } = await ImagePicker.requestCameraPermissionsAsync()
-        if(status !== 'granted') {
-            Alert.alert('Premission needed', 'Camera permission is required')
+        if (status !== 'granted') {
+            Alert.alert('Permission needed', 'Camera permission is required')
             resolve(null)
             return
         }
 
-        const result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1.0
-        })
+        // Ask user what they want to capture
+        Alert.alert(
+            'Camera',
+            'What do you want to capture?',
+            [
+                {
+                    text: 'Photo',
+                    onPress: async () => {
+                        try {
+                            const result = await ImagePicker.launchCameraAsync({
+                                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                                allowsEditing: true,
+                                aspect: [4, 3],
+                                quality: 1.0
+                            })
 
-        if(!result.canceled && result.assets && result.assets.length > 0) {
-            const asset = result.assets[0]
+                            if (!result.canceled && result.assets && result.assets.length > 0) {
+                                const asset = result.assets[0]
+                                const compressedImage = await compressImage(asset.uri, {
+                                    maxWidth: 1920,
+                                    maxHeight: 1080,
+                                    quality: 0.85,
+                                });
+                                resolve(compressedImage)
+                            } else {
+                                resolve(null)
+                            }
+                        } catch (error) {
+                            console.error('Camera photo error:', error);
+                            resolve(null);
+                        }
+                    }
+                },
+                {
+                    text: 'Video',
+                    onPress: async () => {
+                        try {
+                            const result = await ImagePicker.launchCameraAsync({
+                                mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+                                allowsEditing: true,
+                                quality: ImagePicker.UIImagePickerControllerQualityType.High,
+                                videoMaxDuration: 60
+                            })
 
-            const compressedImage = await compressImage(asset.uri, {
-                maxWidth: 1920,
-                maxHeight: 1080,
-                quality: 0.85,
-            });
-
-            resolve(compressedImage)
-        } else {
-            resolve(null)
-        }
+                            if (!result.canceled && result.assets && result.assets.length > 0) {
+                                const asset = result.assets[0]
+                                const compressedVideo = await compressVideo(asset.uri, {
+                                    quality: 0.8
+                                })
+                                resolve(compressedVideo)
+                            } else {
+                                resolve(null)
+                            }
+                        } catch (error) {
+                            console.error('Camera video error:', error);
+                            resolve(null);
+                        }
+                    }
+                },
+                { text: 'Cancel', style: 'cancel', onPress: () => resolve(null) }
+            ]
+        )
     } catch (error) {
         console.error('Camera error:', error);
         resolve(null);
@@ -147,21 +189,31 @@ const openGallery = async (resolve: (value: MediaAsset | null) => void): Promise
         }
 
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1.0,
+            videoMaxDuration: 60
         })
 
         if(!result.canceled && result.assets && result.assets.length > 0) {
             const asset = result.assets[0]
 
-            const compressedImage = await compressImage(asset.uri, {
-                maxWidth: 1920,
-                maxHeight: 1080,
-                quality: 0.85,
-            })
-            resolve(compressedImage)
+            if(asset.type === 'image') {
+                const compressedImage = await compressImage(asset.uri, {
+                    maxWidth: 1920,
+                    maxHeight: 1080,
+                    quality: 0.85,
+                })
+                resolve(compressedImage)
+            } else if (asset.type === 'video') {
+                const compressedVideo = await compressVideo(asset.uri, {
+                    quality: 0.8
+                })
+                resolve(compressedVideo)
+            } else {
+                resolve(null)
+            }
         } else {
             resolve(null)
         }
@@ -171,98 +223,18 @@ const openGallery = async (resolve: (value: MediaAsset | null) => void): Promise
     }
 }
 
-const recordVideo = async (resolve: (value: MediaAsset | null) => void): Promise<void> => {
-    try {
-        const { status } = await ImagePicker.requestCameraPermissionsAsync()
-          if (status !== 'granted') {
-            Alert.alert('Permission needed', 'Camera permission is required');
-            resolve(null);
-            return;
-        }
-
-        const result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-            allowsEditing: true,
-            quality: ImagePicker.UIImagePickerControllerQualityType.High,
-            videoMaxDuration: 60
-        })
-
-        if(!result.canceled && result.assets && result.assets.length > 0) {
-            const asset = result.assets[0]
-
-            const compressedVideo = await compressVideo(asset.uri, {
-                quality: 0.8
-            })
-
-            resolve(compressedVideo)
-        } else {
-            resolve(null)
-        }
-    } catch (error) {
-        console.error('Video recording error:', error);
-        resolve(null);
-    }
-}
-
-const selectVideo = async (resolve: (value: MediaAsset | null) => void): Promise<void> => {
-    try {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-            Alert.alert('Permission needed', 'Media library permission is required');
-            resolve(null);
-            return;
-        }
-
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-            allowsEditing: true,
-            quality: ImagePicker.UIImagePickerControllerQualityType.High,
-            videoMaxDuration: 60,
-        })
-
-        if(!result.canceled && result.assets && result.assets.length > 0) {
-            const asset = result.assets[0]
-
-            const compressedVideo = await compressVideo(asset.uri, {
-                quality: 0.8
-            })
-            resolve(compressedVideo)
-        } else {
-            resolve (null)
-        }
-    } catch (error) {
-        console.error('Video selection error:', error);
-        resolve(null);
-    }
-}
-
-export const pickImage = (): Promise<MediaAsset | null> => {
+export const pickFromCamera = (): Promise<MediaAsset | null> => {
     return new Promise((resolve) => {
-        Alert.alert(
-            'Select Image',
-            'Choose from where you want to select an image',
-            [
-                { text: 'Camera', onPress: () => openCamera(resolve)},
-                { text: 'Gallery', onPress: () => openGallery(resolve)},
-                { text: 'Cancel', style: 'cancel', onPress: () => resolve(null)}
-            ]
-        )
+        openCamera(resolve);
     })
 }
 
-export const pickVideo = (): Promise<MediaAsset | null> => {
+export const pickFromGallery = (): Promise<MediaAsset | null> => {
     return new Promise((resolve) => {
-        Alert.alert(
-            'Select Video',
-            'Choose from where you want to select a video',
-            [
-                { text: 'Camera', onPress: () => recordVideo(resolve) },
-                { text: 'Gallery', onPress: () => selectVideo(resolve) },
-                { text: 'Cancel', style: 'cancel', onPress: () => resolve(null)}
-            ]
-        )
+        openGallery(resolve);
     })
 }
+
 
 export const formatMessagesForGiftedChat = (
     message: Message[],

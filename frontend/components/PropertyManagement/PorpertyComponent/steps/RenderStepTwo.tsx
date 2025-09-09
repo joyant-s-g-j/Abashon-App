@@ -1,5 +1,5 @@
 import { ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React from 'react'
 import { PropertyFormData, User } from '../../types/property'
 import { InputField, LabeledInput, LabelText } from '@/components/ReusableComponent';
 import CustomDropdown from '@/components/CustomDropdown';
