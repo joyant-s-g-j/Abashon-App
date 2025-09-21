@@ -8,8 +8,9 @@ import categoryRoutes from "./routes/category.route.js"
 import facilityRoutes from "./routes/facility.route.js"
 import paymentRoutes from "./routes/payment.route.js"
 import messageRoutes from "./routes/message.route.js"
+import callRoutes from "./routes/call.route.js"
 import { connectDB } from "./lib/db.js";
-import { app, server } from "./lib/socket.js";
+import { app, getActiveCallsCount, server } from "./lib/socket.js";
 
 dotenv.config();
 
@@ -40,11 +41,19 @@ app.use("/api/categories", categoryRoutes)
 app.use("/api/facilities", facilityRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/message", messageRoutes);
+app.use("/api/call", callRoutes)
 
 // Health check
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
+
+app.get("/api/call-stats", (req, res) => {
+  res.json({
+    activeCallsCount: getActiveCallsCount(),
+    timestamp: new Date().toISOString()
+  })
+})
 
 // Error handling middleware
 app.use((err, req, res, next) => {
