@@ -81,3 +81,34 @@ export const saveCallRecord = async(req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const updateCallStatus = async (req, res) => {
+    try {
+        const { callId } = req.params;
+        const { status, duration, endedAt } = req.body;
+        const userId = req.user._id;
+
+        const call = await Call.findOne({
+            callId,
+            $or: [
+                { callerId: userId },
+                { receiverId: userId }
+            ]
+        });
+
+        if(!call) {
+            return res.status(404).json({ message: "Call record not found" })
+        }
+
+        call.status = status || call.status;
+        call.duration = duration || call.duration;
+        call.endedAt = endedAt ? new Date(endedAt) : call.endedAt
+
+        await call.save();
+
+        res.status(200).json({ message: "Call status updated successfully", call })
+    } catch (error) {
+        console.error("Error in updateCallStatus:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
