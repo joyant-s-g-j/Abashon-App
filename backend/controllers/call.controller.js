@@ -35,3 +35,18 @@ export const getCallHistory = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const getActiveCall = async (req, res) => {
+    try {
+        const userId = req.user._id.toString()
+
+        if(isUserInCall(userId)) {
+            res.status(200).json({ hasActiveCall: true })
+        } else {
+            res.status(200).json({ hasActiveCall: false });
+        }
+    } catch (error) {
+        console.error("Error in getActiveCall:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
