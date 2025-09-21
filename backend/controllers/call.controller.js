@@ -50,3 +50,34 @@ export const getActiveCall = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const saveCallRecord = async(req, res) => {
+    try {
+        const {
+            callId,
+            receiverId,
+            duration = 0,
+            status = 'completed',
+            callType = 'audio'
+        } = req.body
+
+        const callerId = req.user._id
+
+        const callRecord = new Call({
+            callId,
+            callerId,
+            receiverId,
+            duration,
+            status,
+            callType,
+            createdAt: new Date()
+        })
+
+        await callRecord.save()
+
+        res.status(201).json({ message: "Call record saved successfully", call: callRecord })
+    } catch (error) {
+        console.error("Error in saveCallRecord:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
