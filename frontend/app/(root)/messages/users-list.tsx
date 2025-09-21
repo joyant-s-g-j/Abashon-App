@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Header } from '@/components/ReusableComponent'
+import { Header, LoadingBox } from '@/components/ReusableComponent'
 import icons from '@/constants/icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { chatApi, User } from '@/services/chatApi'
@@ -129,20 +129,33 @@ const UsersList = () => {
     return messageDate.toLocaleDateString()
   }
 
+  const getAvatarInitials = (name: string) => {
+    if(!name) return '?';
+    const words = name.split(' ').filter(Boolean)
+    if(words.length === 1) return words[0][0].toUpperCase()
+    return (words[0][0] + words[1][0]).toUpperCase()
+  }
+
   const renderUser: ListRenderItem<UserWithLastMessage> = ({ item }) => {
     const isOnline = onlineUsers.includes(item._id)
     const isLastMessageFromCurrentUser = item.lastMessage?.senderId === currentUserId;
-
+    const avatarInitial = getAvatarInitials(item.name)
     return (
       <TouchableOpacity
         className="flex-row items-center bg-white p-4 mx-3 my-1 rounded-xl shadow-sm"
         onPress={() => navigateToChat(item)}
       >
         <View className="relative">
-          <Image 
+          {item.avatar ? (
+            <Image 
               source={{ uri: item.avatar }} 
               className="w-12 h-12 rounded-full"
             />
+          ): (
+            <View className='size-12 rounded-full bg-gray-300 justify-center items-center'>
+              <Text className='text-black-300 text-lg font-semibold'>{avatarInitial}</Text>
+            </View>
+          )}
           {isOnline && (
             <View className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
           )}
@@ -183,10 +196,7 @@ const UsersList = () => {
     return (
       <SafeAreaView className='bg-white h-full'>
         <Header title='Talk with your connection' backRoute='/' rightIcon={icons.bell} />
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text className="mt-3 text-base text-gray-600">Loading chats...</Text>
-        </View>
+        <LoadingBox text='Loading users...' />
       </SafeAreaView>
     );
   }

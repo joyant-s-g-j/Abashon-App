@@ -1,15 +1,13 @@
-import { View, Text, Dimensions, FlatList, Alert, Image, TouchableOpacity, ActivityIndicator, TextInput, Modal, Keyboard } from 'react-native'
+import { View, Text, FlatList, Alert, Keyboard } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router, useLocalSearchParams } from 'expo-router';
 import { chatApi, Message, User } from '@/services/chatApi';
 import { useSocket } from '@/contexts/SocketContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
-import { Video } from 'expo-av';
-import { pickFromCamera, pickFromGallery } from '@/utils/chatUtils';
-
-const { width, height } = Dimensions.get('window')
+import { MediaAsset, pickFromCamera, pickFromGallery } from '@/utils/chatUtils';
+import { LoadingBox } from '@/components/ReusableComponent';
+import { ChatHeader, ChatList, ImageModal, ImagePreview, MessageInput } from '@/components/Messages';
 
 interface ChatMessage {
     _id: string;
@@ -23,7 +21,6 @@ interface ChatMessage {
     isMe: boolean;
 }
 
-
 const ChatScreen: React.FC = () => {
   const params = useLocalSearchParams()
   const selectedUser: User = params.user ? JSON.parse(params.user as string): null;
@@ -34,6 +31,7 @@ const ChatScreen: React.FC = () => {
   const [sending, setSending] = useState<boolean>(false)
   const [imageModalVisible, setImageModalVisible] = useState<boolean>(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedMediaAsset, setSelectedMediaAsset] = useState<MediaAsset | null>(null)
   const flatListRef = useRef<FlatList>(null)
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const { socket, onlineUsers } = useSocket()
@@ -126,18 +124,9 @@ const ChatScreen: React.FC = () => {
                 ? newMessage.receiverId
                 : newMessage.receiverId._id
             
-            if(senderId === selectedUser._id || receiverId === selectedUser._id) {
-              const isMe = senderId === currentUser?._id
-              let senderName: string;
-              let senderAvatar: string | undefined;
-
-              if(isMe) {
-                senderName = currentUser?.name || 'You';
-                senderAvatar = currentUser?.avatar
-              } else {
-                senderName = selectedUser?.name || 'User';
-                senderAvatar = selectedUser?.avatar
-              }
+            if(senderId === selectedUser._id || receiverId === selectedUser?._id) {
+              let senderName: string = selectedUser?.name || 'User';
+              let senderAvatar: string | undefined = selectedUser?.avatar;
 
               if(typeof newMessage.senderId === 'object' && newMessage.senderId) {
                 senderName = newMessage.senderId.name;
@@ -153,110 +142,114 @@ const ChatScreen: React.FC = () => {
                 senderAvatar,
                 image: newMessage.image && newMessage.image.length > 0 ? newMessage.image[0] : undefined,
                 video: newMessage.video && newMessage.video.length > 0 ? newMessage.video[0] : undefined,
-                isMe: senderId === currentUser?._id
+                isMe: false
               }
-              setMessages(prev => [formattedMessage, ...prev])
+              setMessages(prev => {
+                const messageExists = prev.some(msg => msg._id === newMessage._id)
+                if(messageExists) {
+                  return prev;
+                }
+                return [formattedMessage, ...prev]
+              })
             }
         })
     }
   }
 
+  const handlePickFromGallery = async (): Promise<void> => {
+    try {
+      const result: MediaAsset | null = await pickFromGallery()
+
+      if(result && result.uri) {
+        setSelectedMediaAsset(result as any)
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to pick image from gallery');
+    }
+  }
+
+  const handlePickFromCamera = async (): Promise<void> => {
+    try {
+      const result: MediaAsset | null = await pickFromCamera()
+
+      if(result && result.uri) {
+        setSelectedMediaAsset(result as any)
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to take picture');
+    }
+  }
+
+  const removeSelectedMedia = (): void => {
+    setSelectedMediaAsset(null)
+  }
+ 
   const sendMessage = async (): Promise<void> => {
-    if(!inputText.trim() || sending) return;
+    if((!inputText.trim() && !selectedMediaAsset) || sending) return;
 
     setSending(true)
     try {
-        const messageData = { text: inputText.trim() };
-        await chatApi.sendMessages(selectedUser._id, messageData)
+        const messageData: any = { text: inputText.trim() };
 
-        const newMessage: ChatMessage = {
-            _id: Math.random().toString(),
+        if(selectedMediaAsset) {
+          if(selectedMediaAsset.type.startsWith("image/")) {
+            messageData.imageUri = selectedMediaAsset.uri;
+            messageData.imageType = selectedMediaAsset.type;
+          } else if (selectedMediaAsset.type.startsWith("video/")) {
+            messageData.videoUri = selectedMediaAsset.uri
+            messageData.videoType = selectedMediaAsset.type
+          }
+        }
+
+        const tempId = `temp-${Date.now()}-${Math.random()}`
+
+        const optimisticMessage: ChatMessage = {
+            _id: tempId,
             text: inputText.trim(),
             createdAt: new Date(),
             senderId: currentUser?._id || '',
-            senderName: currentUser?.name || '',
+            senderName: currentUser?.name || 'You',
             senderAvatar: currentUser?.avatar,
+            image: selectedMediaAsset?.type.startsWith("image/") ? selectedMediaAsset.uri : undefined,
+            video: selectedMediaAsset?.type.startsWith("video/") ? selectedMediaAsset.uri : undefined,
             isMe: true
         }
 
-        setMessages(prev => [newMessage, ...prev])
+        setMessages(prev => [optimisticMessage, ...prev])
         setInputText('')
+        setSelectedMediaAsset(null)
+
+        const response = await chatApi.sendMessages(selectedUser._id, messageData)
+
+        setMessages(prev => prev.map(msg => 
+          msg._id === tempId ? {
+            ...msg,
+            _id: response._id,
+            text: response.text || msg.text,
+            image: response.image && response.image.length > 0 ? response.image[0] : undefined,
+            video: response.video && response.video.length > 0 ? response.video[0] : undefined,
+            createdAt: new Date(response.createdAt || Date.now())
+          }
+          : msg
+        ))
     } catch (error) {
         console.error('Error sending message:', error);
-        Alert.alert('Error', 'Failed to send message');
+        setMessages(prev => prev.filter(msg => !msg._id.startsWith('temp-')));
+        Alert.alert('Error', `Failed to send message: ${error || 'Unknown error'}`);
     } finally {
         setSending(false)
     }
   }
 
-  const formatTime = (date: Date): string => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: true 
-    });
-  };
-
-  const renderMessage = ({ item }: {item: ChatMessage }) => {
-    return (
-      <View className={`mb-4 mx-4 ${item.isMe ? 'items-end' : 'items-start'}`}>
-      <View className={`flex-row max-w-[80%] ${item.isMe ? 'flex-row-reverse' : 'flex-row'}`}>
-        {/* Avatar */}
-        {!item.isMe && (
-          <View className='mr-2'>
-            <Image 
-              source={{ uri: item.senderAvatar }}
-              className='size-8 rounded-full'
-            />
-          </View>
-        )}
-        {/* Message Content */}
-        <View className={`rounded-2xl p-3 ${
-          item.isMe
-            ? 'bg-blue-500 rounded-br-md'
-            : 'bg-gray-100 rounded-bl-md'
-        }`}>
-          {/* image */}
-          {item.image && (
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedImage(item.image!)
-                setImageModalVisible(true)
-              }}
-            >
-              <Image 
-                source={{ uri: item.image }}
-                className='size-48 rounded-xl mb-2'
-                resizeMode='cover'
-              />
-            </TouchableOpacity>
-          )}
-          {/* video */}
-          {item.video && (
-            <View className='size-48 rounded-xl mb-2 overflow-hidden'>
-              <Video
-                source={{ uri: item.video }}
-                style={{ width: '100%', height: '100%' }}
-                useNativeControls
-                shouldPlay={false}
-              />
-            </View>
-          )}
-          {/* Text */}
-          {item.text ? (
-            <Text className={`text-base ${item.isMe ? 'text-white' : 'text-gray-800 font-rubik'}`}>
-              {item.text}
-            </Text>
-          ) : null}
-        </View>
-      </View>
-      {/* Timestamp */}
-      <Text className='text-xs text-black-300 mt-1 font-rubik mx-2'>
-        {formatTime(item.createdAt)}
-      </Text>
-    </View>
-    )
+  const handleImagePress = (imageUri: string): void => {
+    setSelectedImage(imageUri)
+    setImageModalVisible(true)
   }
+
+  const handleCloseImageModal = (): void => {
+    setImageModalVisible(false);
+    setSelectedImage(null);
+  };
 
   if (!selectedUser) {
     return (
@@ -268,122 +261,50 @@ const ChatScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="mt-3 text-base text-gray-600">Loading chat...</Text>
-      </View>
+      <LoadingBox text='Loading chat...' />
     );
   }
 
   return (
     <SafeAreaView className='bg-gray-50 flex-1'>
       {/* header section */}
-      <View className='flex-row items-center justify-between p-4 bg-white border-b border-gray-200'>
-        <View className='flex-row items-center flex-1'>
-          <TouchableOpacity 
-            onPress={() => router.back()}
-            className="mr-3"
-          >
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
-          <View className='flex-1 flex-row items-center'>
-              <Image 
-                source={{ uri: selectedUser.avatar }}
-                className='size-10 rounded-full mr-3'
-              />
-              <View>
-                  <Text className='text-lg font-rubik-semibold '>
-                      {selectedUser.name}
-                  </Text>
-                  {onlineUsers.includes(selectedUser._id) && (
-                    <Text className='text-xs font-rubik text-green-500'>Online</Text>
-                  )}
-              </View>
-          </View>
-        </View>
-
-        <View className='flex-row gap-5'>
-          <TouchableOpacity>
-            <Ionicons name='call' size={28} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Ionicons name='videocam' size={28} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <ChatHeader 
+        selectedUser={selectedUser}
+        onlineUsers={onlineUsers}
+        onBack={() => router.back()}
+        onCall={() => console.log('call pressed')}
+        onVideoCall={() => console.log('video call pressed')}
+      />
 
       <View className='flex-1' style={{ marginBottom: keyboardHeight }}>
-        <FlatList 
+        <ChatList 
           ref={flatListRef}
-          data={messages}
-          renderItem={renderMessage as any}
-          keyExtractor={(item) => item._id}
-          inverted
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingTop: 10, flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-          className='flex-1 bg-gray-50'
+          messages={messages}
+          onImagePress={handleImagePress}
         />
-        <View className="flex-row items-center p-4 border-t border-gray-200">
-          <TouchableOpacity
-            onPress={pickFromGallery}
-            className="bg-blue-500 rounded-full p-2 mr-2"
-            disabled={sending}
-          >
-            <Ionicons name="image" size={22} color="white" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={pickFromCamera}
-            className="bg-blue-500 rounded-full p-2 mr-2"
-            disabled={sending}
-          >
-            <Ionicons name="camera" size={22} color="white" />
-          </TouchableOpacity>
-
-          <TextInput
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="Type a message..."
-            className="flex-1 bg-gray-100 rounded-full px-4 py-3 mr-3"
-            multiline
-            maxLength={1000}
-            editable={!sending}
+        {selectedMediaAsset && (
+          <ImagePreview 
+            imageUri={selectedMediaAsset.uri}
+            type={selectedMediaAsset.type}
+            onRemove={removeSelectedMedia}
           />
-
-          <TouchableOpacity
-            onPress={sendMessage}
-            className="bg-blue-500 rounded-full p-3"
-            disabled={!inputText.trim()}
-          >
-            <Ionicons name="send" size={16} color="white" />
-          </TouchableOpacity>
-        </View>
+        )}
+        <MessageInput 
+          inputText={inputText}
+          selectedMediaAsset={selectedMediaAsset}
+          sending={sending}
+          onTextChange={setInputText}
+          onSend={sendMessage}
+          onPickFromGallery={handlePickFromGallery}
+          onPickFromCamera={handlePickFromCamera}
+        />
       </View>
 
-
-      {/* Image Preview Modal */}
-      <Modal
+      <ImageModal
         visible={imageModalVisible}
-        transparent={true}
-        onRequestClose={() => setImageModalVisible(false)}
-      >
-        <View className="flex-1 bg-black/90 justify-center items-center">
-          <TouchableOpacity
-            className="absolute top-12 right-5 w-10 h-10 rounded-full bg-white/30 justify-center items-center z-10"
-            onPress={() => setImageModalVisible(false)}
-          >
-            <Ionicons name="close" size={24} color="white" />
-          </TouchableOpacity>
-          {selectedImage && (
-            <Image
-              source={{ uri: selectedImage }}
-              style={{ width, height: height * 0.8 }}
-              resizeMode="contain"
-            />
-          )}
-        </View>
-      </Modal>
+        imageUri={selectedImage}
+        onClose={handleCloseImageModal}
+      />
     </SafeAreaView>
   )
 }

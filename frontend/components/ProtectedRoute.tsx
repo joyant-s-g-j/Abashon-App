@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, ActivityIndicator } from 'react-native';
+import { LoadingBox } from './ReusableComponent';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -30,9 +31,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#0061ff" />
-      </View>
+      <LoadingBox />
     );
   }
 

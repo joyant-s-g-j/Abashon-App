@@ -76,10 +76,7 @@ const PropertyPage = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="mt-3 text-base text-gray-600">Loading Property...</Text>
-      </SafeAreaView>
+      <LoadingBox text='Loading property...' />
     )
   }
   

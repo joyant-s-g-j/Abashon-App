@@ -1,17 +1,15 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
 
 interface LoadingBoxProps {
-  isLoading: boolean;
-  message?: string;
+  text?: string;
 }
 
-const LoadingBox: React.FC<LoadingBoxProps> = ({ isLoading, message = "Loading..." }) => {
-  if (!isLoading) return null;
-
+const LoadingBox: React.FC<LoadingBoxProps> = ({ text = "Loading..." }) => {
   return (
-    <View className='bg-white rounded-xl p-8 items-center justify-center shadow-sm'>
-      <Text className='text-primary-300 font-rubik-medium'>{message}</Text>
+    <View className="flex-1 justify-center items-center">
+      <ActivityIndicator size="large" color="#3B82F6" />
+      <Text className="mt-3 text-base text-gray-600">{text}</Text>
     </View>
   );
 };

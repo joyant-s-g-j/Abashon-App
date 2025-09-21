@@ -35,6 +35,31 @@ const getAuthToken = async () : Promise<string | null> => {
     }
 }
 
+const convertToBase64 = async (uri: string, type: string): Promise<string> => {
+    try {
+        const response = await fetch(uri)
+        if(!response.ok) {
+            throw new Error(`Faild to fetch file: ${response.status}`)
+        }
+        const blob = await response.blob()
+
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                if(typeof reader.result === 'string') {
+                    resolve(reader.result)
+                } else {
+                    reject(new Error('Failed to convert to base64'))
+                }
+            };
+            reader.onerror = () => reject(new Error('FileReader error'));
+            reader.readAsDataURL(blob)
+        })
+    } catch (error) {
+        throw new Error(`Failed to convert ${type} to base64: ${error}`);
+    }
+}
+
 const apiCall = async <T> (
     url: string,
     options: RequestInit = {}
@@ -68,11 +93,30 @@ export const chatApi = {
     getMessages: (userId: string): Promise<Message[]> => 
         apiCall<Message[]>(`/api/message/${userId}`),
 
-    sendMessages: (receiverId: string, messagesData: MessageData): Promise<Message> =>
-        apiCall<Message>(`/api/message/send/${receiverId}`, {
+    sendMessages: async (receiverId: string, messagesData: MessageData & {
+        imageUri?: string,
+        videoUri?: string,
+        imageType?: string,
+        videoType?: string 
+    }): Promise<Message> => {
+        const finalMessageData: MessageData = {
+            text: messagesData.text
+        }
+
+        if(messagesData.imageUri && messagesData.imageType) {
+            finalMessageData.image = await convertToBase64(messagesData.imageUri, messagesData.imageType)
+        }
+
+        if (messagesData.videoUri && messagesData.videoType) {
+            finalMessageData.video = await convertToBase64(messagesData.videoUri, messagesData.videoType);
+        }
+
+        return apiCall<Message>(`/api/message/send/${receiverId}`, {
             method: 'POST',
-            body: JSON.stringify(messagesData)
+            body: JSON.stringify(finalMessageData)
         })
+    }
+        
 }
 
 export type { User, Message, MessageData, ApiResponse }
