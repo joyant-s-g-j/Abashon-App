@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MediaAsset, pickFromCamera, pickFromGallery } from '@/utils/chatUtils';
 import { LoadingBox } from '@/components/ReusableComponent';
 import { ChatHeader, ChatList, ImageModal, ImagePreview, MessageInput } from '@/components/Messages';
+import { useAudioCall } from '@/contexts/AudioCallContext';
+import ActiveCallScreen from '@/components/AudioCall/ActiveCallScreen';
 
 interface ChatMessage {
     _id: string;
@@ -35,6 +37,17 @@ const ChatScreen: React.FC = () => {
   const flatListRef = useRef<FlatList>(null)
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const { socket, onlineUsers } = useSocket()
+
+  const {
+    callState,
+    initiateCall,
+    acceptCall,
+    rejectCall,
+    endCall,
+    toggleMute,
+    isMuted,
+    callDuration
+  } = useAudioCall()
 
   useEffect(() => {
     if(selectedUser) {
@@ -251,6 +264,27 @@ const ChatScreen: React.FC = () => {
     setSelectedImage(null);
   };
 
+  const handleAudioCall = async (): Promise<void> => {
+    try {
+      await initiateCall(selectedUser._id, selectedUser.name, selectedUser.avatar);
+    } catch (error) {
+      console.error('Error starting audio call:', error);
+      Alert.alert('Error', 'Failed to start audio call. Please check your microphone permissions.');
+    }
+  }
+
+  const handleAcceptCall = (): void => {
+    if(callState.callId) {
+      acceptCall(callState.callId)
+    }
+  }
+
+  const handleRejectCall = (): void => {
+    if(callState.callId) {
+      rejectCall(callState.callId)
+    }
+  }
+
   if (!selectedUser) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -265,6 +299,19 @@ const ChatScreen: React.FC = () => {
     );
   }
 
+  if(callState.isCallActive || callState.isOutgoing) {
+    return (
+      <ActiveCallScreen
+        callerInfo={callState.callerInfo as any}
+        onEndCall={endCall}
+        isOutgoing={callState.isOutgoing}
+        isMuted={isMuted}
+        onToggleMute={toggleMute}
+        callDuration={callDuration}
+      />
+    )
+  }
+
   return (
     <SafeAreaView className='bg-gray-50 flex-1'>
       {/* header section */}
@@ -272,7 +319,7 @@ const ChatScreen: React.FC = () => {
         selectedUser={selectedUser}
         onlineUsers={onlineUsers}
         onBack={() => router.back()}
-        onCall={() => console.log('call pressed')}
+        onCall={handleAudioCall}
         onVideoCall={() => console.log('video call pressed')}
       />
 
