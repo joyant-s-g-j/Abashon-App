@@ -10,6 +10,7 @@ import { LoadingBox } from '@/components/ReusableComponent';
 import { ChatHeader, ChatList, ImageModal, ImagePreview, MessageInput } from '@/components/Messages';
 import { useAudioCall } from '@/contexts/AudioCallContext';
 import ActiveCallScreen from '@/components/AudioCall/ActiveCallScreen';
+import IncomingCallModal from '@/components/AudioCall/IncomingCallModal';
 
 interface ChatMessage {
     _id: string;
@@ -346,6 +347,13 @@ const ChatScreen: React.FC = () => {
           onPickFromCamera={handlePickFromCamera}
         />
       </View>
+
+      <IncomingCallModal 
+        visible={callState.isIncoming}
+        callerInfo={callState.callerInfo as any}
+        onAccept={handleAcceptCall}
+        onReject={handleRejectCall}
+      />
 
       <ImageModal
         visible={imageModalVisible}
