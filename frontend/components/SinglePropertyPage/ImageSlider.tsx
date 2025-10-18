@@ -3,8 +3,7 @@ import icons from '@/constants/icons';
 import { useRouter } from 'expo-router';
 
 import React, { useState } from 'react';
-import { View, Image, Dimensions, Text, TouchableOpacity } from 'react-native';
-import Carousel from 'react-native-reanimated-carousel';
+import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -25,25 +24,32 @@ const ImageSlider: React.FC<Props> = ({ images }) => {
       return { uri: imageUrl };
     }
   }
+  
+  const handleScroll = (event: any) => {
+    const slideSize = event.nativeEvent.layoutMeasurement.width;
+    const index = event.nativeEvent.contentOffset.x / slideSize;
+    setActive(Math.round(index));
+  }
+  
   return (
     <View className="relative h-[250px]">
-      <Carousel
-        loop={safeImages.length > 1}
-        autoPlay={safeImages.length > 1}
-        autoPlayInterval={3000}
-        width={width}
-        height={250}
-        data={images}
-        scrollAnimationDuration={1000}
-        onSnapToItem={(index) => setActive(index)}
-        renderItem={({ item }) => (
+      <ScrollView
+        horizontal
+        pagingEnabled
+        scrollEventThrottle={16}
+        onScroll={handleScroll}
+        showsHorizontalScrollIndicator={false}
+      >
+        {safeImages.map((image, index) => (
           <Image
-            source={renderImage(item)}
-            className="w-full h-full"
+            key={index}
+            source={renderImage(image)}
+            style={{ width, height: 250 }}
             resizeMode="cover"
           />
-        )}
-      />
+        ))}
+      </ScrollView>
+      
       {/* upper content */}
       <View className="absolute top-3 left-3 right-3 flex-row items-center justify-between z-10">
         <TouchableOpacity 
@@ -65,7 +71,7 @@ const ImageSlider: React.FC<Props> = ({ images }) => {
 
       {/* Dots */}
       <View className="absolute bottom-4 left-0 right-0 flex-row justify-center items-center">
-        {images?.map((_, index) => (
+        {safeImages?.map((_, index) => (
           <Text
             key={index}
             className={`text-lg mx-1 ${

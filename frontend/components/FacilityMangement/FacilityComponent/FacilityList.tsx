@@ -1,7 +1,7 @@
-import { Text, View } from "react-native";
+import { EmptyState, LoadingBox, SectionTitle } from "@/components/ReusableComponent";
+import { View } from "react-native";
 import { Facility } from "../types/facility";
 import FacilityCard from "./FacilityCard";
-import { EmptyState, LoadingBox, SectionTitle } from "@/components/ReusableComponent";
 
 interface FacilityListProps {
   facilities: Facility[];
@@ -18,10 +18,12 @@ const FacilityList: React.FC<FacilityListProps> = ({
   onEditFacility,
   onDeleteFacility
 }) => {
+  if (isLoading) {
+    return <LoadingBox text="Loading facilities" />;
+  }
+
   return (
   <> 
-    <LoadingBox isLoading={isLoading} message="Loading facilities" />
-
     <EmptyState
       isEmpty={facilities.length === 0}
       icon="water-outline"

@@ -1,5 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription, mediaDevices } from "react-native-webrtc"
+let RTCPeerConnection: any, RTCIceCandidate: any, RTCSessionDescription: any, mediaDevices: any;
+
+try {
+  const webrtc = require("react-native-webrtc");
+  RTCPeerConnection = webrtc.RTCPeerConnection;
+  RTCIceCandidate = webrtc.RTCIceCandidate;
+  RTCSessionDescription = webrtc.RTCSessionDescription;
+  mediaDevices = webrtc.mediaDevices;
+} catch (error) {
+  console.warn("WebRTC not available - audio calls disabled");
+}
 
 export interface CallState {
     isCallActive: boolean;
@@ -15,7 +25,7 @@ export interface CallState {
 
 export class AudioCallService {
     private peerConnection: RTCPeerConnection | null = null;
-    private localSteam: any = null;
+    private localStream: any = null;
     private remoteStream: any = null;
     private socket: any = null;
     private callId: string | null = null;
@@ -110,7 +120,7 @@ export class AudioCallService {
                 audio: true,
                 video: false
             });
-            this.localSteam = stream;
+            this.localStream = stream;
             console.log('Local stream setup successful');
         } catch (error) {
             console.error('Error getting user media:', error);
@@ -129,20 +139,20 @@ export class AudioCallService {
         this.peerConnection = new RTCPeerConnection(configuration)
 
         // Add local stream to peer connection
-        if(this.localSteam) {
-            this.localSteam.getTracks().forEach((track: any) => {
-                this.peerConnection?.addTrack(track, this.localSteam)
+        if(this.localStream) {
+            this.localStream.getTracks().forEach((track: any) => {
+                this.peerConnection?.addTrack(track, this.localStream)
             })
         }
 
         // Handle remote stream
-        this.peerConnection.addEventListener('addstream', (event: any) => {
+        this.peerConnection?.addEventListener('addstream', (event: any) => {
             console.log('Received remote stream');
             this.remoteStream = event.stream;
         })
 
         // Handle ICE candidates
-        this.peerConnection.addEventListener('icecandidate', (event: any) => {
+        this.peerConnection?.addEventListener('icecandidate', (event: any) => {
             if(event.candidate && this.callId) {
                 console.log('Sending ICE candidate');
                 this.socket?.emit('ice-candidate', {
@@ -153,7 +163,7 @@ export class AudioCallService {
         })
 
         // Handle connection state changes
-        this.peerConnection.addEventListener('connectionstatechange', () => {
+        this.peerConnection?.addEventListener('connectionstatechange', () => {
             console.log('Connection state:', this.peerConnection?.connectionState);
             if(this.peerConnection?.connectionState === 'connected') {
                 this.socket?.emit('call-connected', { callId: this.callId })
@@ -234,10 +244,10 @@ export class AudioCallService {
 
     private cleanup(): void {
         console.log('Cleaning up call resources');
-
-        if(this.localSteam) {
-            this.localSteam.getTracks().forEach((track: any) => track.stop());
-            this.localSteam = null;
+        
+        if(this.localStream) {
+            this.localStream.getTracks().forEach((track: any) => track.stop());
+            this.localStream = null;
         }
 
         if(this.peerConnection) {
@@ -254,8 +264,8 @@ export class AudioCallService {
     }
 
     toggleMute(): boolean {
-        if(this.localSteam) {
-            const audioTrack = this.localSteam.getAudioTracks()[0]
+        if(this.localStream) {
+            const audioTrack = this.localStream.getAudioTracks()[0]
             if(audioTrack) {
                 audioTrack.enabled = !audioTrack.enabled;
                 return !audioTrack.enabled;
@@ -265,7 +275,7 @@ export class AudioCallService {
     }
 
     getLocalStream() {
-        return this.localSteam
+        return this.localStream
     }
 
     getRemoteStream() {

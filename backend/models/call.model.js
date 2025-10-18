@@ -55,7 +55,6 @@ const callSchema = new mongoose.Schema(
 
 callSchema.index({ callerId: 1, createdAt: -1 });
 callSchema.index({ receiverId: 1, createdAt: -1 });
-callSchema.index({ callId: 1 });
 
 callSchema.virtual('actualDuration').get(function() {
     if(this.startedAt && this.endedAt) {

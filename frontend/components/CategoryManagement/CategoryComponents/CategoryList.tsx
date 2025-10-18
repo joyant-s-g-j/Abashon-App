@@ -1,7 +1,7 @@
-import { Text, View } from "react-native";
+import { EmptyState, LoadingBox, SectionTitle } from "@/components/ReusableComponent";
+import { View } from "react-native";
 import { Category } from "../types/category";
 import CategoryCard from "./CategoryCard";
-import { EmptyState, LoadingBox, SectionTitle } from "@/components/ReusableComponent";
 
 interface CategoryListProps {
   categories: Category[];
@@ -18,10 +18,12 @@ const CategoryList: React.FC<CategoryListProps> = ({
   onEditCategory,
   onDeleteCategory
 }) => {
+  if (isLoading) {
+    return <LoadingBox text="Loading Categories" />;
+  }
+
   return (
   <>
-    <LoadingBox isLoading={isLoading} message="Loading Categories" />
-
     <EmptyState
       isEmpty={categories.length === 0}
       icon="folder-open-outline"

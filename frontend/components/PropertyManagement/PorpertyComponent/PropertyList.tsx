@@ -1,7 +1,7 @@
-import { View } from 'react-native'
-import React from 'react'
-import { Property } from '../types/property'
 import { EmptyState, LoadingBox, SectionTitle } from '@/components/ReusableComponent';
+import React from 'react';
+import { View } from 'react-native';
+import { Property } from '../types/property';
 import PropertyCard from './PropertyCard';
 
 interface PropertyListProps {
@@ -19,10 +19,12 @@ const PropertyList: React.FC<PropertyListProps> = ({
     onEditProperty,
     onDeleteProperty
 }) => {
+  if (isLoading) {
+    return <LoadingBox text="Loading properties" />;
+  }
+
   return (
     <>
-        <LoadingBox isLoading={isLoading} message="Loading properties" />
-
         <EmptyState 
             isEmpty={properties.length === 0}
             icon='business-outline'
