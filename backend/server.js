@@ -1,16 +1,16 @@
-import express from "express";
-import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import authRoutes from "./routes/auth.route.js";
-import propertyRoutes from "./routes/property.route.js"
-import categoryRoutes from "./routes/category.route.js"
-import facilityRoutes from "./routes/facility.route.js"
-import paymentRoutes from "./routes/payment.route.js"
-import messageRoutes from "./routes/message.route.js"
-import callRoutes from "./routes/call.route.js"
+import dotenv from "dotenv";
+import express from "express";
 import { connectDB } from "./lib/db.js";
 import { app, getActiveCallsCount, server } from "./lib/socket.js";
+import authRoutes from "./routes/auth.route.js";
+import callRoutes from "./routes/call.route.js";
+import categoryRoutes from "./routes/category.route.js";
+import facilityRoutes from "./routes/facility.route.js";
+import messageRoutes from "./routes/message.route.js";
+import paymentRoutes from "./routes/payment.route.js";
+import propertyRoutes from "./routes/property.route.js";
 
 dotenv.config();
 
@@ -24,12 +24,24 @@ connectDB();
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 
-// CORS setup for React Native (Expo)
-const allowedOrigins = process.env.FRONTEND_URLS.split(',');
-
+// CORS setup for React Native (Expo) and APK
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      // Allow requests from exp://, localhost, and all http/https origins for APK
+      const allowedPatterns = [
+        /^exp:\/\//,
+        /^https:\/\//,
+        /^http:\/\//,
+        /^com\.abashon/  // Custom protocol for deep linking
+      ];
+      
+      if (!origin || allowedPatterns.some(pattern => pattern.test(origin))) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );
