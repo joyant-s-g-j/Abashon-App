@@ -377,3 +377,93 @@ export const updatePhoneNumber = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const googleOAuthCallback = async (req, res) => {
+    try {
+        const { code } = req.query;
+        
+        if (!code) {
+            return res.status(400).json({ message: 'Authorization code is required' });
+        }
+
+        // Exchange code for token using the code handler
+        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                code,
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                redirect_uri: `${process.env.BASE_URL}/api/auth/google/callback`,
+                grant_type: 'authorization_code',
+            }),
+        });
+
+        const tokenData = await tokenResponse.json();
+
+        if (!tokenData.access_token) {
+            return res.redirect(`http://localhost:19006?error=${encodeURIComponent(tokenData.error_description || 'Failed to get access token')}`);
+        }
+
+        // Get user info from Google
+        const userResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+            headers: { Authorization: `Bearer ${tokenData.access_token}` },
+        });
+
+        if (!userResponse.ok) {
+            return res.redirect(`http://localhost:19006?error=Failed%20to%20get%20user%20info`);
+        }
+
+        const googleUser = await userResponse.json();
+        const { id: googleId, email, name, picture, verified_email } = googleUser;
+
+        // Find or create user
+        let user = await User.findOne({
+            $or: [
+                { email: email },
+                { googleId: googleId }
+            ]
+        });
+
+        if (user) {
+            if (!user.googleId) {
+                if (user.authMethod === 'local') {
+                    return res.redirect(`http://localhost:19006?error=${encodeURIComponent('This email is already registered with password')}`);
+                }
+                user.googleId = googleId;
+                user.authMethod = 'google';
+            }
+            user.name = name;
+            if (picture && !picture.includes('googleusercontent.com')) {
+                user.avatar = picture;
+            }
+            user.isEmailVerified = verified_email || true;
+            await user.save();
+        } else {
+            user = new User({
+                googleId,
+                email,
+                name,
+                phone: '',
+                avatar: (picture && !picture.includes('googleusercontent.com')) ? picture : "",
+                authMethod: 'google',
+                isEmailVerified: verified_email || true
+            });
+            await user.save();
+        }
+
+        // Generate JWT token
+        const jwtToken = generateToken(user._id, res, true);
+
+        // Redirect with token and user data in query params
+        const redirectUrl = `com.abashon://auth-callback?token=${encodeURIComponent(jwtToken)}&userId=${user._id}&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}&avatar=${encodeURIComponent(user.avatar || '')}&role=${user.role}`;
+        
+        res.redirect(redirectUrl);
+
+    } catch (error) {
+        console.error('Error in Google OAuth callback:', error);
+        res.redirect(`http://localhost:19006?error=${encodeURIComponent('Authentication failed')}`);
+    }
+};

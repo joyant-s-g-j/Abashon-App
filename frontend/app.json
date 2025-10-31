@@ -41,6 +41,9 @@
             },
             {
               "scheme": "abashon"
+            },
+            {
+              "scheme": "com.abashon"
             }
           ],
           "category": [

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, Alert, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, ScrollView, Alert, Modal, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,11 +12,14 @@ const SignIn = () => {
   const [showWebView, setShowWebView] = useState(false);
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
   const GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID
-  const REDIRECT_URI = process.env.REDIRECT_URI || 'http://localhost:19006'
+  const REDIRECT_URI = 'http://localhost:19006' // Google requires valid HTTP/HTTPS for OAuth
+  
+  // Use a backend proxy URL for Google OAuth redirect
+  const BACKEND_GOOGLE_CALLBACK = `${API_BASE_URL}/api/auth/google/callback`
   
   const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${GOOGLE_CLIENT_ID}&` +
-    `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
+    `redirect_uri=${encodeURIComponent(BACKEND_GOOGLE_CALLBACK)}&` +
     `response_type=code&` +
     `scope=openid%20email%20profile&` +
     `access_type=offline&` +
@@ -26,67 +29,33 @@ const SignIn = () => {
     const { url } = navState;
     
     // Check if we've reached the redirect URI with an authorization code
-    if (url.startsWith(REDIRECT_URI) && url.includes('code=')) {
+    if (url.startsWith(BACKEND_GOOGLE_CALLBACK) && url.includes('code=')) {
+      // The backend will handle the redirect after processing
+      setShowWebView(false);
+    } else if (url.includes('com.abashon://auth-callback')) {
       setShowWebView(false);
       
-      // Extract authorization code
-      const codeMatch = url.match(/code=([^&]+)/);
-      if (codeMatch) {
-        const authCode = decodeURIComponent(codeMatch[1]);
-        await exchangeCodeForToken(authCode);
-      }
-    } else if (url.includes('error=')) {
-      setShowWebView(false);
-      const errorMatch = url.match(/error=([^&]+)/);
-      const error = errorMatch ? decodeURIComponent(errorMatch[1]) : 'Unknown error';
-      Alert.alert('Authentication Error', error);
-      setIsLoading(false);
-    }
-  };
-
-  const exchangeCodeForToken = async (code: string) => {
-    setIsLoading(true);
-    try {
-      await AsyncStorage.multiRemove(['user', 'token']);
-      const response = await fetch(`${API_BASE_URL}/api/auth/google/code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code: code,
-          redirectUri: REDIRECT_URI,
-        }),
-      });
-
-      const data = await response.json()
-
-      if (response.ok && data.success) {
-        // Store user data
-        const token = data.token;
-        if (!token) {
-          console.error('No token found in response body');
-          Alert.alert('Error', 'Authentication failed - no token received');
-          return;
-        }
+      // Extract token and user data from deep link
+      const urlParams = new URLSearchParams(url.split('?')[1]);
+      const token = urlParams.get('token');
+      const userData = {
+        _id: urlParams.get('userId'),
+        name: urlParams.get('name'),
+        email: urlParams.get('email'),
+        phone: '',
+        role: urlParams.get('role') || 'customer',
+        avatar: urlParams.get('avatar') || '',
+        authMethod: 'google'
+      };
+      
+      if (token && userData._id) {
+        await AsyncStorage.multiRemove(['user', 'token']);
         await AsyncStorage.setItem('token', token);
-
-        const userData = {
-          _id: data._id,
-          name: data.name,
-          email: data.email,
-          phone: data.phone || '', // Ensure phone field is included
-          role: data.role || 'customer',
-          avatar: data.avatar || '',
-          authMethod: data.authMethod || 'google',
-          googleId: data.googleId,
-          isEmailVerified: data.isEmailVerified || true
-        };
         await AsyncStorage.setItem('user', JSON.stringify(userData));
 
         Alert.alert(
           'Success!',
-          `Welcome ${data.name}! You have successfully signed in.`,
+          `Welcome ${userData.name}! You have successfully signed in.`,
           [
             {
               text: 'OK',
@@ -97,11 +66,13 @@ const SignIn = () => {
           ]
         );
       } else {
-        Alert.alert('Error', data.message || 'Authentication failed');
+        Alert.alert('Error', 'Authentication failed');
       }
-    } catch (error) {
-      Alert.alert('Error', 'Authentication failed. Please try again.');
-    } finally {
+    } else if (url.includes('error=')) {
+      setShowWebView(false);
+      const errorMatch = url.match(/error=([^&]+)/);
+      const error = errorMatch ? decodeURIComponent(errorMatch[1]) : 'Unknown error';
+      Alert.alert('Authentication Error', error);
       setIsLoading(false);
     }
   };
