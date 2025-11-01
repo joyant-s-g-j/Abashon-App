@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid"
 const app = express()
 const server = http.createServer(app)
 
-const allowedOrigins = process.env.FRONTEND_URLS.split(',');
+const allowedOrigins = process.env.FRONTEND_URLS;
 
 const io = new Server(server, {
     cors: {
