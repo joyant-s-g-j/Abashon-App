@@ -12,11 +12,12 @@ const SignIn = () => {
   const [showWebView, setShowWebView] = useState(false);
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
   const GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID
-  const REDIRECT_URI = 'http://localhost:19006' // Google requires valid HTTP/HTTPS for OAuth
   
-  // Use a backend proxy URL for Google OAuth redirect
+  // For production APK: use the backend callback URL
+  // For Expo Go: can also use the same backend callback since we registered it
   const BACKEND_GOOGLE_CALLBACK = `${API_BASE_URL}/api/auth/google/callback`
   
+  // Build Google OAuth URL with backend callback
   const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${GOOGLE_CLIENT_ID}&` +
     `redirect_uri=${encodeURIComponent(BACKEND_GOOGLE_CALLBACK)}&` +
@@ -28,11 +29,28 @@ const SignIn = () => {
   const handleWebViewNavigation = async (navState: any) => {
     const { url } = navState;
     
-    // Check if we've reached the redirect URI with an authorization code
-    if (url.startsWith(BACKEND_GOOGLE_CALLBACK) && url.includes('code=')) {
-      // The backend will handle the redirect after processing
+    console.log('🔵 WebView Navigation URL:', url);
+    
+    // Check if we've reached the backend callback
+    if (url.includes('/api/auth/google/callback')) {
+      console.log('✅ Google callback detected');
       setShowWebView(false);
+      
+      // Extract authorization code if present
+      if (url.includes('code=')) {
+        const codeMatch = url.match(/code=([^&]+)/);
+        if (codeMatch) {
+          const authCode = decodeURIComponent(codeMatch[1]);
+          console.log('📦 Authorization code extracted');
+        }
+      } else if (url.includes('error=')) {
+        const errorMatch = url.match(/error=([^&]+)/);
+        const error = errorMatch ? decodeURIComponent(errorMatch[1]) : 'Unknown error';
+        console.error('❌ Google auth error:', error);
+        Alert.alert('Authentication Error', error);
+      }
     } else if (url.includes('com.abashon://auth-callback')) {
+      console.log('✅ Deep link callback detected');
       setShowWebView(false);
       
       // Extract token and user data from deep link
@@ -42,36 +60,47 @@ const SignIn = () => {
         _id: urlParams.get('userId'),
         name: urlParams.get('name'),
         email: urlParams.get('email'),
-        phone: '',
+        phone: urlParams.get('phone') || '',
         role: urlParams.get('role') || 'customer',
         avatar: urlParams.get('avatar') || '',
         authMethod: 'google'
       };
       
+      console.log('📦 User data from deep link:', userData._id, userData.email);
+      
       if (token && userData._id) {
-        await AsyncStorage.multiRemove(['user', 'token']);
-        await AsyncStorage.setItem('token', token);
-        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        try {
+          await AsyncStorage.multiRemove(['user', 'token']);
+          await AsyncStorage.setItem('token', token);
+          await AsyncStorage.setItem('user', JSON.stringify(userData));
+          
+          console.log('✅ Authentication successful, redirecting...');
 
-        Alert.alert(
-          'Success!',
-          `Welcome ${userData.name}! You have successfully signed in.`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                router.replace('/(root)/(tabs)');
+          Alert.alert(
+            'Success!',
+            `Welcome ${userData.name}! You have successfully signed in.`,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  router.replace('/(root)/(tabs)');
+                },
               },
-            },
-          ]
-        );
+            ]
+          );
+        } catch (err) {
+          console.error('❌ Error saving auth data:', err);
+          Alert.alert('Error', 'Failed to save authentication data');
+        }
       } else {
-        Alert.alert('Error', 'Authentication failed');
+        console.error('❌ Missing token or user ID');
+        Alert.alert('Error', 'Authentication failed - missing credentials');
       }
     } else if (url.includes('error=')) {
       setShowWebView(false);
       const errorMatch = url.match(/error=([^&]+)/);
       const error = errorMatch ? decodeURIComponent(errorMatch[1]) : 'Unknown error';
+      console.error('❌ Authorization error:', error);
       Alert.alert('Authentication Error', error);
       setIsLoading(false);
     }
@@ -79,12 +108,15 @@ const SignIn = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      console.log('🔵 Google login initiated');
+      console.log('Backend callback URL:', BACKEND_GOOGLE_CALLBACK);
+      
       // Clear any existing data before starting new sign-in
       await AsyncStorage.multiRemove(['user', 'token']);
       setIsLoading(true);
       setShowWebView(true);
     } catch (error) {
-      console.error('Error clearing storage:', error);
+      console.error('❌ Error clearing storage:', error);
       setIsLoading(true);
       setShowWebView(true);
     }

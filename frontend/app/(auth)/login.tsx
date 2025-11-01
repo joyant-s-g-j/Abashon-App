@@ -48,17 +48,26 @@ const login = () => {
 
     setLoading(true)
     try {
+      console.log('🔵 LOGIN: Starting login attempt');
+      console.log('API_BASE_URL:', API_BASE_URL);
+      console.log('Email:', email.trim().toLowerCase());
+      
       const response = await axios.post(
         `${API_BASE_URL}/api/auth/login`,
         {
-          email: email,
+          email: email.trim().toLowerCase(),
           password: password,
         },
         {
-          withCredentials: true,
-          timeout: 10000,
+          timeout: 15000,
+          headers: {
+            'Content-Type': 'application/json',
+          }
         }
       );
+      
+      console.log('✅ LOGIN SUCCESS: Response received', response.status);
+      
       let userData;
       let token;
       if(response.data.success) {
@@ -73,14 +82,23 @@ const login = () => {
 
       if(userData) {
         await AsyncStorage.setItem('user', JSON.stringify(userData));
+        console.log('✅ User data saved');
       }
       if (token) {
         await AsyncStorage.setItem('token', token);
+        console.log('✅ Token saved');
       }
+      
+      Alert.alert('Success', 'Login successful!');
       router.replace("/(root)/(tabs)");
     } catch (error) {
+      console.error('❌ LOGIN ERROR:', error);
       
       if (axios.isAxiosError(error)) {
+        console.error('Axios Error Code:', error.code);
+        console.error('Status:', error.response?.status);
+        console.error('Response Data:', error.response?.data);
+        
         if (error.code === 'ECONNABORTED') {
           Alert.alert('Error', 'Request timeout. Please check your internet connection.');
         } else if (error.response?.data?.message) {
@@ -88,9 +106,14 @@ const login = () => {
         } else if (error.response?.status === 401) {
           Alert.alert('Error', 'Invalid email or password');
         } else if (error.response?.status === 400) {
-          Alert.alert('Error', 'Invalid login credentials');
+          Alert.alert('Error', error.response.data?.message || 'Invalid login credentials');
+        } else if (error.message?.includes('Network')) {
+          Alert.alert(
+            'Network Error', 
+            `Cannot connect to: ${API_BASE_URL}\n\nMake sure:\n1. Internet is connected\n2. Backend is running\n3. API URL is correct`
+          );
         } else {
-          Alert.alert('Error', 'Network error. Please check your connection.');
+          Alert.alert('Error', error.message || 'Network error. Please try again.');
         }
       } else {
         Alert.alert('Error', 'An unexpected error occurred. Please try again.');
