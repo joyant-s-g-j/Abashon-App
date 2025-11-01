@@ -26,8 +26,9 @@
       "package": "com.joyant.abashon",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFFFFF"
       },
+      "icon": "./assets/images/icon.png",
       "edgeToEdgeEnabled": true,
       "intentFilters": [
         {

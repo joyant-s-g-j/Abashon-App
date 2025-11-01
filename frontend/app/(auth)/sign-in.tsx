@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, Alert, Modal, Linking } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { WebView } from 'react-native-webview';
+import icons from '@/constants/icons';
+import images from '@/constants/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import images from '@/constants/images';
-import icons from '@/constants/icons';
+import React, { useState } from 'react';
+import { Alert, Image, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 
 const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,12 +28,9 @@ const SignIn = () => {
 
   const handleWebViewNavigation = async (navState: any) => {
     const { url } = navState;
-    
-    console.log('🔵 WebView Navigation URL:', url);
-    
+        
     // Check if we've reached the backend callback
     if (url.includes('/api/auth/google/callback')) {
-      console.log('✅ Google callback detected');
       setShowWebView(false);
       
       // Extract authorization code if present
@@ -41,7 +38,6 @@ const SignIn = () => {
         const codeMatch = url.match(/code=([^&]+)/);
         if (codeMatch) {
           const authCode = decodeURIComponent(codeMatch[1]);
-          console.log('📦 Authorization code extracted');
         }
       } else if (url.includes('error=')) {
         const errorMatch = url.match(/error=([^&]+)/);
@@ -50,7 +46,6 @@ const SignIn = () => {
         Alert.alert('Authentication Error', error);
       }
     } else if (url.includes('com.abashon://auth-callback')) {
-      console.log('✅ Deep link callback detected');
       setShowWebView(false);
       
       // Extract token and user data from deep link
@@ -64,9 +59,7 @@ const SignIn = () => {
         role: urlParams.get('role') || 'customer',
         avatar: urlParams.get('avatar') || '',
         authMethod: 'google'
-      };
-      
-      console.log('📦 User data from deep link:', userData._id, userData.email);
+      };    
       
       if (token && userData._id) {
         try {
@@ -74,7 +67,6 @@ const SignIn = () => {
           await AsyncStorage.setItem('token', token);
           await AsyncStorage.setItem('user', JSON.stringify(userData));
           
-          console.log('✅ Authentication successful, redirecting...');
 
           Alert.alert(
             'Success!',
@@ -107,10 +99,7 @@ const SignIn = () => {
   };
 
   const handleGoogleLogin = async () => {
-    try {
-      console.log('🔵 Google login initiated');
-      console.log('Backend callback URL:', BACKEND_GOOGLE_CALLBACK);
-      
+    try {      
       // Clear any existing data before starting new sign-in
       await AsyncStorage.multiRemove(['user', 'token']);
       setIsLoading(true);

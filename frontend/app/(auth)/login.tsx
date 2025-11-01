@@ -1,11 +1,11 @@
-import { View, Text, Image, TouchableOpacity, TextInput, Keyboard, Platform, Alert} from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import images from '@/constants/images'
-import { Link, useRouter } from 'expo-router'
-import axios from 'axios';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import axios from 'axios'
+import { Link, useRouter } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { Alert, Image, Keyboard, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const login = () => {
   const [email, setEmail] = useState('');
@@ -48,9 +48,6 @@ const login = () => {
 
     setLoading(true)
     try {
-      console.log('🔵 LOGIN: Starting login attempt');
-      console.log('API_BASE_URL:', API_BASE_URL);
-      console.log('Email:', email.trim().toLowerCase());
       
       const response = await axios.post(
         `${API_BASE_URL}/api/auth/login`,
@@ -66,8 +63,6 @@ const login = () => {
         }
       );
       
-      console.log('✅ LOGIN SUCCESS: Response received', response.status);
-      
       let userData;
       let token;
       if(response.data.success) {
@@ -82,11 +77,9 @@ const login = () => {
 
       if(userData) {
         await AsyncStorage.setItem('user', JSON.stringify(userData));
-        console.log('✅ User data saved');
       }
       if (token) {
         await AsyncStorage.setItem('token', token);
-        console.log('✅ Token saved');
       }
       
       Alert.alert('Success', 'Login successful!');
