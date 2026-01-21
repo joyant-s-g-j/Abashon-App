@@ -138,10 +138,9 @@ export const googleAuthWithAccessToken = async (req, res) => {
       await user.save();
     }
 
-    const token = generateToken(user._id, res);
+    generateToken(user._id, res);
     res.status(200).json({
       success: true,
-      token: token,
       _id: user._id,
       name: user.name,
       email: user.email,
@@ -388,12 +387,21 @@ export const googleOAuthCallback = async (req, res) => {
     const { code } = req.query;
 
     if (!code) {
-      return res
-        .status(400)
-        .json({ message: "Authorization code is required" });
+      return res.status(400).send(`
+                <html>
+                    <head><title>Error</title></head>
+                    <body>
+                        <h1>Authorization Error</h1>
+                        <p>Authorization code is required</p>
+                        <script>
+                            window.location.href = 'com.abashon://auth-callback?error=Authorization%20code%20is%20required';
+                        </script>
+                    </body>
+                </html>
+            `);
     }
 
-    // Exchange code for token using the code handler
+    // Exchange code for token
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: {
@@ -411,9 +419,21 @@ export const googleOAuthCallback = async (req, res) => {
     const tokenData = await tokenResponse.json();
 
     if (!tokenData.access_token) {
-      return res.redirect(
-        `http://localhost:19006?error=${encodeURIComponent(tokenData.error_description || "Failed to get access token")}`,
+      const errorMsg = encodeURIComponent(
+        tokenData.error_description || "Failed to get access token",
       );
+      return res.send(`
+                <html>
+                    <head><title>Error</title></head>
+                    <body>
+                        <h1>Token Error</h1>
+                        <p>${tokenData.error_description || "Failed to get access token"}</p>
+                        <script>
+                            window.location.href = 'com.abashon://auth-callback?error=${errorMsg}';
+                        </script>
+                    </body>
+                </html>
+            `);
     }
 
     // Get user info from Google
@@ -425,9 +445,18 @@ export const googleOAuthCallback = async (req, res) => {
     );
 
     if (!userResponse.ok) {
-      return res.redirect(
-        `http://localhost:19006?error=Failed%20to%20get%20user%20info`,
-      );
+      return res.send(`
+                <html>
+                    <head><title>Error</title></head>
+                    <body>
+                        <h1>User Info Error</h1>
+                        <p>Failed to get user info</p>
+                        <script>
+                            window.location.href = 'com.abashon://auth-callback?error=Failed%20to%20get%20user%20info';
+                        </script>
+                    </body>
+                </html>
+            `);
     }
 
     const googleUser = await userResponse.json();
@@ -441,9 +470,21 @@ export const googleOAuthCallback = async (req, res) => {
     if (user) {
       if (!user.googleId) {
         if (user.authMethod === "local") {
-          return res.redirect(
-            `http://localhost:19006?error=${encodeURIComponent("This email is already registered with password")}`,
+          const errorMsg = encodeURIComponent(
+            "This email is already registered with password",
           );
+          return res.send(`
+                        <html>
+                            <head><title>Error</title></head>
+                            <body>
+                                <h1>Email Already Registered</h1>
+                                <p>This email is already registered with password</p>
+                                <script>
+                                    window.location.href = 'com.abashon://auth-callback?error=${errorMsg}';
+                                </script>
+                            </body>
+                        </html>
+                    `);
         }
         user.googleId = googleId;
         user.authMethod = "google";
@@ -471,14 +512,53 @@ export const googleOAuthCallback = async (req, res) => {
     // Generate JWT token
     const jwtToken = generateToken(user._id, res, true);
 
-    // Redirect with token and user data in query params
+    // Return HTML page that redirects to deep link
     const redirectUrl = `com.abashon://auth-callback?token=${encodeURIComponent(jwtToken)}&userId=${user._id}&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}&avatar=${encodeURIComponent(user.avatar || "")}&role=${user.role}`;
 
-    res.redirect(redirectUrl);
+    return res.send(`
+            <html>
+                <head>
+                    <title>Authentication Successful</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+                        .container { background: white; padding: 40px; border-radius: 10px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+                        h1 { color: #333; margin: 0 0 10px 0; }
+                        p { color: #666; margin: 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>✓ Signed In Successfully</h1>
+                        <p>Redirecting to Abashon...</p>
+                    </div>
+                    <script>
+                        // Redirect to deep link
+                        window.location.href = '${redirectUrl}';
+                        
+                        // Fallback for WebView
+                        setTimeout(() => {
+                            if (typeof AndroidBridge !== 'undefined') {
+                                AndroidBridge.handleDeepLink('${redirectUrl}');
+                            }
+                        }, 500);
+                    </script>
+                </body>
+            </html>
+        `);
   } catch (error) {
     console.error("Error in Google OAuth callback:", error);
-    res.redirect(
-      `http://localhost:19006?error=${encodeURIComponent("Authentication failed")}`,
-    );
+    const errorMsg = encodeURIComponent("Authentication failed");
+    return res.send(`
+            <html>
+                <head><title>Error</title></head>
+                <body>
+                    <h1>Authentication Error</h1>
+                    <p>${error.message}</p>
+                    <script>
+                        window.location.href = 'com.abashon://auth-callback?error=${errorMsg}';
+                    </script>
+                </body>
+            </html>
+        `);
   }
 };
