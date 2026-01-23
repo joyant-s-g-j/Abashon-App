@@ -1,5 +1,5 @@
-import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
 import { Alert } from 'react-native';
 
 export const useImagePicker = () => {
@@ -23,7 +23,7 @@ export const useImagePicker = () => {
         const imageUri = result.assets[0].uri;
         try {
           const base64 = await FileSystem.readAsStringAsync(imageUri, {
-            encoding: FileSystem.EncodingType.Base64,
+            encoding: 'base64',
           });
 
           return `data:image/jpeg;base64,${base64}`;

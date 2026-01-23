@@ -2,7 +2,6 @@ import { View, Text, Image, TouchableOpacity, Linking } from 'react-native';
 import React from 'react';
 import icons from '@/constants/icons';
 import IconText from './IconText';
-import images from '@/constants/images';
 import Heading from './Heading';
 import { Property } from '../PropertyManagement';
 import { router } from 'expo-router';

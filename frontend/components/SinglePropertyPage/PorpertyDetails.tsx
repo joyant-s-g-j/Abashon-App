@@ -33,18 +33,6 @@ const PorpertyDetails: React.FC<PropertDetailsProps> = ({ property }) => {
 
   const facilities = getFacilities();
 
-  const handleImagePress = (index: number) => {
-    // Handle individual image press
-    console.log('Image pressed:', index);
-    // You can navigate to full screen image viewer
-  };
-
-  const handleViewAllPress = () => {
-    // Handle view all images press
-    console.log('View all images pressed');
-    // Navigate to full gallery view
-  };
-
   return (
     <View className='mt-4'>
       {/* facilities */}

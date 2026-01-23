@@ -4,7 +4,7 @@ import images from '@/constants/images'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ImagePicker from 'expo-image-picker'
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 

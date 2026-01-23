@@ -1,5 +1,4 @@
 import * as ImageManipulator from 'expo-image-manipulator'
-import * as VideoThumbnails from 'expo-video-thumbnails';
 import * as ImagePicker from "expo-image-picker"
 import { Alert } from 'react-native';
 import { Message } from '@/services/chatApi';

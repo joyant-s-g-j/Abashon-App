@@ -6,17 +6,16 @@ import Header from '@/components/ReusableComponent/Header'
 import SearchInput from '@/components/SearchInput'
 import icons from '@/constants/icons'
 import { useLocalSearchParams } from 'expo-router'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { FlatList, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-const explore = () => {
+const Explore = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const params = useLocalSearchParams<{filter?: string}>()
   const selectedFilter = params.filter || "All"
   const {
     properties,
-    isLoading,
   } = useProperties()
   const filteredProperties = useMemo(() => {
     let filtered = filterProperties(properties, searchQuery)
@@ -77,4 +76,4 @@ const explore = () => {
   )
 }
 
-export default explore
+export default Explore

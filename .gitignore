@@ -43,6 +43,8 @@ lerna-debug.log*
 # ─────────────── Environment Variables ───────────────
 .env
 .env*.local
+.env.production
+.env.local
 
 # ─────────────── IDE / Editor ───────────────
 .vscode/

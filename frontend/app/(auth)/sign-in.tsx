@@ -1,10 +1,15 @@
+import { CONFIG } from "@/constants/config";
 import icons from "@/constants/icons";
 import images from "@/constants/images";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Google from "expo-auth-session/providers/google";
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  isSuccessResponse,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -15,112 +20,126 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// This is needed to properly close the browser on web
-WebBrowser.maybeCompleteAuthSession();
-
 const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
-  const GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
+  const API_BASE_URL = CONFIG.API_BASE_URL;
+  const GOOGLE_WEB_CLIENT_ID = CONFIG.GOOGLE_WEB_CLIENT_ID;
 
-  // Configure Google Auth with expo-auth-session
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: GOOGLE_CLIENT_ID,
-    scopes: ["openid", "profile", "email"],
-  });
-
-  // Handle Google auth response
+  // Configure Google Sign-In on mount
   useEffect(() => {
-    handleGoogleResponse();
-  }, [response]);
-
-  const handleGoogleResponse = async () => {
-    if (response?.type === "success") {
-      const { authentication } = response;
-
-      if (authentication?.accessToken) {
-        try {
-          // Send access token to backend
-          const backendResponse = await fetch(
-            `${API_BASE_URL}/api/auth/google/access-token`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                accessToken: authentication.accessToken,
-              }),
-            },
-          );
-
-          const data = await backendResponse.json();
-
-          if (backendResponse.ok) {
-            // Save user data and token
-            await AsyncStorage.multiRemove(["user", "token"]);
-
-            // Extract token from cookies or response
-            const userData = {
-              _id: data._id,
-              name: data.name,
-              email: data.email,
-              phone: data.phone || "",
-              role: data.role || "customer",
-              avatar: data.avatar || "",
-              authMethod: "google",
-            };
-
-            await AsyncStorage.setItem("user", JSON.stringify(userData));
-
-            // If backend returns a token in the response body
-            if (data.token) {
-              await AsyncStorage.setItem("token", data.token);
-            }
-
-            Alert.alert(
-              "Success!",
-              `Welcome ${userData.name}! You have successfully signed in.`,
-              [
-                {
-                  text: "OK",
-                  onPress: () => {
-                    router.replace("/(root)/(tabs)");
-                  },
-                },
-              ],
-            );
-          } else {
-            Alert.alert("Error", data.message || "Authentication failed");
-          }
-        } catch (error) {
-          console.error("❌ Backend auth error:", error);
-          Alert.alert("Error", "Failed to authenticate with server");
-        }
-      }
-      setIsLoading(false);
-    } else if (response?.type === "error") {
-      console.error("❌ Google auth error:", response.error);
-      Alert.alert(
-        "Authentication Error",
-        response.error?.message || "Google sign-in failed",
-      );
-      setIsLoading(false);
-    } else if (response?.type === "cancel") {
-      setIsLoading(false);
-    }
-  };
+    GoogleSignin.configure({
+      webClientId: GOOGLE_WEB_CLIENT_ID,
+      offlineAccess: true,
+      scopes: ["profile", "email"],
+    });
+  }, []);
 
   const handleGoogleLogin = async () => {
     try {
-      // Clear any existing data before starting new sign-in
       await AsyncStorage.multiRemove(["user", "token"]);
       setIsLoading(true);
-      await promptAsync();
+
+      // Check if Google Play Services are available
+      await GoogleSignin.hasPlayServices();
+
+      // Sign in using native Google Sign-In
+      const response = await GoogleSignin.signIn();
+
+      if (isSuccessResponse(response)) {
+        // Get tokens
+        const tokens = await GoogleSignin.getTokens();
+        const accessToken = tokens.accessToken;
+
+        // ...existing code...
+
+        if (accessToken) {
+          await authenticateWithBackend(accessToken);
+        } else {
+          setIsLoading(false);
+          Alert.alert("Error", "Could not get access token");
+        }
+      } else {
+        setIsLoading(false);
+      }
     } catch (error) {
-      console.error("❌ Error starting Google sign-in:", error);
-      Alert.alert("Error", "Failed to start Google sign-in");
       setIsLoading(false);
+      console.error("❌ Google Sign-In error:", error);
+
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.SIGN_IN_CANCELLED:
+            break;
+          case statusCodes.IN_PROGRESS:
+            Alert.alert("Error", "Sign-in already in progress");
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            Alert.alert("Error", "Google Play Services not available");
+            break;
+          default:
+            Alert.alert(
+              "Error",
+              `Failed to sign in with Google: ${error.code}`,
+            );
+        }
+      } else {
+        Alert.alert("Error", "Failed to sign in with Google");
+      }
+    }
+  };
+
+  const authenticateWithBackend = async (token: string) => {
+    try {
+      const endpoint = `${API_BASE_URL}/api/auth/google/access-token`;
+
+      const body = { accessToken: token };
+
+      const backendResponse = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await backendResponse.json();
+
+      if (!backendResponse.ok) {
+        setIsLoading(false);
+        Alert.alert("Error", data.message || "Authentication failed");
+        return;
+      }
+
+      const userData = {
+        _id: data._id,
+        name: data.name,
+        email: data.email,
+        phone: data.phone || "",
+        role: data.role || "customer",
+        avatar: data.avatar || "",
+        authMethod: "google",
+      };
+
+      await AsyncStorage.setItem("user", JSON.stringify(userData));
+
+      if (data.token) {
+        await AsyncStorage.setItem("token", data.token);
+      }
+
+      setIsLoading(false);
+      Alert.alert(
+        "Success!",
+        `Welcome ${userData.name}! You have successfully signed in.`,
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              router.replace("/(root)/(tabs)");
+            },
+          },
+        ],
+      );
+    } catch (error) {
+      console.error("❌ Backend auth error:", error);
+      setIsLoading(false);
+      Alert.alert("Error", "Failed to authenticate with server");
     }
   };
 
@@ -152,9 +171,9 @@ const SignIn = () => {
 
           <TouchableOpacity
             onPress={handleGoogleLogin}
-            disabled={isLoading || !request}
+            disabled={isLoading}
             className={`bg-white shadow-md shadow-zinc-400 rounded-full w-full py-4 mt-5 ${
-              isLoading || !request ? "opacity-50" : ""
+              isLoading ? "opacity-50" : ""
             }`}
           >
             <View className="flex flex-row items-center justify-center gap-2">

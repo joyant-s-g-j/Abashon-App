@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Header, LoadingBox } from '@/components/ReusableComponent'
 import icons from '@/constants/icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { chatApi, User } from '@/services/chatApi'
 import { useSocket } from '@/contexts/SocketContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { ActivityIndicator, Alert, FlatList, Image, ListRenderItem, RefreshControl, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, FlatList, Image, ListRenderItem, RefreshControl, Text, TouchableOpacity, View } from 'react-native'
 import { router } from 'expo-router'
 
 interface UserWithLastMessage extends User {

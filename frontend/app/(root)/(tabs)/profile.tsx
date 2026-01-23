@@ -4,7 +4,7 @@ import icons from '@/constants/icons'
 import images from '@/constants/images'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Image, ImageSourcePropType, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -39,7 +39,7 @@ const SettingsItem = ({icon, title, onPress, textStyle, showArrow = true, route 
   )
 }
 
-const profile = () => {
+const Profile = () => {
   const router = useRouter()
   const [user, setUser] = useState<null | {
     name: string;
@@ -126,4 +126,4 @@ const profile = () => {
   )
 }
 
-export default profile
+export default Profile

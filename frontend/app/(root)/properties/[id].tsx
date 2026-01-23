@@ -1,5 +1,5 @@
-import { View, ScrollView, Alert, ActivityIndicator, Text } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, ScrollView, Alert } from 'react-native'
+import { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ImageSlider from '@/components/SinglePropertyPage/ImageSlider'
 import PropertInfo from '@/components/SinglePropertyPage/PropertInfo'

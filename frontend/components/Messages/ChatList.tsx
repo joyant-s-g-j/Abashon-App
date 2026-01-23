@@ -1,5 +1,5 @@
-import { FlatList } from 'react-native'
-import React, { forwardRef } from 'react'
+import { forwardRef } from 'react';
+import { FlatList } from 'react-native';
 import MessageItem from './MessageItem';
 
 interface ChatMessage {
@@ -39,4 +39,7 @@ const ChatList = forwardRef<FlatList, ChatListProps> (
         )
     }
 )
+
+ChatList.displayName = 'ChatList';
+
 export default ChatList

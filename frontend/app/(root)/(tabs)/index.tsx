@@ -3,7 +3,6 @@ import Filters from "@/components/Filters";
 import { filterProperties, useProperties } from "@/components/PropertyManagement";
 import { EmptyState } from "@/components/ReusableComponent";
 import SearchInput from "@/components/SearchInput";
-import icons from "@/constants/icons";
 import images from "@/constants/images";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";

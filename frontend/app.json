@@ -2,6 +2,7 @@
   "expo": {
     "name": "ABASHON",
     "slug": "abashon",
+    "owner": "joyant_s_g_j",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -38,6 +39,11 @@
             {
               "scheme": "https",
               "host": "auth.expo.dev",
+              "pathPrefix": "/@joyant_s_g_j/abashon"
+            },
+            {
+              "scheme": "https",
+              "host": "auth.expo.io",
               "pathPrefix": "/@joyant_s_g_j/abashon"
             },
             {
@@ -82,7 +88,9 @@
             "./assets/fonts/Rubik-SemiBold.ttf"
           ]
         }
-      ]
+      ],
+      "expo-web-browser",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true

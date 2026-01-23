@@ -1,15 +1,12 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { User } from '@/services/chatApi';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 interface ChatHeaderProps {
   selectedUser: User;
   onlineUsers: string[];
   onBack: () => void;
-  onCall?: () => void;
-  onVideoCall?: () => void;
 }
 
 const getAvatarInitials = (name: string) => {
@@ -23,8 +20,6 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   selectedUser,
   onlineUsers,
   onBack,
-  onCall,
-  onVideoCall,
 }) => {
   const avatarInitial = getAvatarInitials(selectedUser.name)
   return (
@@ -57,15 +52,6 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                   )}
               </View>
           </View>
-        </View>
-
-        <View className='flex-row gap-5'>
-          <TouchableOpacity onPress={onCall}>
-            <Ionicons name='call' size={28} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onVideoCall}>
-            <Ionicons name='videocam' size={28} />
-          </TouchableOpacity>
         </View>
       </View>
   )

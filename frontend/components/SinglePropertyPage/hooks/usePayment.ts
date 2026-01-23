@@ -1,7 +1,6 @@
 import { PaymentService } from "@/utils/PaymentService"
 import { useState, useCallback } from "react"
 import { Alert } from "react-native"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export const usePayment = () => {
     const [loading, setLoading] = useState(false)
