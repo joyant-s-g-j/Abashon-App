@@ -108,4 +108,4 @@ abashon-app/
 
 ---
 
-Made with ❤️ by **[Joyant Sheikhar Gupta Joy](https://joyant.me)** | Real Estate Mobile Application 🏠
+Made with ❤️ by **[Joyant Sheikhar Gupta Joy](https://joyantsgj.dev/)** | Real Estate Mobile Application 🏠
