@@ -89,16 +89,6 @@ abashon-app/
 └── README.md                     # Project documentation
 ```
 
-##  App Screenshots
-
-| Home | Explore | Property Details |
-|------|---------|------------------|
-| Browse featured properties | Search & filter listings | View full property info |
-
-| Messages | Profile | Admin Dashboard |
-|----------|---------|-----------------|
-| Real-time chat | User settings | Manage properties |
-
 ## 🔐 User Roles
 
 | Role | Permissions |
